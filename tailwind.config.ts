@@ -6,8 +6,10 @@ const config: Config = {
     "./pages/**/*.{js,ts,jsx,tsx,mdx}",
     "./components/**/*.{js,ts,jsx,tsx,mdx}",
     "./app/**/*.{js,ts,jsx,tsx,mdx}",
+    "./src/**/*.{js,ts,jsx,tsx,mdx}",
     "./node_modules/@nextui-org/theme/dist/**/*.{js,ts,jsx,tsx}",
   ],
+  prefix: "",
   theme: {
     screens: {
       "3xs": "320px",
@@ -96,6 +98,7 @@ const config: Config = {
     },
   },
   darkMode: ["class"],
-  plugins: [nextui()],
+  plugins: [require("tailwindcss-animate"), nextui()],
 } satisfies Config;
+
 export default config;

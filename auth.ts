@@ -1,14 +1,15 @@
-import prisma from "@/prisma/client";
 import { PrismaAdapter } from "@auth/prisma-adapter";
+import { compare } from "bcryptjs";
 import NextAuth from "next-auth";
 import { Provider } from "next-auth/providers";
 import Credentials from "next-auth/providers/credentials";
 import Github from "next-auth/providers/github";
-import Google, { GoogleProfile } from "next-auth/providers/google";
-import { compare, hash } from "bcryptjs";
-import { ReactNode } from "react";
-import { FaGoogle, FaGithub } from "react-icons/fa";
+import Google from "next-auth/providers/google";
 import { IconType } from "react-icons";
+import { FaGithub, FaGoogle } from "react-icons/fa";
+import prisma from "./prisma/client";
+import slugify from "slugify";
+import { nanoid } from "nanoid";
 
 if (!process.env.NEXT_PUBLIC_AUTH_GOOGLE_ID) {
   throw new Error("NEXT_PUBLIC_AUTH_GOOGLE_ID is not set");
@@ -38,15 +39,6 @@ const providers: Provider[] = [
   Google({
     clientId: process.env.NEXT_PUBLIC_AUTH_GOOGLE_ID,
     clientSecret: process.env.NEXT_PUBLIC_AUTH_GOOGLE_SECRET,
-    profile: (profile: GoogleProfile) => {
-      console.log(profile.email_verified);
-      return {
-        name: profile.name as string,
-        email: profile.email as string,
-        image: profile.picture as string,
-        isVerified: profile.email_verified,
-      };
-    },
   }),
   Github({
     clientId: process.env.NEXT_PUBLIC_AUTH_GITHUB_ID,
@@ -75,4 +67,14 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   pages: { signIn: "/auth", newUser: "/auth" },
   providers,
   session: { strategy: "jwt" },
+  // debug: process.env.NODE_ENV === "development",
+  events: {
+    async createUser({ user }) {
+      if (!user.email) return;
+      // Create a slug for the user
+      let slug = slugify(user.name ?? "", { lower: true, strict: true, trim: true });
+      while (await prisma.user.findFirst({ where: { slug } })) slug = `${slug}-${nanoid(6)}`;
+      await prisma.user.update({ where: { email: user.email }, data: { slug } });
+    },
+  },
 });

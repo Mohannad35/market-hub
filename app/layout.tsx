@@ -2,9 +2,9 @@ import { inter, satisfy } from "@/components/fonts";
 import NavBar from "@/components/nav-bar/NavBar";
 import "@radix-ui/themes/styles.css";
 import type { Metadata } from "next";
+import { ThemeProvider } from "next-themes";
 import "./globals.css";
 import { Providers } from "./providers";
-import { ThemeProvider } from "next-themes";
 
 export const metadata: Metadata = {
   title: "MarketHub",
