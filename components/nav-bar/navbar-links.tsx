@@ -19,13 +19,13 @@ const NavBarLinks = () => {
         <NavbarItem key={i} isActive={currentPath === link.href} className='hidden md:flex'>
           <Link
             href={link.href}
-            className={cn(
-              {
-                'text-foreground': currentPath === link.href,
-                'text-muted-foreground hover:text-foreground': currentPath !== link.href,
-              },
-              'transition-colors duration-200 ease-in-out text-lg'
-            )}
+            // className={cn(
+            //   {
+            //     'text-foreground': currentPath === link.href,
+            //     'text-muted-foreground hover:text-foreground': currentPath !== link.href,
+            //   },
+            //   'transition-colors duration-200 ease-in-out text-lg'
+            // )}
           >
             {link.name}
           </Link>

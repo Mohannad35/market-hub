@@ -10,14 +10,13 @@ import {
 import { Button, Input, Textarea } from "@nextui-org/react";
 import { Flex, Text } from "@radix-ui/themes";
 import { useMutation } from "@tanstack/react-query";
-import Image from "next/image";
-import { useCallback, useEffect, useState } from "react";
+import { getCldImageUrl } from "next-cloudinary";
+import { useRouter } from "next/navigation";
+import { useCallback, useState } from "react";
+import { useBeforeUnload, useUnmount } from "react-use";
+import { toast } from "sonner";
 import { ZodSchema } from "zod";
 import Uoload from "./Upload";
-import { getCldImageUrl } from "next-cloudinary";
-import { toast } from "sonner";
-import { useRouter } from "next/navigation";
-import { useBeforeUnload, useUnmount } from "react-use";
 
 const NewProductForm = () => {
   const router = useRouter();
@@ -29,7 +28,6 @@ const NewProductForm = () => {
         res.json()
       ),
   });
-
   const beforeUnmount = useCallback(() => {
     if (publicId.length > 0) {
       setPublicId(publicId => {
@@ -65,6 +63,7 @@ const NewProductForm = () => {
       error: err => err || "An unexpected error occurred",
     });
   };
+
   return (
     <form className="flex flex-col gap-4" action={handleSubmitSignUp}>
       <Flex direction="column" gap="4" align="start">

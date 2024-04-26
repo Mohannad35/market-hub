@@ -28,7 +28,7 @@ export default function RootLayout({
         >
           <Providers>
             <NavBar />
-            <main className="container font-inter">{children}</main>
+            <main className="font-inter">{children}</main>
           </Providers>
         </ThemeProvider>
       </body>

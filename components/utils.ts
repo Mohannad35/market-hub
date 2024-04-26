@@ -1,3 +1,5 @@
+import { update } from "lodash";
+import { ReadonlyURLSearchParams } from "next/navigation";
 import { ZodError } from "zod";
 
 export function getFormDataObject(formData: FormData): { [key: string]: FormDataEntryValue } {
@@ -18,4 +20,16 @@ export function formatErrors(error: ZodError) {
             .map(e => e?.join(", "))
             .join(". "),
   };
+}
+
+export function getQueryObject(searchParams: URLSearchParams | ReadonlyURLSearchParams) {
+  const queryArr: { [key: string]: string | string[] } = {};
+  searchParams.forEach((value, key) =>
+    update(queryArr, key, v => {
+      if (!v) return value;
+      else if (typeof v === "string") return [v, value];
+      else if (Array.isArray(v)) return [...v, value];
+    })
+  );
+  return queryArr;
 }
