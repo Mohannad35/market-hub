@@ -1,10 +1,10 @@
-import { inter, satisfy } from "@/components/fonts";
 import NavBar from "@/components/nav-bar/NavBar";
+import { Providers } from "@/components/root-layout/Providers";
+import { inter, satisfy } from "@/lib/fonts";
 import "@radix-ui/themes/styles.css";
 import type { Metadata } from "next";
 import { ThemeProvider } from "next-themes";
 import "./globals.css";
-import { Providers } from "./providers";
 
 export const metadata: Metadata = {
   title: "MarketHub",

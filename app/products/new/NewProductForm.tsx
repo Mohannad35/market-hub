@@ -1,33 +1,34 @@
 "use client";
 
-import { formatErrors, getFormDataObject } from "@/components/utils";
+import { useAddProduct } from "@/hook/use-mutation-hooks";
+import { useBrands, useCategories } from "@/hook/use-query-hooks";
+import { getFormDataObject, validateSchema } from "@/lib/utils";
 import {
-  descriptionSchema,
-  nameSchema,
-  priceSchema,
-  quantitySchema,
-} from "@/components/validationSchemas";
-import { Button, Input, Textarea } from "@nextui-org/react";
+  idSchema,
+  integerSchema,
+  numberSchema,
+  stringMinMaxSchema,
+} from "@/lib/validation-schemas";
+import { Autocomplete, AutocompleteItem } from "@nextui-org/autocomplete";
+import { Button } from "@nextui-org/button";
+import { Input, Textarea } from "@nextui-org/input";
 import { Flex, Text } from "@radix-ui/themes";
-import { useMutation } from "@tanstack/react-query";
 import { getCldImageUrl } from "next-cloudinary";
 import { useRouter } from "next/navigation";
 import { useCallback, useState } from "react";
 import { useBeforeUnload, useUnmount } from "react-use";
 import { toast } from "sonner";
-import { ZodSchema } from "zod";
 import Uoload from "./Upload";
 
 const NewProductForm = () => {
   const router = useRouter();
   const [publicId, setPublicId] = useState<string[]>([]);
-  const signupMutation = useMutation({
-    mutationKey: ["newProduct"],
-    mutationFn: (data: { [key: string]: FormDataEntryValue | string[] }) =>
-      fetch("/api/products", { method: "POST", body: JSON.stringify(data) }).then(res =>
-        res.json()
-      ),
-  });
+  const [brandId, setBrandId] = useState<null | string>(null);
+  const [categoryId, setCategoryId] = useState<null | string>(null);
+  const addProductMutation = useAddProduct();
+  const brandQuery = useBrands();
+  const categoriesQuery = useCategories();
+
   const beforeUnmount = useCallback(() => {
     if (publicId.length > 0) {
       setPublicId(publicId => {
@@ -40,23 +41,25 @@ const NewProductForm = () => {
   useUnmount(beforeUnmount);
   useBeforeUnload(beforeUnmount, "You have unsaved changes, are you sure?");
 
-  const validate = (value: string | number, schema: ZodSchema): string | true => {
-    const valid = schema.safeParse(value);
-    return valid.success ? true : formatErrors(valid.error).messege;
-  };
-
   const handleSubmitSignUp = async (formData: FormData) => {
     if (publicId.length < 1) return toast.error("A product needs at least one image");
+    if (!brandId || !categoryId) return toast.error("Brand and Category are required");
     const data = getFormDataObject(formData);
     const ids = publicId.map(id => getCldImageUrl({ src: id }));
     const promise = new Promise<{ name: string }>(async (resolve, reject) => {
-      const res = await signupMutation.mutateAsync({ ...data, image: ids });
+      const res = await addProductMutation.mutateAsync({
+        ...data,
+        image: ids,
+        brandId,
+        categoryId,
+      });
       if (res.error) reject(res.error);
       resolve(res);
     });
     toast.promise(promise, {
       loading: "Adding product...",
       success: data => {
+        setPublicId([]);
         setTimeout(() => router.push("/products"), 2000);
         return `${data.name} has been added`;
       },
@@ -74,7 +77,7 @@ const NewProductForm = () => {
           name="name"
           label="Name"
           type="text"
-          validate={value => validate(value, nameSchema)}
+          validate={value => validateSchema(value, stringMinMaxSchema("Name", 2, 100))}
           errorMessage={valid => valid.validationErrors}
         />
         <Textarea
@@ -83,7 +86,7 @@ const NewProductForm = () => {
           name="description"
           label="Description"
           type="text"
-          validate={value => validate(value, descriptionSchema)}
+          validate={value => validateSchema(value, stringMinMaxSchema("Name", 2, 10_000))}
           errorMessage={valid => valid.validationErrors}
         />
         <Flex width="100%" gap="5" direction={{ initial: "column", xs: "row" }} justify="between">
@@ -93,7 +96,7 @@ const NewProductForm = () => {
             name="price"
             label="Price"
             type="number"
-            validate={value => validate(parseFloat(value), priceSchema)}
+            validate={value => validateSchema(value, numberSchema("Price"))}
             errorMessage={valid => valid.validationErrors}
           />
           <Input
@@ -102,12 +105,42 @@ const NewProductForm = () => {
             name="quantity"
             label="Quantity"
             type="number"
-            validate={value => validate(parseFloat(value), quantitySchema)}
+            validate={value => validateSchema(value, integerSchema("Quantity"))}
             errorMessage={valid => valid.validationErrors}
           />
         </Flex>
         {/* Add category and brand fields here */}
-        <Button type="submit" color="primary" isLoading={signupMutation.isPending}>
+        <Flex width="100%" gap="5" direction={{ initial: "column", xs: "row" }} justify="between">
+          {categoriesQuery.isSuccess && (
+            <Autocomplete
+              isRequired
+              defaultItems={categoriesQuery.data}
+              label="Category"
+              variant="underlined"
+              selectedKey={categoryId}
+              onSelectionChange={key => setCategoryId(key as string)}
+              validate={() => validateSchema(categoryId, idSchema("Category"))}
+              errorMessage={valid => valid.validationErrors}
+            >
+              {category => <AutocompleteItem key={category.id}>{category.name}</AutocompleteItem>}
+            </Autocomplete>
+          )}
+          {brandQuery.isSuccess && (
+            <Autocomplete
+              isRequired
+              defaultItems={brandQuery.data}
+              label="Brand"
+              variant="underlined"
+              selectedKey={brandId}
+              onSelectionChange={key => setBrandId(key as string)}
+              validate={() => validateSchema(brandId, idSchema("Brand"))}
+              errorMessage={valid => valid.validationErrors}
+            >
+              {brand => <AutocompleteItem key={brand.id}>{brand.name}</AutocompleteItem>}
+            </Autocomplete>
+          )}
+        </Flex>
+        <Button type="submit" color="primary" isLoading={addProductMutation.isPending}>
           <Text size="3" weight="medium">
             Add Product
           </Text>

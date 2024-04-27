@@ -1,10 +1,12 @@
 "use client";
 
-import { Button, Card, CardBody, CardFooter, CardProps, Image } from "@nextui-org/react";
+import { Button } from "@nextui-org/button";
+import { Card, CardBody, CardFooter, CardProps } from "@nextui-org/card";
+import { Image } from "@nextui-org/image";
 import { Product } from "@prisma/client";
-import { useRouter } from "next/navigation";
-import NextImage from "next/image";
 import { Flex, Text } from "@radix-ui/themes";
+import NextImage from "next/image";
+import { useRouter } from "next/navigation";
 
 export interface ProductCardProps extends CardProps {
   product: Product;
@@ -30,6 +32,7 @@ const ProductCard = ({ onPress, product, ...props }: ProductCardProps) => {
           radius="none"
           width={300}
           height={300}
+          className="max-h-[12rem]"
           as={NextImage}
           alt={product.name || "Product Image"}
           src={product.image[0] || process.env.IMAGE_PLACEHOLDER}

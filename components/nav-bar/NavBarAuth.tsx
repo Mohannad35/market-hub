@@ -1,17 +1,11 @@
 "use client";
 
-import {
-  Avatar,
-  Button,
-  Dropdown,
-  DropdownItem,
-  DropdownMenu,
-  DropdownTrigger,
-  Skeleton,
-  User,
-} from "@nextui-org/react";
-import { signIn, signOut, useSession } from "next-auth/react";
+import { Avatar } from "@nextui-org/avatar";
+import { Button } from "@nextui-org/button";
+import { Dropdown, DropdownItem, DropdownMenu, DropdownTrigger } from "@nextui-org/dropdown";
+import { Skeleton } from "@nextui-org/skeleton";
 import { CircleUserRoundIcon, LogOutIcon, SettingsIcon } from "lucide-react";
+import { signIn, signOut, useSession } from "next-auth/react";
 import Image from "next/image";
 
 const NavBarAuth = () => {

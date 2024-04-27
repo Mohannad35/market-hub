@@ -1,10 +1,10 @@
-import { Navbar, NavbarBrand, NavbarContent, NavbarItem } from "@nextui-org/react";
+import { Navbar, NavbarBrand, NavbarContent, NavbarItem } from "@nextui-org/navbar";
+import { Heading } from "@radix-ui/themes";
 import { Store } from "lucide-react";
 import Link from "next/link";
-import NavBarAuth from "./navbar-auth";
-import NavBarLinks from "./navbar-links";
+import NavBarAuth from "./NavBarAuth";
+import Search from "./Search";
 import { ThemeToggle } from "./ThemeModeToggle";
-import { Heading, Text } from "@radix-ui/themes";
 
 export default function NavBar() {
   return (
@@ -42,8 +42,8 @@ export default function NavBar() {
       </NavbarBrand>
 
       {/* Center of the navbar */}
-      <NavbarContent justify="center">
-        <NavBarLinks />
+      <NavbarContent justify="center" className="hidden w-full max-w-[30rem] md:flex">
+        <Search />
       </NavbarContent>
 
       {/* Right side of the navbar */}

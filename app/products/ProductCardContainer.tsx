@@ -1,47 +1,35 @@
 "use client";
 
-import { Product } from "@prisma/client";
-import ProductCard from "./ProductCard";
+import Pagination from "@/components/common/Pagination";
+import { useProducts } from "@/hook/use-query-hooks";
 import { Flex } from "@radix-ui/themes";
-import { useQuery } from "@tanstack/react-query";
-import { ReadonlyURLSearchParams, useSearchParams } from "next/navigation";
-import { Pagination } from "@nextui-org/react";
-import { useState } from "react";
+import { useSearchParams } from "next/navigation";
+import { useEffect } from "react";
+import ProductCard from "./ProductCard";
 
 const ProductCardContainer = () => {
   const searchParams = useSearchParams();
-  const [currentPage, setCurrentPage] = useState(1);
-  const { data: products, isSuccess, error, isLoading } = useProducts(searchParams);
+  const { data, isSuccess, error, isLoading, refetch } = useProducts(searchParams);
+
+  useEffect(() => {
+    refetch();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParams]);
 
   if (isLoading) return <p>Loading...</p>;
   else if (error) return <p>Error: {error.message}</p>;
   else if (!isSuccess) return <p>No products found</p>;
+  const { products, count } = data;
   return (
-    <Flex direction="column" align="center" gapY='5'>
-      <Flex direction="row" wrap="wrap" gap="5" justify="start" align="start">
+    <Flex width="100%" direction="column" align="center" gapY="5">
+      <Flex width="100%" direction="row" wrap="wrap" gap="5" justify="start" align="start">
         {products.map((product, index) => (
           <ProductCard key={index} product={product} />
         ))}
       </Flex>
-      <Pagination
-        showControls
-        color="primary"
-        total={10}
-        page={currentPage}
-        onChange={setCurrentPage}
-      />
+      <Pagination count={count} />
     </Flex>
   );
 };
 
 export default ProductCardContainer;
-
-const useProducts = (searchParams: ReadonlyURLSearchParams) => {
-  const query = searchParams.toString();
-  return useQuery<Product[]>({
-    queryKey: ["issues"],
-    queryFn: () => fetch(`/api/products${query ? "?" + query : ""}`).then(res => res.json()),
-    staleTime: 1000 * 60, // 1 minute
-    retry: 3,
-  });
-};

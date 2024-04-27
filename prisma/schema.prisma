@@ -90,7 +90,7 @@ model Category {
   slug          String     @unique
   image         String?
   isPredecessor Boolean    @default(false)
-  predecessorId String?    @unique @db.ObjectId
+  predecessorId String?    @db.ObjectId
   predecessor   Category?  @relation("BlogOwnerHistory", fields: [predecessorId], references: [id], onDelete: NoAction, onUpdate: NoAction)
   successors    Category[] @relation("BlogOwnerHistory")
   products      Product[]

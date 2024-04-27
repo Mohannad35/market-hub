@@ -1,14 +1,15 @@
 "use client";
 
-import { formatErrors, getFormDataObject } from "@/components/utils";
-import { Button, Input } from "@nextui-org/react";
+import { getFormDataObject, validateSchema } from "@/lib/utils";
+import { stringMinMaxSchema, stringSchema } from "@/lib/validation-schemas";
+import { Button } from "@nextui-org/button";
+import { Input } from "@nextui-org/input";
 import { Text } from "@radix-ui/themes";
-import { EyeIcon, EyeOffIcon, LogInIcon } from "lucide-react";
+import { EyeIcon, EyeOffIcon } from "lucide-react";
 import { signIn } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useRef, useState } from "react";
 import { Id, toast } from "react-toastify";
-import { string } from "zod";
 
 const SigninForm = () => {
   const searchParams = useSearchParams();
@@ -61,12 +62,7 @@ const SigninForm = () => {
         name="email"
         label="Email"
         type="email"
-        validate={value => {
-          const valid = string()
-            .email("Invalid email")
-            .safeParse(value ?? "");
-          return valid.success ? true : formatErrors(valid.error).messege;
-        }}
+        validate={value => validateSchema(value, stringSchema("Email").email("Invalid email"))}
         errorMessage={valid => valid.validationErrors}
       />
 
@@ -81,6 +77,7 @@ const SigninForm = () => {
             {isVisible ? <EyeOffIcon /> : <EyeIcon />}
           </button>
         }
+        validate={value => validateSchema(value, stringMinMaxSchema("Password", 8, 30))}
         errorMessage="Required"
       />
 

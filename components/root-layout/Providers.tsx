@@ -1,13 +1,12 @@
 "use client";
 
-import QueryClientProvider from "@/components/QueryClientProvider";
-import { NextUIProvider } from "@nextui-org/react";
+import QueryClientProvider from "./QueryClientProvider";
+import { Toaster } from "@/components/ui/sonner";
+import { NextUIProvider } from "@nextui-org/system";
 import { Theme } from "@radix-ui/themes";
 import { SessionProvider } from "next-auth/react";
-import { ThemeProvider, useTheme } from "next-themes";
-import { useEffect, useState } from "react";
+import { useTheme } from "next-themes";
 import { ToastContainer } from "react-toastify";
-import { Toaster } from "@/components/ui/sonner";
 import "react-toastify/dist/ReactToastify.css";
 
 export function Providers({ children }: { children: React.ReactNode }) {
@@ -21,17 +20,16 @@ export function Providers({ children }: { children: React.ReactNode }) {
             {children}
             <Toaster richColors duration={3000} />
             <ToastContainer
+              toastClassName="dark:border dark:border-default-100"
               theme={theme === "system" ? systemTheme : theme}
-              position="top-right"
-              autoClose={5000}
-              hideProgressBar={false}
-              newestOnTop={false}
-              closeOnClick
-              rtl={false}
-              pauseOnFocusLoss={false}
+              position="bottom-right"
+              stacked
+              hideProgressBar
               draggable
               pauseOnHover
-              limit={5}
+              closeOnClick
+              pauseOnFocusLoss={false}
+              limit={10}
             />
           </Theme>
         </SessionProvider>

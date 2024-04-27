@@ -1,8 +1,8 @@
 "use client";
 
 import { providerMap } from "@/auth";
-import DividerWithLabel from "@/components/DividerWithLabel";
-import { Button } from "@nextui-org/react";
+import DividerWithLabel from "@/components/common/DividerWithLabel";
+import { Button } from "@nextui-org/button";
 import { Flex } from "@radix-ui/themes";
 import { signIn } from "next-auth/react";
 import SigninForm from "./SignInForm";

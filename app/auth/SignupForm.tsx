@@ -1,59 +1,36 @@
 "use client";
 
-import { formatErrors, getFormDataObject } from "@/components/utils";
-import { Button, Input } from "@nextui-org/react";
+import { useSignupMutation } from "@/hook/use-mutation-hooks";
+import { getFormDataObject, validateSchema } from "@/lib/utils";
+import { stringMinMaxSchema, stringSchema } from "@/lib/validation-schemas";
+import { Button } from "@nextui-org/button";
+import { Input } from "@nextui-org/input";
 import { Text } from "@radix-ui/themes";
-import { useMutation } from "@tanstack/react-query";
 import { EyeIcon, EyeOffIcon } from "lucide-react";
-import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
-import { Id, toast } from "react-toastify";
-import { string } from "zod";
+import { Dispatch, SetStateAction, useState } from "react";
+import { toast } from "react-toastify";
 
 const SignupForm = ({ setTab }: { setTab: Dispatch<SetStateAction<string | number>> }) => {
   const [isVisible, setIsVisible] = useState(false);
   const toggleVisibility = () => setIsVisible(!isVisible);
-  const toastId = useRef<Id | null>(null);
-
-  const signupMutation = useMutation({
-    mutationKey: ["signup"],
-    mutationFn: (data: { [key: string]: FormDataEntryValue }) =>
-      fetch("/api/users", { method: "POST", body: JSON.stringify(data) }).then(res => res.json()),
-  });
-
-  useEffect(() => {
-    switch (signupMutation.status) {
-      case "pending":
-        toastId.current = toast("Signing up...", { autoClose: false, isLoading: true });
-        break;
-      case "success":
-        if (toastId.current) {
-          if (signupMutation.data.user) {
-            toast.update(toastId.current, {
-              isLoading: false,
-              type: "success",
-              render: "Signed up successfully",
-              autoClose: 3000,
-              progress: 0,
-            });
-            setTimeout(() => setTab("login"), 3000);
-          } else if (signupMutation.data.error) {
-            toast.update(toastId.current, {
-              isLoading: false,
-              type: "error",
-              render: signupMutation.data.error,
-              autoClose: 3000,
-              progress: 0,
-            });
-          }
-        }
-      default:
-        break;
-    }
-  }, [setTab, signupMutation.data, signupMutation.status]);
+  const signupMutation = useSignupMutation();
 
   const handleSubmitSignUp = async (formData: FormData) => {
     const data = getFormDataObject(formData);
-    signupMutation.mutate(data);
+    const promise = new Promise<{ name: string }>(async (resolve, reject) => {
+      const res = await signupMutation.mutateAsync(data);
+      if (res.error) reject(res.error);
+      resolve(res);
+    });
+    toast.promise(
+      promise,
+      {
+        pending: "Signing up...",
+        success: "Signed up successfully",
+        error: { render: ({ data }: { data: string }) => data || "An unexpected error occurred" },
+      },
+      { toastId: "signup-toast" }
+    );
   };
   return (
     <form className="flex flex-col gap-4" action={handleSubmitSignUp}>
@@ -62,13 +39,7 @@ const SignupForm = ({ setTab }: { setTab: Dispatch<SetStateAction<string | numbe
         variant="underlined"
         name="name"
         label="Name"
-        validate={value => {
-          const valid = string()
-            .min(2, "Name must contain at least 2 character(s)")
-            .max(256, "Name must contain at most 256 character(s)")
-            .safeParse(value ?? "");
-          return valid.success ? true : formatErrors(valid.error).messege;
-        }}
+        validate={value => validateSchema(value, stringMinMaxSchema("Name", 2, 100))}
         errorMessage={valid => valid.validationErrors}
       />
       <Input
@@ -77,12 +48,7 @@ const SignupForm = ({ setTab }: { setTab: Dispatch<SetStateAction<string | numbe
         name="email"
         label="Email"
         type="email"
-        validate={value => {
-          const valid = string()
-            .email("Invalid email")
-            .safeParse(value ?? "");
-          return valid.success ? true : formatErrors(valid.error).messege;
-        }}
+        validate={value => validateSchema(value, stringSchema("Email").email("Invalid email"))}
         errorMessage={valid => valid.validationErrors}
       />
       <Input
@@ -96,13 +62,7 @@ const SignupForm = ({ setTab }: { setTab: Dispatch<SetStateAction<string | numbe
             {isVisible ? <EyeOffIcon /> : <EyeIcon />}
           </button>
         }
-        validate={value => {
-          const valid = string()
-            .min(8, "Password must contain at least 2 character(s)")
-            .max(30, "Password must contain at most 30 character(s)")
-            .safeParse(value ?? "");
-          return valid.success ? true : formatErrors(valid.error).messege;
-        }}
+        validate={value => validateSchema(value, stringMinMaxSchema("Password", 8, 30))}
         errorMessage={valid => valid.validationErrors}
       />
 

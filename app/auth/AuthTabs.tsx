@@ -1,12 +1,12 @@
 "use client";
 
-import { Tab, Tabs } from "@nextui-org/react";
+import { Tab, Tabs } from "@nextui-org/tabs";
 import { Flex } from "@radix-ui/themes";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
+import { toast } from "react-toastify";
 import Signin from "./SignIn";
 import Signup from "./Signup";
-import { useRouter, useSearchParams } from "next/navigation";
-import { toast } from "react-toastify";
 
 const AuthTabs = () => {
   const router = useRouter();

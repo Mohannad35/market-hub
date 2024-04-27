@@ -1,11 +1,11 @@
 "use client";
 
-import { Button } from "@nextui-org/react";
+import { Button } from "@nextui-org/button";
 import { Flex } from "@radix-ui/themes";
 import { CloudUploadIcon } from "lucide-react";
 import { CldImage, CldUploadWidget } from "next-cloudinary";
 import { useTheme } from "next-themes";
-import React, { Dispatch } from "react";
+import { Dispatch, SetStateAction } from "react";
 
 interface CloudinaryResult {
   public_id: string;
@@ -13,7 +13,7 @@ interface CloudinaryResult {
 
 interface UoloadProps {
   publicId: string[];
-  setPublicId: Dispatch<React.SetStateAction<string[]>>;
+  setPublicId: Dispatch<SetStateAction<string[]>>;
 }
 
 const Uoload = ({ publicId, setPublicId }: UoloadProps) => {

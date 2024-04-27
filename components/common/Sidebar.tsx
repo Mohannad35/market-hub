@@ -1,9 +1,10 @@
 "use client";
 
+import { Accordion, AccordionItem } from "@nextui-org/accordion";
 import { Card, CardBody, CardHeader } from "@nextui-org/card";
 import { Listbox, ListboxItem } from "@nextui-org/listbox";
-import { Accordion, AccordionItem } from "@nextui-org/accordion";
-import { cn, Selection } from "@nextui-org/react";
+import { cn } from "@nextui-org/system";
+import { Selection } from "@nextui-org/table";
 
 interface SidebarItem {
   text: string;
