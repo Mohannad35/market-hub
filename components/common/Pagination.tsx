@@ -14,7 +14,7 @@ const Pagination = ({ count }: { count: number }) => {
   const [currentPage, setCurrentPage] = useState(() =>
     searchParams.has("page") ? parseInt(searchParams.get("page") as string) : 1
   );
-  const [pageSize, setPageSize] = useState(20);
+  const [pageSize, setPageSize] = useState(6);
 
   useEffect(() => {
     let query = new URLSearchParams(searchParams.toString());
@@ -31,7 +31,8 @@ const Pagination = ({ count }: { count: number }) => {
     router.push(query ? "?" + query : "");
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pageSize]);
-  if (Math.ceil(count / pageSize) === 1) return <></>;
+  const total = Math.ceil(count / pageSize);
+  if (total <= 1) return <></>;
   return (
     <Flex gap="2">
       <Button
@@ -46,7 +47,7 @@ const Pagination = ({ count }: { count: number }) => {
       </Button>
       <NextPagination
         color="primary"
-        total={Math.ceil(count / pageSize)}
+        total={total}
         page={currentPage}
         onChange={setCurrentPage}
         className="hidden lg:flex"

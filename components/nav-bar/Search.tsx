@@ -24,7 +24,7 @@ const Search = () => {
         variant="bordered"
         placeholder="Type to search..."
         className="hidden md:block"
-        startContent={
+        endContent={
           <button className="focus:outline-none" type="submit">
             <SearchIcon className="pointer-events-none text-2xl text-default-400" />
           </button>

@@ -45,10 +45,10 @@ export async function GET(request: NextRequest) {
   } = data;
   const popObj: Prisma.ProductInclude<DefaultArgs> | null | undefined = {};
   if (populate) populate.forEach(pop => (popObj[pop as "brand" | "category" | "vendor"] = true));
-  if (brands) popObj.brand = { where: { slug: { in: brands } } };
-  if (category) popObj.category = { where: { slug: category } };
   const prismaQuery: Prisma.ProductFindManyArgs = {
     where: {
+      category: category ? { slug: category } : undefined,
+      brand: brands ? { slug: { in: brands } } : undefined,
       name: { contains: search || undefined, mode: "insensitive" },
       price: { gte: minPrice, lte: maxPrice },
     },

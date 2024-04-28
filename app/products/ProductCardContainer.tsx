@@ -2,24 +2,35 @@
 
 import Pagination from "@/components/common/Pagination";
 import { useProducts } from "@/hook/use-query-hooks";
-import { Flex } from "@radix-ui/themes";
+import { Flex, Text } from "@radix-ui/themes";
 import { useSearchParams } from "next/navigation";
-import { useEffect } from "react";
+import { useCallback, useEffect, useState } from "react";
 import ProductCard from "./ProductCard";
+import { Spinner } from "@nextui-org/spinner";
 
 const ProductCardContainer = () => {
   const searchParams = useSearchParams();
-  const { data, isSuccess, error, isLoading, refetch } = useProducts(searchParams);
+  const { data, isSuccess, error, isLoading, isRefetching, refetch } = useProducts(searchParams);
 
   useEffect(() => {
     refetch();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchParams]);
+  }, [refetch, searchParams]);
 
-  if (isLoading) return <p>Loading...</p>;
-  else if (error) return <p>Error: {error.message}</p>;
-  else if (!isSuccess) return <p>No products found</p>;
+  if (isLoading || isRefetching)
+    return (
+      <Flex height="100%" width="100%" justify="center" align="center">
+        <Spinner />
+      </Flex>
+    );
+  else if (error) return <Text>Error: {error.message}</Text>;
+  else if (!isSuccess) return <Text>No products found</Text>;
   const { products, count } = data;
+  if (count === 0)
+    return (
+      <Flex width="100%" direction="column" align="center" gapY="5">
+        <Text size="5">No products found</Text>
+      </Flex>
+    );
   return (
     <Flex width="100%" direction="column" align="center" gapY="5">
       <Flex width="100%" direction="row" wrap="wrap" gap="5" justify="start" align="start">

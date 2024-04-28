@@ -1,5 +1,6 @@
 "use client";
 
+import { Skeleton } from "@/components/ui/skeleton";
 import { createQueryString, deleteQueryString } from "@/hook/query-string-manipulation-hooks";
 import { useBrands, useCategories } from "@/hook/use-query-hooks";
 import { Autocomplete, AutocompleteItem } from "@nextui-org/autocomplete";
@@ -18,8 +19,14 @@ const FilterSidebar = () => {
   const searchParams = useSearchParams();
   const brandQuery = useBrands();
   const categoriesQuery = useCategories();
-  const [category, setCategory] = useState<string | number>();
-  const [brands, setBrands] = useState<Selection>(new Set());
+  const [category, setCategory] = useState<string | number>(() => {
+    const category = searchParams.get("category");
+    return category ? category : "";
+  });
+  const [brands, setBrands] = useState<Selection>(() => {
+    const brands = searchParams.get("brands");
+    return brands ? new Set(brands.split(",")) : new Set();
+  });
 
   useEffect(() => {
     let query = new URLSearchParams(searchParams.toString());
@@ -39,7 +46,19 @@ const FilterSidebar = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [brands]);
 
-  if (brandQuery.isLoading || categoriesQuery.isLoading) return <p>Loading...</p>;
+  if (brandQuery.isLoading || categoriesQuery.isLoading)
+    return (
+      <Card
+        shadow="none"
+        radius="none"
+        className="sticky h-full min-w-[15rem] max-w-[20rem] border-none bg-transparent ps-3"
+      >
+        <Flex direction="column" width="100%" gapY="5">
+          <Skeleton className="h-12 max-w-xs rounded-xl" />
+          <Skeleton className="h-12 max-w-xs rounded-xl" />
+        </Flex>
+      </Card>
+    );
   else if (brandQuery.error || categoriesQuery.error)
     return <p>Error: {brandQuery.error?.message || categoriesQuery.error?.message}</p>;
   else if (!brandQuery.isSuccess || !categoriesQuery.isSuccess) return <p>No data found</p>;
@@ -47,7 +66,7 @@ const FilterSidebar = () => {
     <Card
       shadow="none"
       radius="none"
-      className="sticky h-full min-h-screen min-w-[15rem] max-w-[20rem] border-none bg-transparent ps-3"
+      className="sticky h-full min-w-[15rem] max-w-[20rem] border-none bg-transparent ps-3"
     >
       <Flex direction="column" width="100%" gapY="5">
         <Autocomplete
@@ -72,7 +91,7 @@ const FilterSidebar = () => {
           labelPlacement="inside"
           classNames={{
             base: "max-w-xs",
-            trigger: "min-h-12 py-2",
+            trigger: "min-h-12",
           }}
           selectedKeys={brands}
           onSelectionChange={setBrands}
