@@ -37,6 +37,14 @@ export const integerSchema = (label: string) =>
     })
     .regex(/^[0-9]+$/g, `Invalid ${label} value`);
 
+export const positiveNumberSchema = (label: string) =>
+  z
+    .string({
+      invalid_type_error: `${label} must be a string`,
+      required_error: `${label} is required`,
+    })
+    .regex(/^([0-9]*[.])?[0-9]*$/g, `Invalid ${label} value`);
+
 export const numberSchema = (label: string) =>
   z
     .string({
@@ -88,8 +96,8 @@ const imageSchema = z
     invalid_type_error: "Image must be an array",
     required_error: "Image is required",
   })
-  .min(1, "Image must contain at least 1 URL(s)")
-  .max(5, "Image must contain at most 5 URL(s)");
+  .min(1, "Image must contain at least 1 image(s)")
+  .max(10, "Image must contain at most 10 image(s)");
 
 export const newProductSchema = z
   .object({

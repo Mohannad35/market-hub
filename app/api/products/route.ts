@@ -43,6 +43,7 @@ export async function GET(request: NextRequest) {
     populate,
     popular,
   } = data;
+  sortBy.replace("name", "slug");
   const popObj: Prisma.ProductInclude<DefaultArgs> | null | undefined = {};
   if (populate) populate.forEach(pop => (popObj[pop as "brand" | "category" | "vendor"] = true));
   const prismaQuery: Prisma.ProductFindManyArgs = {
@@ -54,7 +55,7 @@ export async function GET(request: NextRequest) {
     },
     orderBy: popular
       ? [{ rating: "desc" }, { ratingCount: "desc" }, { sold: "desc" }, { createdAt: "desc" }]
-      : { [sortBy!]: direction },
+      : { [sortBy]: direction },
     take: pageSize || 20,
     skip: ((page || 1) - 1) * (pageSize || 20),
     include: popObj,

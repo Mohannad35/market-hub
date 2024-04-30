@@ -20,27 +20,28 @@ const ProductCard = ({ onPress, product, ...props }: ProductCardProps) => {
   };
   return (
     <Card
-      shadow="sm"
-      className="max-h-[20rem] w-[12rem]"
+      radius="none"
+      shadow="none"
+      className="h-[20rem] w-[14rem] bg-neutral-200 dark:bg-neutral-800"
       isPressable
       onPress={() => handlePress(product.slug)}
       {...props}
     >
-      <CardBody className="overflow-visible p-0">
+      <CardBody className="items-center justify-normal overflow-x-clip overflow-y-visible p-0">
         <Image
           shadow="none"
           radius="none"
-          width={300}
-          height={300}
-          className="max-h-[12rem]"
+          width={480}
+          height={480}
+          className="max-h-[14rem] object-contain"
           as={NextImage}
           alt={product.name || "Product Image"}
           src={product.image[0] || process.env.IMAGE_PLACEHOLDER}
         />
       </CardBody>
       <CardFooter className="justify-between p-2 text-small">
-        <Flex width="100%" gap="2" direction="column" justify="start" align="start">
-          <Text size="5" weight="medium" wrap="nowrap">
+        <Flex width="260px" gap="2" direction="column" justify="start" align="start">
+          <Text size="5" weight="medium" className="line-clamp-2 w-[260px] text-start">
             {product.name}
           </Text>
           <Flex width="100%" direction="row" justify="between" align="center">

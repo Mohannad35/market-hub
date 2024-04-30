@@ -53,7 +53,7 @@ const Uoload = ({ publicId, setPublicId }: UoloadProps) => {
           showAdvancedOptions: false,
           cropping: false,
           multiple: true,
-          maxFiles: 5,
+          maxFiles: 10,
           maxFileSize: 5_242_880, // 5MB
           defaultSource: "local",
           theme: "default",

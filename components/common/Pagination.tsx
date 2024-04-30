@@ -14,7 +14,7 @@ const Pagination = ({ count }: { count: number }) => {
   const [currentPage, setCurrentPage] = useState(() =>
     searchParams.has("page") ? parseInt(searchParams.get("page") as string) : 1
   );
-  const [pageSize, setPageSize] = useState(6);
+  const [pageSize, setPageSize] = useState(20);
 
   useEffect(() => {
     let query = new URLSearchParams(searchParams.toString());

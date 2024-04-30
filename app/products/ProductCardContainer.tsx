@@ -33,7 +33,7 @@ const ProductCardContainer = () => {
     );
   return (
     <Flex width="100%" direction="column" align="center" gapY="5">
-      <Flex width="100%" direction="row" wrap="wrap" gap="5" justify="start" align="start">
+      <Flex width="100%" direction="row" wrap="wrap" gap="3" justify="start" align="start">
         {products.map((product, index) => (
           <ProductCard key={index} product={product} />
         ))}
