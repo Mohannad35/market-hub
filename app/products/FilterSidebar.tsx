@@ -9,9 +9,9 @@ const FilterSidebar = () => {
     <Flex className="sticky h-full w-[20rem] border-none bg-transparent ps-3">
       <Flex direction="column" width="100%" gapY="5">
         <SortBy />
+        <PriceFilter />
         <CategorySelect />
         <BrandSelect />
-        <PriceFilter />
       </Flex>
     </Flex>
   );

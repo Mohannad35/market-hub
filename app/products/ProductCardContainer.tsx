@@ -2,11 +2,11 @@
 
 import Pagination from "@/components/common/Pagination";
 import { useProducts } from "@/hook/use-query-hooks";
+import { Spinner } from "@nextui-org/spinner";
 import { Flex, Text } from "@radix-ui/themes";
 import { useSearchParams } from "next/navigation";
-import { useCallback, useEffect, useState } from "react";
+import { useEffect } from "react";
 import ProductCard from "./ProductCard";
-import { Spinner } from "@nextui-org/spinner";
 
 const ProductCardContainer = () => {
   const searchParams = useSearchParams();

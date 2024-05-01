@@ -6,6 +6,20 @@ import { ReadonlyURLSearchParams } from "next/navigation";
 // These hooks are used to fetch data from the server
 // and must be used inside a client component only.
 
+export const useProduct = (
+  slug: string,
+  searchParams?: ReadonlyURLSearchParams | URLSearchParams
+) => {
+  const query = searchParams && searchParams.toString();
+  return useQuery<Product>({
+    queryKey: ["product", slug],
+    queryFn: () =>
+      fetch(`/api/products/${slug}${query ? "?" + query : ""}`).then(res => res.json()),
+    staleTime: 1000 * 60, // 1 minute
+    retry: 3,
+  });
+};
+
 export const useProducts = (searchParams?: ReadonlyURLSearchParams | URLSearchParams) => {
   const query = searchParams && searchParams.toString();
   return useQuery<{ products: Product[]; count: number }>({

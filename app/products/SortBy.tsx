@@ -43,6 +43,7 @@ const SortBy = () => {
   return (
     <Select
       title="Sort by"
+      aria-label="Sort by"
       variant="bordered"
       defaultSelectedKeys={[
         (searchParams.get("sortBy") || "createdAt") + (searchParams.get("direction") || "-desc"),

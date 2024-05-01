@@ -82,14 +82,10 @@ const directionSchema = (label: string) =>
     .transform(value => value.replace(/ending$/, ""));
 
 const populateSchema = (regex: RegExp, label?: string) =>
-  z
-    .string({
-      invalid_type_error: `${label || "populate"} must be a string`,
-      required_error: `${label || "populate"} is required`,
-    })
-    .regex(regex, `Invalid ${label || "populate"} value`)
+  stringMinMaxSchema(label || "Populate", 2, 100)
+    .regex(regex, `Invalid ${label || "Populate"} value`)
     .optional()
-    .transform(value => (value ? value.split(",") : undefined));
+    .transform(value => (value ? Array.from(new Set(value.split(","))) : undefined));
 
 const imageSchema = z
   .array(stringSchema("URL").url("Invalid URL"), {
@@ -175,8 +171,12 @@ export const productQuerySchema = z.object({
   maxPrice: numberSchema("Max Price")
     .optional()
     .transform(value => (value ? parseFloat(value) : undefined)),
-  populate: populateSchema(/^(category|brand|vendor)$/g, "Populate"),
+  populate: populateSchema(/^(category|brand|vendor)(,(category|brand|vendor))*$/g, "Populate"),
   popular: booleanSchema("Popular")
     .optional()
     .transform(value => (value ? (value === "true" ? true : false) : undefined)),
+});
+
+export const productDetailsQuerySchema = z.object({
+  populate: populateSchema(/^(category|brand|vendor)(,(category|brand|vendor))*$/g, "Populate"),
 });
