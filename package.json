@@ -1,7 +1,12 @@
 {
-  "name": "e-commerce-app",
+  "name": "market-hub",
   "version": "0.1.0",
   "private": true,
+  "author": {
+    "name": "Mohannad Ragab",
+    "email": "mohannadragab53@gmail.com",
+    "url": "https://github.com/Mohannad35"
+  },
   "scripts": {
     "dev": "next dev",
     "build": "next build",
