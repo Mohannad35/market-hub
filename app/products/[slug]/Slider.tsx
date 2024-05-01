@@ -37,7 +37,7 @@ export function Slider({ items }: { items: { id: number; url: string }[] }) {
   }, [emblaMainApi, onSelect]);
 
   return (
-    <Flex direction={"row"} gap="1rem">
+    <Flex direction={"row"} gap="1rem" minWidth='600px'>
       <Carousel
         setApi={setEmblaThumbsApi}
         opts={{ align: "start", containScroll: "keepSnaps", dragFree: true }}

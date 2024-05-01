@@ -18,7 +18,7 @@ const ProductCardContainer = () => {
 
   if (isLoading || isRefetching)
     return (
-      <Flex height="100%" width="100%" justify="center" align="center">
+      <Flex className="h-[calc(100vh-120px)]" width="100%" justify="center" align="center">
         <Spinner />
       </Flex>
     );
