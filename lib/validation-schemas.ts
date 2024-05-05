@@ -29,6 +29,7 @@ const booleanSchema = (label?: string) =>
     invalid_type_error: `${label || "Boolean"} must be a string`,
     message: `${label || "Boolean"} must be either true or false`,
   });
+
 export const integerSchema = (label: string) =>
   z
     .string({
@@ -53,7 +54,7 @@ export const numberSchema = (label: string) =>
     })
     .regex(/^[+-]?([0-9]*[.])?[0-9]+$/g, `Invalid ${label} value`);
 
-const regexSchema = (regex: RegExp, label: string) =>
+export const regexSchema = (regex: RegExp, label: string) =>
   z
     .string({
       invalid_type_error: `${label} must be a string`,
@@ -87,6 +88,11 @@ const populateSchema = (regex: RegExp, label?: string) =>
     .optional()
     .transform(value => (value ? Array.from(new Set(value.split(","))) : undefined));
 
+const populateProductSchema = populateSchema(
+  /^(category|brand|vendor|rates|lists|cartItems)(,(category|brand|vendor|rates|lists|cartItems))*$/g,
+  "Populate"
+);
+
 const imageSchema = z
   .array(stringSchema("URL").url("Invalid URL"), {
     invalid_type_error: "Image must be an array",
@@ -97,7 +103,7 @@ const imageSchema = z
 
 export const newProductSchema = z
   .object({
-    name: stringMinMaxSchema("Name", 2, 100),
+    name: stringMinMaxSchema("Name", 4, 256),
     description: stringMinMaxSchema("Name", 2, 10_000),
     price: numberSchema("Price").transform(value => parseFloat(value)),
     quantity: integerSchema("Quantity").transform(value => parseInt(value)),
@@ -109,15 +115,15 @@ export const newProductSchema = z
 
 export const newBrandSchema = z
   .object({
-    name: stringMinMaxSchema("Name", 2, 100),
+    name: stringMinMaxSchema("Name", 2, 256),
     image: stringSchema("Image").url("Invalid URL").optional(),
   })
   .strict();
 
 export const newCategorySchema = z
   .object({
-    name: stringMinMaxSchema("Name", 2, 100),
-    predecessorId: idSchema("Predecessor ID").optional(),
+    name: stringMinMaxSchema("Name", 2, 256),
+    path: regexSchema(/^\/[ \w&-]+(\/[ \w&-]+)*$/g, "Path").transform(val => val.toLowerCase()),
     image: stringSchema("Image").url("Invalid URL").optional(),
   })
   .strict();
@@ -144,11 +150,10 @@ export const categoryQuerySchema = z.object({
   skip: integerSchema("Skip")
     .optional()
     .transform(value => (value ? parseInt(value) : undefined)),
-  predecessorId: idSchema("Predecessor ID").optional(),
-  main: booleanSchema("Main")
+  path: regexSchema(/^\/[ \w&-]+(\/[ \w&-]+)*$/g, "Path")
     .optional()
-    .transform(value => (value ? (value === "true" ? true : false) : undefined)),
-  populate: populateSchema(/^(products|predecessor|successors)$/g, "Populate"),
+    .transform(val => val && val.toLowerCase()),
+  populate: populateSchema(/^(products)$/g, "Populate"),
 });
 
 export const productQuerySchema = z.object({
@@ -161,7 +166,7 @@ export const productQuerySchema = z.object({
   sortBy: regexSchema(/^(name|price|createdAt|sold|rating)$/g, "Sort By").default("createdAt"),
   direction: directionSchema("Direction"),
   search: searchSchema("Search"),
-  category: stringMinMaxSchema("Name", 2, 100).optional(),
+  category: stringMinMaxSchema("Name", 2, 256).optional(),
   brands: stringMinMaxSchema("Brands", 2, 256)
     .optional()
     .transform(value => (value ? value.split(",") : undefined)),
@@ -171,12 +176,12 @@ export const productQuerySchema = z.object({
   maxPrice: numberSchema("Max Price")
     .optional()
     .transform(value => (value ? parseFloat(value) : undefined)),
-  populate: populateSchema(/^(category|brand|vendor)(,(category|brand|vendor))*$/g, "Populate"),
+  populate: populateProductSchema,
   popular: booleanSchema("Popular")
     .optional()
     .transform(value => (value ? (value === "true" ? true : false) : undefined)),
 });
 
 export const productDetailsQuerySchema = z.object({
-  populate: populateSchema(/^(category|brand|vendor)(,(category|brand|vendor))*$/g, "Populate"),
+  populate: populateProductSchema,
 });

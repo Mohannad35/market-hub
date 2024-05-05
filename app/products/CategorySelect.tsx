@@ -2,15 +2,16 @@
 
 import { Skeleton } from "@/components/ui/skeleton";
 import { createQueryString, deleteQueryString } from "@/hook/query-string-manipulation-hooks";
-import { useCategories } from "@/hook/use-query-hooks";
+import { useQueryHook } from "@/hook/use-tanstack-hooks";
 import { Autocomplete, AutocompleteItem } from "@nextui-org/autocomplete";
+import { Category } from "@prisma/client";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
 const CategorySelect = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const categoriesQuery = useCategories();
+  const categoriesQuery = useQueryHook<Category[]>("/api/categories", ["categories", "search"]);
   const [category, setCategory] = useState<string | number>(() => {
     const category = searchParams.get("category");
     return category ? category : "";
@@ -37,7 +38,7 @@ const CategorySelect = () => {
       selectedKey={category}
       onSelectionChange={setCategory}
     >
-      {item => <AutocompleteItem key={item.slug}>{item.name}</AutocompleteItem>}
+      {category => <AutocompleteItem key={category.path}>{category.name}</AutocompleteItem>}
     </Autocomplete>
   );
 };

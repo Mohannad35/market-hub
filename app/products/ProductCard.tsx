@@ -1,7 +1,6 @@
 "use client";
 
-import StarIcon from "@mui/icons-material/Star";
-import Rating from "@mui/material/Rating";
+import Rating from "@/components/common/Rating";
 import { Button } from "@nextui-org/button";
 import { Card, CardBody, CardFooter, CardProps } from "@nextui-org/card";
 import { Image } from "@nextui-org/image";
@@ -56,23 +55,11 @@ const ProductCard = ({ onPress, product, ...props }: ProductCardProps) => {
             </Link>
           </Tooltip>
 
-          <Flex width="100%" direction="row" justify="start" align="center" gapX="2">
-            <Rating
-              readOnly
-              size="small"
-              name="product rating"
-              defaultValue={product.rating}
-              precision={0.5}
-              icon={<StarIcon fontSize="small" className="text-yellow-400 dark:text-yellow-500" />}
-              emptyIcon={<StarIcon fontSize="small" className="text-gray-400 opacity-20" />}
-              className="z-50 cursor-pointer"
-            />
-            <Text className="text-muted-foreground">{product.ratingCount}</Text>
-          </Flex>
+          <Rating rating={product.rating} ratingCount={product.ratingCount} />
 
           <Flex width="100%" direction="row" justify="between" align="center">
             <Text weight="medium" className="text-muted-foreground">
-              {product.price} LE
+              {product.price} EGP
             </Text>
             <Button color="primary" variant="solid" size="sm" radius="lg">
               Add to Cart

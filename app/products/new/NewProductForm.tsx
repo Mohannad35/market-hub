@@ -1,7 +1,7 @@
 "use client";
 
-import { useAddProduct } from "@/hook/use-mutation-hooks";
-import { useBrands, useCategories } from "@/hook/use-query-hooks";
+import Uoload from "@/components/common/Upload";
+import { useMutationHook, useQueryHook } from "@/hook/use-tanstack-hooks";
 import { getFormDataObject, validateSchema } from "@/lib/utils";
 import {
   idSchema,
@@ -12,22 +12,22 @@ import {
 import { Autocomplete, AutocompleteItem } from "@nextui-org/autocomplete";
 import { Button } from "@nextui-org/button";
 import { Input, Textarea } from "@nextui-org/input";
+import { Brand, Category, Product } from "@prisma/client";
 import { Flex, Text } from "@radix-ui/themes";
 import { getCldImageUrl } from "next-cloudinary";
 import { useRouter } from "next/navigation";
 import { useCallback, useState } from "react";
 import { useBeforeUnload, useUnmount } from "react-use";
 import { toast } from "sonner";
-import Uoload from "./Upload";
 
 const NewProductForm = () => {
   const router = useRouter();
   const [publicId, setPublicId] = useState<string[]>([]);
   const [brandId, setBrandId] = useState<null | string>(null);
   const [categoryId, setCategoryId] = useState<null | string>(null);
-  const addProductMutation = useAddProduct();
-  const brandQuery = useBrands();
-  const categoriesQuery = useCategories();
+  const addProductMutation = useMutationHook<Product>("/api/products", ["newProduct"]);
+  const brandQuery = useQueryHook<Brand[]>("/api/brands", ["brands", "newProduct"]);
+  const categoriesQuery = useQueryHook<Category[]>("/api/categories", ["categories", "newProduct"]);
 
   const beforeUnmount = useCallback(() => {
     if (publicId.length > 0) {
@@ -41,26 +41,25 @@ const NewProductForm = () => {
   useUnmount(beforeUnmount);
   useBeforeUnload(beforeUnmount, "You have unsaved changes, are you sure?");
 
-  const handleSubmitSignUp = async (formData: FormData) => {
+  const handleSubmit = async (formData: FormData) => {
     if (publicId.length < 1) return toast.error("A product needs at least one image");
     if (!brandId || !categoryId) return toast.error("Brand and Category are required");
     const data = getFormDataObject(formData);
     const ids = publicId.map(id => getCldImageUrl({ src: id }));
     const promise = new Promise<{ name: string }>(async (resolve, reject) => {
-      const res = await addProductMutation.mutateAsync({
-        ...data,
-        image: ids,
-        brandId,
-        categoryId,
-      });
-      if (res.error) reject(res.error);
-      resolve(res);
+      await addProductMutation
+        .mutateAsync({ ...data, image: ids, brandId, categoryId })
+        .then(resolve)
+        .catch(reject);
     });
     toast.promise(promise, {
       loading: "Adding product...",
       success: data => {
         setPublicId([]);
-        setTimeout(() => router.push("/products"), 2000);
+        setTimeout(() => {
+          router.push("/products");
+          router.refresh();
+        }, 2000);
         return `${data.name} has been added`;
       },
       error: err => err || "An unexpected error occurred",
@@ -68,16 +67,22 @@ const NewProductForm = () => {
   };
 
   return (
-    <form className="flex flex-col gap-4" action={handleSubmitSignUp}>
+    <form className="flex flex-col gap-4" action={handleSubmit}>
       <Flex direction="column" gap="4" align="start">
-        <Uoload publicId={publicId} setPublicId={setPublicId} />
+        <Uoload
+          publicId={publicId}
+          setPublicId={setPublicId}
+          folder="products"
+          maxFiles={10}
+          multiple
+        />
         <Input
           isRequired
           variant="underlined"
           name="name"
           label="Name"
           type="text"
-          validate={value => validateSchema(value, stringMinMaxSchema("Name", 2, 100))}
+          validate={value => validateSchema(value, stringMinMaxSchema("Name", 2, 256))}
           errorMessage={valid => valid.validationErrors}
         />
         <Textarea

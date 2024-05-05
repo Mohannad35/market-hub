@@ -14,9 +14,12 @@ interface CloudinaryResult {
 interface UoloadProps {
   publicId: string[];
   setPublicId: Dispatch<SetStateAction<string[]>>;
+  folder: string;
+  multiple?: boolean;
+  maxFiles?: number;
 }
 
-const Uoload = ({ publicId, setPublicId }: UoloadProps) => {
+const Uoload = ({ publicId, setPublicId, folder, multiple = false, maxFiles }: UoloadProps) => {
   const { theme, systemTheme } = useTheme();
 
   const onAbort = async () => {
@@ -46,14 +49,14 @@ const Uoload = ({ publicId, setPublicId }: UoloadProps) => {
       <CldUploadWidget
         uploadPreset={process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET}
         options={{
-          folder: "products",
+          folder,
           resourceType: "image",
           sources: ["local", "url", "camera", "image_search", "facebook", "dropbox", "instagram"],
           googleApiKey: process.env.NEXT_PUBLIC_CLOUDINARY_GOOGLE_API_KEY,
           showAdvancedOptions: false,
           cropping: false,
-          multiple: true,
-          maxFiles: 10,
+          multiple,
+          maxFiles,
           maxFileSize: 5_242_880, // 5MB
           defaultSource: "local",
           theme: "default",

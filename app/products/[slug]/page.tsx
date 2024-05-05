@@ -1,12 +1,29 @@
 import { Flex } from "@radix-ui/themes";
 import ProductDetails from "./ProductDetails";
+import ProductRates from "./ProductRates";
+import { dehydrate, HydrationBoundary, QueryClient } from "@tanstack/react-query";
+import { getProduct } from "./getProduct";
 
-const ProductDetailsPage = ({ params: { slug } }: { params: { slug: string } }) => {
+interface Params {
+  params: { slug: string };
+}
+
+export default async function ProductDetailsPage({ params: { slug } }: Params) {
+  const queryClient = new QueryClient();
+
+  await queryClient.prefetchQuery({
+    queryKey: ["product", slug],
+    queryFn: getProduct,
+  });
+
   return (
-    <Flex direction="column" className="container">
-      <ProductDetails slug={slug} />
-    </Flex>
+    // Neat! Serialization is now as easy as passing props.
+    // HydrationBoundary is a Client Component, so hydration will happen there.
+    <HydrationBoundary state={dehydrate(queryClient)}>
+      <Flex direction="column" className="container" gapY="4">
+        <ProductDetails slug={slug} />
+        <ProductRates slug={slug} />
+      </Flex>
+    </HydrationBoundary>
   );
-};
-
-export default ProductDetailsPage;
+}

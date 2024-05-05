@@ -26,7 +26,7 @@ const providers: Provider[] = [
       email: { label: "Email", type: "email", placeholder: "jsmith@example.com" },
       password: { label: "Password", type: "password" },
     },
-    authorize: async (credentials, req) => {
+    authorize: async (credentials, request) => {
       const { email, password } = credentials;
       if (!email || !password) return null;
       // logic to verify if user exists

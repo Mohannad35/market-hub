@@ -1,3 +1,5 @@
+"use client";
+
 import {
   Carousel,
   CarouselContent,
@@ -37,17 +39,17 @@ export function Slider({ items }: { items: { id: number; url: string }[] }) {
   }, [emblaMainApi, onSelect]);
 
   return (
-    <Flex direction={"row"} gap="1rem" minWidth='600px'>
+    <Flex direction="row" gap="0.5rem" minWidth="600px">
       <Carousel
         setApi={setEmblaThumbsApi}
         opts={{ align: "start", containScroll: "keepSnaps", dragFree: true }}
-        className="w-full max-w-[5rem]"
+        className="w-full max-w-[3rem]"
         orientation="vertical"
       >
-        <CarouselContent className="-mt-1 h-[30rem]">
+        <CarouselContent className="-mt-4 h-[30rem]">
           {items.map((item, index) => (
-            <CarouselItem key={index} className="basis-1/5">
-              <button onClick={() => onThumbClick(index)} className="w-[5rem]">
+            <CarouselItem key={index} className="basis-1/12">
+              <button onClick={() => onThumbClick(index)} className="w-[3rem]">
                 <Image
                   width={720}
                   height={720}
@@ -67,7 +69,7 @@ export function Slider({ items }: { items: { id: number; url: string }[] }) {
       </Carousel>
 
       <Flex direction={"column"} gap="1rem">
-        <Carousel setApi={setEmblaMainApi} className="w-full max-w-sm">
+        <Carousel setApi={setEmblaMainApi} className="w-full max-w-md">
           <CarouselContent>
             {items.map((item, index) => (
               <CarouselItem key={index}>

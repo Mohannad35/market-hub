@@ -1,8 +1,9 @@
 "use client";
 
 import Pagination from "@/components/common/Pagination";
-import { useProducts } from "@/hook/use-query-hooks";
+import { useQueryHook } from "@/hook/use-tanstack-hooks";
 import { Spinner } from "@nextui-org/spinner";
+import { Product } from "@prisma/client";
 import { Flex, Text } from "@radix-ui/themes";
 import { useSearchParams } from "next/navigation";
 import { useEffect } from "react";
@@ -10,7 +11,10 @@ import ProductCard from "./ProductCard";
 
 const ProductCardContainer = () => {
   const searchParams = useSearchParams();
-  const { data, isSuccess, error, isLoading, isRefetching, refetch } = useProducts(searchParams);
+  const { data, isSuccess, error, isLoading, isRefetching, refetch } = useQueryHook<{
+    products: Product[];
+    count: number;
+  }>("/api/products", ["products", searchParams.get("page") || "1"], searchParams.toString());
 
   useEffect(() => {
     refetch();

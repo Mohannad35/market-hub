@@ -13,6 +13,26 @@ generator client {
   provider = "prisma-client-js"
 }
 
+enum CouponType {
+  admin
+  vendor
+}
+
+enum Status {
+  pending
+  processing
+  shipped
+  delivered
+  canceled
+}
+
+enum RequestStatus {
+  pending
+  processing
+  accepted
+  canceled
+}
+
 enum Gender {
   male
   female
@@ -43,6 +63,13 @@ model User {
   accounts        Account[]
   sessions        Session[]
   products        Product[]
+  coupons         Coupon[]
+  activeCartId    String?   @db.ObjectId
+  carts           Cart[]
+  lists           List[]
+  orders          Order[]
+  rates           Rate[]
+  requests        Request[]
 
   // Optional for WebAuthn support
   Authenticator Authenticator[]
@@ -52,22 +79,26 @@ model User {
 }
 
 model Product {
-  id          String    @id @default(auto()) @map("_id") @db.ObjectId
+  id          String     @id @default(auto()) @map("_id") @db.ObjectId
   name        String
-  slug        String    @unique
+  slug        String     @unique
   description String
   price       Float
   quantity    Int
   image       String[]
-  sold        Int       @default(0)
-  rating      Float     @default(0)
-  ratingCount Int       @default(0)
-  vendorId    String    @db.ObjectId
-  brandId     String?   @db.ObjectId
-  categoryId  String?   @db.ObjectId
-  vendor      User      @relation(fields: [vendorId], references: [id])
-  brand       Brand?    @relation(fields: [brandId], references: [id])
-  category    Category? @relation(fields: [categoryId], references: [id])
+  sold        Int        @default(0)
+  rating      Float      @default(0)
+  ratingCount Int        @default(0)
+  cartItems   CartItem[]
+  vendorId    String     @db.ObjectId
+  vendor      User       @relation(fields: [vendorId], references: [id])
+  brandId     String     @db.ObjectId
+  brand       Brand      @relation(fields: [brandId], references: [id])
+  categoryId  String     @db.ObjectId
+  category    Category   @relation(fields: [categoryId], references: [id])
+  listsId     String[]   @db.ObjectId
+  lists       List[]     @relation(fields: [listsId], references: [id])
+  rates       Rate[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -85,18 +116,135 @@ model Brand {
 }
 
 model Category {
-  id            String     @id @default(auto()) @map("_id") @db.ObjectId
-  name          String
-  slug          String     @unique
-  image         String?
-  isPredecessor Boolean    @default(false)
-  predecessorId String?    @db.ObjectId
-  predecessor   Category?  @relation("BlogOwnerHistory", fields: [predecessorId], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  successors    Category[] @relation("BlogOwnerHistory")
-  products      Product[]
+  id       String    @id @default(auto()) @map("_id") @db.ObjectId
+  name     String
+  path     String    @unique
+  image    String?
+  products Product[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model Coupon {
+  id          String     @id @default(auto()) @map("_id") @db.ObjectId
+  code        String     @unique
+  name        String?
+  description String?
+  type        CouponType @default(vendor)
+  value       Float
+  minAmount   Float      @default(0)
+  maxAmount   Float
+  startDate   DateTime   @default(now())
+  endDate     DateTime
+  isActive    Boolean    @default(true)
+  cartsId     String[]   @db.ObjectId
+  carts       Cart[]     @relation(fields: [cartsId], references: [id])
+  userId      String     @db.ObjectId
+  user        User       @relation(fields: [userId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Cart {
+  id         String     @id @default(auto()) @map("_id") @db.ObjectId
+  userId     String     @unique @db.ObjectId
+  user       User       @relation(fields: [userId], references: [id])
+  couponsId  String[]   @db.ObjectId
+  coupons    Coupon[]   @relation(fields: [couponsId], references: [id])
+  bill       Float
+  billBefore Float
+  items      Item[]
+  cartItems  CartItem[]
+  order      Order?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+type Item {
+  quantity   Int
+  priceAfter Float
+  product    String @db.ObjectId
+}
+
+model CartItem {
+  id         String  @id @default(auto()) @map("_id") @db.ObjectId
+  quantity   Int
+  priceAfter Float
+  cartId     String  @db.ObjectId
+  productId  String  @db.ObjectId
+  cart       Cart    @relation(fields: [cartId], references: [id])
+  product    Product @relation(fields: [productId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([cartId, productId])
+}
+
+model List {
+  id          String    @id @default(auto()) @map("_id") @db.ObjectId
+  name        String
+  description String?
+  userId      String    @db.ObjectId
+  user        User      @relation(fields: [userId], references: [id])
+  productsId  String[]  @db.ObjectId
+  Products    Product[] @relation(fields: [productsId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, name])
+}
+
+model Order {
+  id      String @id @default(auto()) @map("_id") @db.ObjectId
+  code    String @unique
+  userId  String @db.ObjectId
+  user    User   @relation(fields: [userId], references: [id])
+  cartId  String @unique @db.ObjectId
+  cart    Cart   @relation(fields: [cartId], references: [id])
+  address String
+  phone   String
+  email   String
+  status  Status @default(pending)
+  payment String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, cartId])
+}
+
+model Rate {
+  id        String  @id @default(auto()) @map("_id") @db.ObjectId
+  rate      Float
+  comment   String?
+  productId String  @db.ObjectId
+  product   Product @relation(fields: [productId], references: [id])
+  userId    String  @db.ObjectId
+  user      User    @relation(fields: [userId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([productId, userId])
+}
+
+model Request {
+  id      String        @id @default(auto()) @map("_id") @db.ObjectId
+  type    String
+  userId  String        @db.ObjectId
+  user    User          @relation(fields: [userId], references: [id])
+  details String
+  status  RequestStatus @default(pending)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, type])
 }
 
 model Account {

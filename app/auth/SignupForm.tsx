@@ -1,10 +1,11 @@
 "use client";
 
-import { useSignupMutation } from "@/hook/use-mutation-hooks";
+import { useMutationHook } from "@/hook/use-tanstack-hooks";
 import { getFormDataObject, validateSchema } from "@/lib/utils";
 import { stringMinMaxSchema, stringSchema } from "@/lib/validation-schemas";
 import { Button } from "@nextui-org/button";
 import { Input } from "@nextui-org/input";
+import { User } from "@prisma/client";
 import { Text } from "@radix-ui/themes";
 import { EyeIcon, EyeOffIcon } from "lucide-react";
 import { Dispatch, SetStateAction, useState } from "react";
@@ -13,21 +14,21 @@ import { toast } from "react-toastify";
 const SignupForm = ({ setTab }: { setTab: Dispatch<SetStateAction<string | number>> }) => {
   const [isVisible, setIsVisible] = useState(false);
   const toggleVisibility = () => setIsVisible(!isVisible);
-  const signupMutation = useSignupMutation();
+  const signupMutation = useMutationHook<User>("/api/auth", ["signup"]);
 
   const handleSubmitSignUp = async (formData: FormData) => {
     const data = getFormDataObject(formData);
-    const promise = new Promise<{ name: string }>(async (resolve, reject) => {
-      const res = await signupMutation.mutateAsync(data);
-      if (res.error) reject(res.error);
-      resolve(res);
-    });
+    const promise = new Promise<{ name: string }>(async (resolve, reject) =>
+      signupMutation.mutateAsync(data).then(resolve).catch(reject)
+    );
     toast.promise(
       promise,
       {
         pending: "Signing up...",
         success: "Signed up successfully",
-        error: { render: ({ data }: { data: string }) => data || "An unexpected error occurred" },
+        error: {
+          render: ({ data }: { data: Error }) => data.message || "An unexpected error occurred",
+        },
       },
       { toastId: "signup-toast" }
     );

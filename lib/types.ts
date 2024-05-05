@@ -1,5 +1,16 @@
-import { Category } from "@prisma/client";
+import { Brand, Category, Product, Rate } from "@prisma/client";
 
-export interface CategoryWithSuccessors extends Category {
-  successors: Category[];
+export interface ProductWithBrandAndCategoryAndRates extends Product {
+  brand: Brand;
+  category: Category;
+  rates: Rate[];
+}
+
+export interface ProductWithBrandAndCategory extends Product {
+  brand: Brand;
+  category: Category;
+}
+
+export interface ProductWithRates extends Product {
+  rates: Rate[];
 }

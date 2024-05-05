@@ -6,9 +6,9 @@ cloudinary.config({
   cloud_name: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
 });
 
-export async function DELETE(req: NextRequest) {
+export async function DELETE(request: NextRequest) {
   // Get the body of the request and validate it
-  const { publicId }: { publicId: string[] } = await req.json();
+  const { publicId }: { publicId: string[] } = await request.json();
   if (!publicId || publicId.length < 1)
     return NextResponse.json({ error: "No publicId provided" }, { status: 400 });
   publicId.forEach(async id => await cloudinary.uploader.destroy(id));

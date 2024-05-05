@@ -1,14 +1,27 @@
+import { ProductWithBrandAndCategory } from "@/lib/types";
 import { formatErrors, getQueryObject } from "@/lib/utils";
 import { productDetailsQuerySchema } from "@/lib/validation-schemas";
 import prisma from "@/prisma/client";
-import { Prisma } from "@prisma/client";
+import { Prisma, Product } from "@prisma/client";
 import { DefaultArgs } from "@prisma/client/runtime/library";
 import { NextRequest, NextResponse } from "next/server";
 
+/**
+ * API route to get product details
+ * @param request NextRequest object
+ * @param params params containing product slug
+ * @returns { Promise<NextResponse<ProductWithBrandAndCategory | Product | { message: string } | null>> }
+ * @returns returns a product populated with brand and category if requested in the query
+ * @returns returns a product if found by the slug or null if not found
+ * @access public
+ * @method GET
+ * @example /api/products/iphone-12
+ * @example /api/products/iphone-12?populate=brand,category
+ */
 export async function GET(
   request: NextRequest,
   { params: { slug } }: { params: { slug: string } }
-) {
+): Promise<NextResponse<ProductWithBrandAndCategory | Product | { message: string } | null>> {
   const searchParams = request.nextUrl.searchParams;
   const query = getQueryObject(searchParams);
   const { success, data, error } = productDetailsQuerySchema.safeParse(query);

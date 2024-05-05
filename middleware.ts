@@ -1,9 +1,9 @@
 import { auth } from '@/auth';
 import { NextResponse } from 'next/server';
 
-export default auth(req => {
-  if (!req.auth) {
-    const { origin, pathname } = req.nextUrl;
+export default auth(request => {
+  if (!request.auth) {
+    const { origin, pathname } = request.nextUrl;
     const callbackUrl = encodeURIComponent(`${origin}${pathname}`.replace(/_next.*/g, ''));
     const authUrl = `${origin}/api/auth/signin?callbackUrl=${callbackUrl}`;
 

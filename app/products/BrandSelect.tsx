@@ -2,21 +2,19 @@
 
 import { Skeleton } from "@/components/ui/skeleton";
 import { createQueryString, deleteQueryString } from "@/hook/query-string-manipulation-hooks";
-import { useBrands, useCategories } from "@/hook/use-query-hooks";
+import { useQueryHook } from "@/hook/use-tanstack-hooks";
 import { Avatar } from "@nextui-org/avatar";
-import { Card } from "@nextui-org/card";
 import { Chip } from "@nextui-org/chip";
 import { Select, SelectedItems, SelectItem } from "@nextui-org/select";
 import { Selection } from "@nextui-org/table";
 import { Brand } from "@prisma/client";
-import { Flex } from "@radix-ui/themes";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
 const BrandSelect = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const brandQuery = useBrands();
+  const brandQuery = useQueryHook<Brand[]>("/api/brands", ["brands", "search"]);
   const [brands, setBrands] = useState<Selection>(() => {
     const brands = searchParams.get("brands");
     return brands ? new Set(brands.split(",")) : new Set();
