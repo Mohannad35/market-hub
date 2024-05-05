@@ -128,6 +128,16 @@ export const newCategorySchema = z
   })
   .strict();
 
+export const newRateSchema = z
+  .object({
+    rate: numberSchema("Rate")
+      .transform(value => parseFloat(value))
+      .refine(value => value > 0 && value <= 5, "Rate must be between 0 and 5"),
+    comment: stringMinMaxSchema("Comment", 2, 10_000).optional(),
+    productId: idSchema("Product"),
+  })
+  .strict();
+
 export const signUpSchema = z.object({
   name: z.string().min(2),
   email: z.string().email(),
@@ -185,3 +195,21 @@ export const productQuerySchema = z.object({
 export const productDetailsQuerySchema = z.object({
   populate: populateProductSchema,
 });
+
+export const productRatesQuerySchema = z
+  .object({
+    pageSize: integerSchema("Page Size")
+      .optional()
+      .transform(value => (value ? parseInt(value) : undefined)),
+    page: integerSchema("Page")
+      .optional()
+      .transform(value => (value ? parseInt(value) : undefined)),
+    sortBy: regexSchema(/^(name|price|createdAt|sold|rating)$/g, "Sort By").default("createdAt"),
+    direction: directionSchema("Direction"),
+    productId: idSchema("Product").optional(),
+    productSlug: stringMinMaxSchema("Product Slug", 2, 256).optional(),
+  })
+  .refine(
+    ({ productId, productSlug }) => productId || productSlug,
+    "Product Id or Slug is required"
+  );

@@ -119,6 +119,7 @@ model Category {
   id       String    @id @default(auto()) @map("_id") @db.ObjectId
   name     String
   path     String    @unique
+  parent   String
   image    String?
   products Product[]
 

@@ -33,7 +33,7 @@ export async function POST(
   if (parent && !(await prisma.category.findUnique({ where: { path: parent } })))
     return NextResponse.json({ message: "Parent doesn't exist" }, { status: 400 });
   // Create the category
-  const category = await prisma.category.create({ data });
+  const category = await prisma.category.create({ data: { ...data, parent: parent || "/" } });
   return NextResponse.json(category, { status: 201 });
 }
 

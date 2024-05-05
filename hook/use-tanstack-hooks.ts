@@ -20,7 +20,8 @@ import {
 export function useQueryHook<TData, TError = Error>(
   url: string,
   key: string[],
-  query?: string
+  query?: string,
+  enabled: boolean = true
 ): UseQueryResult<TData, TError> {
   return useQuery<TData, TError>({
     queryKey: [...key],
@@ -33,6 +34,7 @@ export function useQueryHook<TData, TError = Error>(
     },
     staleTime: 1000 * 60, // 1 minute
     retry: 3,
+    enabled,
     placeholderData: keepPreviousData,
   });
 }

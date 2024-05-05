@@ -10,18 +10,12 @@ import { Product } from "@prisma/client";
 import { Flex, Text } from "@radix-ui/themes";
 import NextImage from "next/image";
 import NextLink from "next/link";
-import { useRouter } from "next/navigation";
 
 export interface ProductCardProps extends CardProps {
   product: Product;
 }
 
-const ProductCard = ({ onPress, product, ...props }: ProductCardProps) => {
-  const router = useRouter();
-
-  const handlePress = (slug: string) => {
-    router.push(`/products/${slug}`);
-  };
+const ProductCard = ({ product, ...props }: ProductCardProps) => {
   return (
     <Card
       radius="none"

@@ -3,6 +3,8 @@ import ProductDetails from "./ProductDetails";
 import ProductRates from "./ProductRates";
 import { dehydrate, HydrationBoundary, QueryClient } from "@tanstack/react-query";
 import { getProduct } from "./getProduct";
+import { Divider } from "@nextui-org/divider";
+import RelatedProducts from "./RelatedProducts";
 
 interface Params {
   params: { slug: string };
@@ -22,6 +24,8 @@ export default async function ProductDetailsPage({ params: { slug } }: Params) {
     <HydrationBoundary state={dehydrate(queryClient)}>
       <Flex direction="column" className="container" gapY="4">
         <ProductDetails slug={slug} />
+        <RelatedProducts slug={slug} />
+        <Divider />
         <ProductRates slug={slug} />
       </Flex>
     </HydrationBoundary>

@@ -1,13 +1,13 @@
 "use client";
 
 import Pagination from "@/components/common/Pagination";
+import ProductCard from "@/components/product/ProductCard";
 import { useQueryHook } from "@/hook/use-tanstack-hooks";
 import { Spinner } from "@nextui-org/spinner";
 import { Product } from "@prisma/client";
 import { Flex, Text } from "@radix-ui/themes";
 import { useSearchParams } from "next/navigation";
 import { useEffect } from "react";
-import ProductCard from "./ProductCard";
 
 const ProductCardContainer = () => {
   const searchParams = useSearchParams();
