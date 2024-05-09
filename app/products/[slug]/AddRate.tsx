@@ -2,6 +2,7 @@
 
 import MuiRating from "@/components/common/Rating";
 import { useMutationHook } from "@/hook/use-tanstack-hooks";
+import { getRate } from "@/lib/query-functions/rate";
 import { ProductWithBrandAndCategoryAndRates } from "@/lib/types";
 import { getFormDataObject, validateSchema } from "@/lib/utils";
 import { stringMinMaxSchema } from "@/lib/validation-schemas";
@@ -11,7 +12,6 @@ import { Flex, Text } from "@radix-ui/themes";
 import { QueryObserverResult, RefetchOptions, useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { toast } from "sonner";
-import { getRate } from "./getRate";
 
 interface AddRateProps {
   productId: string;
@@ -29,7 +29,7 @@ const AddRate = ({ productId, refetchProduct }: AddRateProps) => {
   });
 
   const handleSubmit = async (formData: FormData) => {
-    const body = getFormDataObject(formData);
+    const body = getFormDataObject<{ rating: string; comment: string }>(formData);
     const { rating, comment } = body;
     const promise = new Promise<Rate>(async (resolve, reject) =>
       addRateMutation.mutateAsync({ rate: rating, comment, productId }).then(resolve).catch(reject)

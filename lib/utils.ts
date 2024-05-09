@@ -28,10 +28,10 @@ export const validateSchema = (
   return valid.success ? true : formatErrors(valid.error).message;
 };
 
-export function getFormDataObject(formData: FormData): { [key: string]: FormDataEntryValue } {
+export function getFormDataObject<TData>(formData: FormData) {
   const data: { [key: string]: FormDataEntryValue } = {};
   formData.forEach((value, key) => (data[key] = value));
-  return data;
+  return data as TData;
 }
 
 export function formatErrors(error: ZodError | Error) {

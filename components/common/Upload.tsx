@@ -1,60 +1,93 @@
 "use client";
 
+import { Modify } from "@/lib/types";
 import { Button } from "@nextui-org/button";
-import { Flex } from "@radix-ui/themes";
-import { CloudUploadIcon } from "lucide-react";
-import { CldImage, CldUploadWidget } from "next-cloudinary";
+import { Card, CardFooter } from "@nextui-org/react";
+import { Flex, Text } from "@radix-ui/themes";
+import { CloudUploadIcon, Trash2Icon } from "lucide-react";
+import { CldImage, CldUploadWidget, CldUploadWidgetProps } from "next-cloudinary";
 import { useTheme } from "next-themes";
-import { Dispatch, SetStateAction } from "react";
+import { Dispatch, SetStateAction, useCallback } from "react";
+import { useBeforeUnload, useUnmount } from "react-use";
 
 interface CloudinaryResult {
   public_id: string;
 }
-
-interface UoloadProps {
-  publicId: string[];
-  setPublicId: Dispatch<SetStateAction<string[]>>;
-  folder: string;
-  multiple?: boolean;
-  maxFiles?: number;
-}
-
-const Uoload = ({ publicId, setPublicId, folder, multiple = false, maxFiles }: UoloadProps) => {
+type Props = Modify<
+  CldUploadWidgetProps,
+  {
+    publicId: string[];
+    setPublicId: Dispatch<SetStateAction<string[]>>;
+    folder: string;
+    multiple?: boolean;
+    maxFiles?: number;
+  }
+>;
+const Uoload = ({ publicId, setPublicId, folder, multiple = false, maxFiles, ...props }: Props) => {
   const { theme, systemTheme } = useTheme();
-
-  const onAbort = async () => {
-    if (publicId?.length < 1) return;
+  const onAbort = useCallback(() => {
+    if (publicId.length < 1) return false;
     setPublicId(publicId => {
-      fetch("/api/admin/upload", { method: "DELETE", body: JSON.stringify({ publicId }) });
-      return [];
+      const ids = publicId.filter(id => id.startsWith("https"));
+      const deleted = publicId.filter(id => !id.startsWith("https"));
+      fetch("/api/admin/upload", { method: "DELETE", body: JSON.stringify({ publicId: deleted }) });
+      return ids;
+    });
+    return true;
+  }, [publicId.length, setPublicId]);
+  useUnmount(onAbort);
+  useBeforeUnload(onAbort, "You have unsaved changes, are you sure?");
+
+  const handleDelete = async (id: string[]) => {
+    const regex = new RegExp(`market-hub\/${folder}\/\\w+`);
+    const ids = id.map(i => (i.startsWith("http") ? i.match(regex) : i));
+    setPublicId(publicId => {
+      fetch("/api/admin/upload", { method: "DELETE", body: JSON.stringify({ publicId: ids }) });
+      return publicId.filter(i => !id.includes(i));
     });
   };
-
   return (
     <Flex direction="column" gap="5" justify="start" align="start">
-      <div className="flex flex-wrap">
+      <Flex wrap="wrap" gap="4">
         {publicId?.length > 0 &&
           publicId?.map(id => (
-            <CldImage
-              className="object-contain p-5"
-              key={id}
-              src={id}
-              alt={""}
-              width={270}
-              height={180}
-            />
+            <Card key={id} className="h-[200px] w-[200px] border-none ">
+              <Flex className="h-[200px] w-[200px]">
+                <CldImage
+                  key={id}
+                  src={id}
+                  alt={""}
+                  width={200}
+                  height={200}
+                  className="rounded-md object-contain"
+                />
+              </Flex>
+              <CardFooter className="absolute bottom-1 z-10 ml-1 h-[40px] w-[40px] rounded-large p-0">
+                <Button
+                  isIconOnly
+                  variant="faded"
+                  color="danger"
+                  size="sm"
+                  className="z-50"
+                  radius="lg"
+                  onPress={() => handleDelete([id])}
+                >
+                  <Trash2Icon size={20} />
+                </Button>
+              </CardFooter>
+            </Card>
           ))}
-      </div>
+      </Flex>
 
       <CldUploadWidget
-        uploadPreset={process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET}
+        signatureEndpoint="/api/sign-cloudinary-params"
         options={{
-          folder,
           resourceType: "image",
           sources: ["local", "url", "camera", "image_search", "facebook", "dropbox", "instagram"],
           googleApiKey: process.env.NEXT_PUBLIC_CLOUDINARY_GOOGLE_API_KEY,
           showAdvancedOptions: false,
           cropping: false,
+          folder: `market-hub/${folder}`,
           multiple,
           maxFiles,
           maxFileSize: 5_242_880, // 5MB
@@ -110,23 +143,23 @@ const Uoload = ({ publicId, setPublicId, folder, multiple = false, maxFiles }: U
           console.error("Upload error:", error);
           onAbort();
         }}
+        {...props}
       >
-        {({ open }) => {
-          function handleOnClick() {
-            onAbort();
-            open();
-          }
-          return (
-            <Button
-              startContent={<CloudUploadIcon />}
-              variant="solid"
-              color="primary"
-              onClick={handleOnClick}
-            >
+        {({ open }) => (
+          <Button
+            startContent={<CloudUploadIcon />}
+            variant="solid"
+            color="primary"
+            onClick={() => {
+              if (!multiple) handleDelete(publicId);
+              open();
+            }}
+          >
+            <Text size="4" weight="medium">
               Images
-            </Button>
-          );
-        }}
+            </Text>
+          </Button>
+        )}
       </CldUploadWidget>
     </Flex>
   );

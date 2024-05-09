@@ -12,7 +12,6 @@ const PriceFilter = () => {
   const searchParams = useSearchParams();
 
   const handleSubmit = (formData: FormData) => {
-    console.log(formData.get("minPrice"), formData.get("maxPrice"));
     const minPrice = formData.get("minPrice") as string;
     const maxPrice = formData.get("maxPrice") as string;
     const query = new URLSearchParams(searchParams.toString());

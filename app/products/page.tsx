@@ -1,7 +1,7 @@
+import CardContainer from "@/components/common/CardContainer";
 import { Flex } from "@radix-ui/themes";
 import FilterSidebar from "./FilterSidebar";
-import ProductCardContainer from "./ProductCardContainer";
-import Toolbar from "./Toolbar";
+import ProductCard from "@/components/product/ProductCard";
 
 const ProductsPage = async () => {
   return (
@@ -9,12 +9,12 @@ const ProductsPage = async () => {
       <FilterSidebar />
 
       <Flex width="100%" direction="column" gap="5" justify="start" align="start" px="2rem">
-        {/* <Button href="/products/new" as={Link} color="primary" variant="solid">
-          New Product
-        </Button> */}
-        <Toolbar />
-
-        <ProductCardContainer />
+        <CardContainer
+          label="products"
+          api="/api/products"
+          uniqueKey="searchProducts"
+          Card={ProductCard}
+        />
       </Flex>
     </Flex>
   );

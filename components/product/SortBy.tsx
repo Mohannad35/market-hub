@@ -6,18 +6,7 @@ import { Selection } from "@nextui-org/table";
 import { ArrowUpDownIcon } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 
-const sortOpts = [
-  { label: "Newest", value: "createdAt-desc" },
-  { label: "Oldest", value: "createdAt-asc" },
-  { label: "Title: A-Z", value: "name-asc" },
-  { label: "Title: Z-A", value: "name-desc" },
-  { label: "Price: Low to High", value: "price-asc" },
-  { label: "Price: High to Low", value: "price-desc" },
-  { label: "Popular", value: "sold-asc" },
-  { label: "Rating", value: "rating-desc" },
-];
-
-const SortBy = () => {
+const SortBy = ({ sortOpts }: { sortOpts: { label: string; value: string }[] }) => {
   const router = useRouter();
   const searchParams = useSearchParams();
 

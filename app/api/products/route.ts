@@ -2,16 +2,19 @@ import { auth } from "@/auth";
 import { newProductSchema, productQuerySchema } from "@/lib/validation-schemas";
 import { formatErrors, getQueryObject } from "@/lib/utils";
 import prisma from "@/prisma/client";
-import { Prisma, Product } from "@prisma/client";
+import { Prisma, Product, User } from "@prisma/client";
 import { DefaultArgs } from "@prisma/client/runtime/library";
 import { nanoid } from "nanoid";
 import { NextRequest, NextResponse } from "next/server";
 import slugify from "slugify";
+import { ApiError } from "next/dist/server/api-utils";
+import { wrapperMiddleware } from "@/lib/middleware/wrapper";
+import { authMiddleware } from "@/lib/middleware/auth";
 
 /**
  * API route to create a new product
  * @param request NextRequest object
- * @returns { Promise<NextResponse<Product | { message: string } | {}>> }
+ * @returns { Promise<NextResponse<Product>> }
  * @returns returns the created product if successfully created
  * @returns returns an empty response if the user is not authenticated with status 401
  * @returns returns an empty response if the user is not found with status 401
@@ -20,17 +23,12 @@ import slugify from "slugify";
  * @method POST
  * @example /api/products
  */
-export async function POST(
-  request: NextRequest
-): Promise<NextResponse<Product | { message: string } | {}>> {
-  const session = await auth();
-  if (!session?.user?.email) return NextResponse.json({}, { status: 401 });
-  const user = await prisma.user.findUnique({ where: { email: session.user.email } });
-  if (!user) return NextResponse.json({}, { status: 401 });
+async function POST_handler(request: NextRequest): Promise<NextResponse<Product>> {
+  const user = JSON.parse(request.cookies.get("user")!.value!) as User;
   // Get the body of the request and validate it
   const body = await request.json();
   const { success, data, error } = newProductSchema.safeParse(body);
-  if (!success) return NextResponse.json(formatErrors(error), { status: 400 });
+  if (!success) throw new ApiError(400, formatErrors(error).message);
   // Create a slug for the product
   let slug = slugify(data.name, { lower: true, strict: true, trim: true });
   while (await prisma.product.findUnique({ where: { slug } })) slug = `${slug}-${nanoid(8)}`;
@@ -42,7 +40,7 @@ export async function POST(
 /**
  * API route to get a list of products
  * @param request NextRequest object
- * @returns { Promise<NextResponse<{ products: Product[]; count: number } | { message: string }>> }
+ * @returns { Promise<NextResponse<{ items: Product[]; count: number }>> }
  * @returns returns a list of products and the total count of products
  * @returns returns an error message if the query is invalid with status 400
  * @access public
@@ -53,13 +51,13 @@ export async function POST(
  * @example /api/products?minPrice=1000&maxPrice=2000
  * @example /api/products?populate=brand,category
  */
-export async function GET(
+async function GET_handler(
   request: NextRequest
-): Promise<NextResponse<{ products: Product[]; count: number } | { message: string }>> {
+): Promise<NextResponse<{ items: Product[]; count: number }>> {
   const searchParams = request.nextUrl.searchParams;
   const query = getQueryObject(searchParams);
   const { success, data, error } = productQuerySchema.safeParse(query);
-  if (!success) return NextResponse.json(formatErrors(error), { status: 400 });
+  if (!success) throw new ApiError(400, formatErrors(error).message);
   const {
     page,
     pageSize,
@@ -90,9 +88,12 @@ export async function GET(
     skip: ((page || 1) - 1) * (pageSize || 20),
     include: popObj,
   };
-  const [products, count] = await prisma.$transaction([
+  const [items, count] = await prisma.$transaction([
     prisma.product.findMany(prismaQuery),
     prisma.product.count({ where: prismaQuery.where }),
   ]);
-  return NextResponse.json({ products, count });
+  return NextResponse.json({ items, count });
 }
+
+export const POST = wrapperMiddleware(authMiddleware, POST_handler);
+export const GET = wrapperMiddleware(GET_handler);

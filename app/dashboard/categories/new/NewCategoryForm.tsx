@@ -1,6 +1,6 @@
 "use client";
 
-import Uoload from "@/components/common/Upload";
+import Upload from "@/components/common/Upload";
 import { useMutationHook, useQueryHook } from "@/hook/use-tanstack-hooks";
 import { getFormDataObject, validateSchema } from "@/lib/utils";
 import { stringMinMaxSchema, stringSchema } from "@/lib/validation-schemas";
@@ -11,41 +11,28 @@ import { Category } from "@prisma/client";
 import { Flex, Text } from "@radix-ui/themes";
 import { getCldImageUrl } from "next-cloudinary";
 import { useRouter } from "next/navigation";
-import { useCallback, useState } from "react";
-import { useBeforeUnload, useUnmount } from "react-use";
+import { useState } from "react";
 import { toast } from "sonner";
 
 const NewCategoryForm = () => {
   const router = useRouter();
   const [publicId, setPublicId] = useState<string[]>([]);
-  const [parentPath, setParentPath] = useState<string>("");
+  const [parentPath, setParentPath] = useState<string>("/");
   const addCategoryMutation = useMutationHook<Category>("/api/categories", ["newCategory"]);
-  const categoriesQuery = useQueryHook<Category[]>("/api/categories", ["categories", "new"]);
-
-  const beforeUnmount = useCallback(() => {
-    if (publicId.length > 0) {
-      setPublicId(publicId => {
-        fetch("/api/admin/upload", { method: "DELETE", body: JSON.stringify({ publicId }) });
-        return [];
-      });
-    }
-    return publicId.length > 0;
-  }, [publicId]);
-  useUnmount(beforeUnmount);
-  useBeforeUnload(beforeUnmount, "You have unsaved changes, are you sure?");
+  const categoriesQuery = useQueryHook<{ items: Category[]; count: number }>("/api/categories", [
+    "categories",
+    "new",
+  ]);
 
   const handleSubmit = async (formData: FormData) => {
     if (publicId.length < 1) return toast.error("A category needs at least one image");
-    const data = getFormDataObject(formData);
+    const data = getFormDataObject<Pick<Category, "name">>(formData);
     const ids = publicId.map(id => getCldImageUrl({ src: id }));
     const { name } = data;
+    console.log(parentPath);
     const promise = new Promise<{ name: string }>(async (resolve, reject) =>
       addCategoryMutation
-        .mutateAsync({
-          name,
-          path: `${parentPath}/${(name as string).toLowerCase()}`,
-          image: ids[0],
-        })
+        .mutateAsync({ name, parent: parentPath, image: ids[0] })
         .then(resolve)
         .catch(reject)
     );
@@ -54,7 +41,7 @@ const NewCategoryForm = () => {
       success: data => {
         setPublicId([]);
         setTimeout(() => {
-          router.push("/categories");
+          router.push("/dashboard/categories");
           router.refresh();
         }, 2000);
         return `${data.name} has been added`;
@@ -64,9 +51,12 @@ const NewCategoryForm = () => {
   };
 
   return (
-    <form className="flex flex-col gap-4" action={handleSubmit}>
+    <form action={handleSubmit}>
       <Flex direction="column" gap="4" align="start">
-        <Uoload publicId={publicId} setPublicId={setPublicId} folder="categories" />
+        <Text size="7" weight="medium">
+          New Category
+        </Text>
+        <Upload publicId={publicId} setPublicId={setPublicId} folder="categories" />
         <Input
           isRequired
           variant="underlined"
@@ -78,7 +68,7 @@ const NewCategoryForm = () => {
         />
         {categoriesQuery.isSuccess && (
           <Autocomplete
-            defaultItems={categoriesQuery.data}
+            defaultItems={categoriesQuery.data.items}
             label="Parent Category"
             variant="underlined"
             selectedKey={parentPath}

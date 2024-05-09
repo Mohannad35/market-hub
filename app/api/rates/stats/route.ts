@@ -5,6 +5,7 @@ import prisma from "@/prisma/client";
 import { ApiError } from "next/dist/server/api-utils";
 import { NextRequest, NextResponse } from "next/server";
 
+// get rating stats for a product
 const GET_handler = async (request: NextRequest) => {
   const query = getQueryObject(request.nextUrl.searchParams);
   const { success, data, error } = productRatesQuerySchema.safeParse(query);

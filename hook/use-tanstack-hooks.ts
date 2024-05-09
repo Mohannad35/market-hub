@@ -40,6 +40,7 @@ export function useQueryHook<TData, TError = Error>(
 }
 
 type TVariables = { [key: string]: string[] | FormDataEntryValue };
+type TMethod = "POST" | "PUT" | "PATCH" | "DELETE";
 /**
  * This hook is used to add or edit data to the server
  * @param url string API endpoint
@@ -52,7 +53,7 @@ type TVariables = { [key: string]: string[] | FormDataEntryValue };
 export function useMutationHook<TData, TError = Error>(
   url: string,
   key: string[],
-  method = "POST",
+  method: TMethod = "POST",
   query?: string
 ): UseMutationResult<TData, TError, TVariables> {
   return useMutation<TData, TError, TVariables>({

@@ -1,12 +1,12 @@
 "use client";
 
 import ProductCard from "@/components/product/ProductCard";
+import { getProduct, getRelatedProducts } from "@/lib/query-functions/product";
 import { ProductWithBrandAndCategoryAndRates } from "@/lib/types";
 import { Divider } from "@nextui-org/react";
 import { Product } from "@prisma/client";
 import { Flex, Text } from "@radix-ui/themes";
 import { useQuery } from "@tanstack/react-query";
-import { getProduct, getRelatedProducts } from "./getProduct";
 
 const RelatedProducts = ({ slug }: { slug: string }) => {
   const { data: product } = useQuery<ProductWithBrandAndCategoryAndRates>({
@@ -34,6 +34,9 @@ const RelatedProducts = ({ slug }: { slug: string }) => {
   return (
     <>
       <Divider />
+      <Text size="4" weight="medium">
+        Related Products
+      </Text>
       <Flex width="100%" direction="row" gap="3" justify="start" align="start">
         {products.map((product, index) => (
           <ProductCard key={index} product={product} />

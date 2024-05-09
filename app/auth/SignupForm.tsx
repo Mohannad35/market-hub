@@ -1,6 +1,7 @@
 "use client";
 
 import { useMutationHook } from "@/hook/use-tanstack-hooks";
+import { Modify } from "@/lib/types";
 import { getFormDataObject, validateSchema } from "@/lib/utils";
 import { stringMinMaxSchema, stringSchema } from "@/lib/validation-schemas";
 import { Button } from "@nextui-org/button";
@@ -11,13 +12,14 @@ import { EyeIcon, EyeOffIcon } from "lucide-react";
 import { Dispatch, SetStateAction, useState } from "react";
 import { toast } from "react-toastify";
 
+type SignupData = Pick<Modify<User, { password: string }>, "name" | "email" | "password">;
 const SignupForm = ({ setTab }: { setTab: Dispatch<SetStateAction<string | number>> }) => {
   const [isVisible, setIsVisible] = useState(false);
   const toggleVisibility = () => setIsVisible(!isVisible);
   const signupMutation = useMutationHook<User>("/api/auth", ["signup"]);
 
   const handleSubmitSignUp = async (formData: FormData) => {
-    const data = getFormDataObject(formData);
+    const data = getFormDataObject<SignupData>(formData);
     const promise = new Promise<{ name: string }>(async (resolve, reject) =>
       signupMutation.mutateAsync(data).then(resolve).catch(reject)
     );

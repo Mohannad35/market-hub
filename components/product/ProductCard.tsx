@@ -11,11 +11,10 @@ import { Flex, Text } from "@radix-ui/themes";
 import NextImage from "next/image";
 import NextLink from "next/link";
 
-export interface ProductCardProps extends CardProps {
-  product: Product;
+interface ProductCardProps extends CardProps {
+  item: Product;
 }
-
-const ProductCard = ({ product, ...props }: ProductCardProps) => {
+const ProductCard = ({ item, ...props }: ProductCardProps) => {
   return (
     <Card
       radius="none"
@@ -26,7 +25,7 @@ const ProductCard = ({ product, ...props }: ProductCardProps) => {
       <CardBody
         as={NextLink}
         className="items-center justify-normal overflow-x-clip overflow-y-visible p-0"
-        href={`/products/${product.slug}`}
+        href={`/products/${item.slug}`}
       >
         <Image
           shadow="none"
@@ -35,25 +34,25 @@ const ProductCard = ({ product, ...props }: ProductCardProps) => {
           height={480}
           className="max-h-[14rem] object-contain"
           as={NextImage}
-          alt={product.name || "Product Image"}
-          src={product.image[0] || process.env.IMAGE_PLACEHOLDER}
+          alt={item.name || "Product Image"}
+          src={item.image[0] || process.env.IMAGE_PLACEHOLDER}
         />
       </CardBody>
       <CardFooter className="justify-between p-2 text-small">
         <Flex width="260px" gap="2" direction="column" justify="start" align="start">
-          <Tooltip content={product.name} radius="sm">
-            <Link href={`/products/${product.slug}`} color="foreground">
+          <Tooltip content={item.name} radius="sm">
+            <Link href={`/products/${item.slug}`} color="foreground">
               <Text size="5" weight="medium" className="line-clamp-2 w-[260px] text-start">
-                {product.name}
+                {item.name}
               </Text>
             </Link>
           </Tooltip>
 
-          <Rating rating={product.rating} ratingCount={product.ratingCount} />
+          <Rating rating={item.rating} ratingCount={item.ratingCount} />
 
           <Flex width="100%" direction="row" justify="between" align="center">
             <Text weight="medium" className="text-muted-foreground">
-              {product.price} EGP
+              {item.price} EGP
             </Text>
             <Button color="primary" variant="solid" size="sm" radius="lg">
               Add to Cart

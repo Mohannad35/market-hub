@@ -12,11 +12,7 @@ export const metadata: Metadata = {
     "MarketHub is a multi vendor website where you can find any thing you wish for a good price.",
 };
 
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en" suppressHydrationWarning className={`${inter.variable} ${satisfy.variable}`}>
       <body className="min-h-svh">

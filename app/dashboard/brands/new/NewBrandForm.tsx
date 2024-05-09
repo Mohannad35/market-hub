@@ -1,6 +1,6 @@
 "use client";
 
-import Uoload from "@/components/common/Upload";
+import Upload from "@/components/common/Upload";
 import { useMutationHook } from "@/hook/use-tanstack-hooks";
 import { getFormDataObject, validateSchema } from "@/lib/utils";
 import { stringMinMaxSchema } from "@/lib/validation-schemas";
@@ -10,8 +10,7 @@ import { Brand } from "@prisma/client";
 import { Flex, Text } from "@radix-ui/themes";
 import { getCldImageUrl } from "next-cloudinary";
 import { useRouter } from "next/navigation";
-import { useCallback, useState } from "react";
-import { useBeforeUnload, useUnmount } from "react-use";
+import { useState } from "react";
 import { toast } from "react-toastify";
 
 const NewBrandForm = () => {
@@ -19,21 +18,9 @@ const NewBrandForm = () => {
   const [publicId, setPublicId] = useState<string[]>([]);
   const addBrandMutation = useMutationHook<Brand>("/api/brands", ["newBrand"]);
 
-  const beforeUnmount = useCallback(() => {
-    if (publicId.length > 0) {
-      setPublicId(publicId => {
-        fetch("/api/admin/upload", { method: "DELETE", body: JSON.stringify({ publicId }) });
-        return [];
-      });
-    }
-    return publicId.length > 0;
-  }, [publicId]);
-  useUnmount(beforeUnmount);
-  useBeforeUnload(beforeUnmount, "You have unsaved changes, are you sure?");
-
   const handleSubmit = async (formData: FormData) => {
     if (publicId.length < 1) return toast.error("A brand needs at least one image");
-    const data = getFormDataObject(formData);
+    const data = getFormDataObject<Pick<Brand, "name">>(formData);
     const ids = publicId.map(id => getCldImageUrl({ src: id }));
     const { name } = data;
     const promise = new Promise<{ name: string }>(async (resolve, reject) =>
@@ -45,7 +32,7 @@ const NewBrandForm = () => {
         render: ({ data }) => {
           setPublicId([]);
           setTimeout(() => {
-            router.push("/brands");
+            router.push("/dashboard/brands");
             router.refresh();
           }, 2000);
           return `${data.name} has been added`;
@@ -58,9 +45,12 @@ const NewBrandForm = () => {
   };
 
   return (
-    <form className="flex flex-col gap-4" action={handleSubmit}>
+    <form action={handleSubmit}>
       <Flex direction="column" gap="4" align="start">
-        <Uoload publicId={publicId} setPublicId={setPublicId} folder="brands" />
+        <Text size="7" weight="medium">
+          New Brand
+        </Text>
+        <Upload publicId={publicId} setPublicId={setPublicId} folder="brands" />
         <Input
           isRequired
           variant="underlined"

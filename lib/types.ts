@@ -1,5 +1,15 @@
 import { Brand, Category, Product, Rate, User } from "@prisma/client";
 
+export type Modify<T, R> = Omit<T, keyof R> & R;
+
+export interface CategoryWithProducts extends Category {
+  products: Product[];
+}
+
+export interface BrandWithProducts extends Brand {
+  products: Product[];
+}
+
 export interface ProductWithBrandAndCategoryAndRates extends Product {
   brand: Brand;
   category: Category;

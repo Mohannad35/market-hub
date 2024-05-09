@@ -1,6 +1,7 @@
 "use client";
 
 import Rating from "@/components/common/Rating";
+import { getProduct } from "@/lib/query-functions/product";
 import { ProductWithBrandAndCategoryAndRates } from "@/lib/types";
 import { Selection, Spinner } from "@nextui-org/react";
 import { Flex, Heading, Text } from "@radix-ui/themes";
@@ -9,7 +10,6 @@ import { useState } from "react";
 import AddToCartButton from "./AddToCartButton";
 import BuyNowButton from "./BuyNowButton";
 import CategoriesBreadcrumbs from "./CategoriesBreadcrumbs";
-import { getProduct } from "./getProduct";
 import QuantitySelect from "./QuantitySelect";
 import { Slider } from "./Slider";
 
@@ -23,7 +23,7 @@ const ProductDetails = ({ slug }: { slug: string }) => {
 
   if (isLoading || isRefetching)
     return (
-      <Flex className="h-[calc(100vh-120px)]" width="100%" justify="center" align="center">
+      <Flex width="100%" height="100%" justify="center" align="center">
         <Spinner />
       </Flex>
     );
@@ -36,7 +36,7 @@ const ProductDetails = ({ slug }: { slug: string }) => {
     <Flex direction="column" justify="start" gapY="2">
       <CategoriesBreadcrumbs path={path} />
 
-      <Flex width="100%" direction={{ initial: "column", md: "row" }} gap="1rem">
+      <Flex width="100%" direction={{ initial: "column", lg: "row" }} gap="1rem">
         <Slider items={image.map((img, i) => ({ id: i, url: img }))} />
 
         <Flex direction="column" gap="1rem" width="100%">

@@ -1,7 +1,8 @@
 "use client";
 
-import Uoload from "@/components/common/Upload";
+import Upload from "@/components/common/Upload";
 import { useMutationHook, useQueryHook } from "@/hook/use-tanstack-hooks";
+import { Modify } from "@/lib/types";
 import { getFormDataObject, validateSchema } from "@/lib/utils";
 import {
   idSchema,
@@ -16,35 +17,30 @@ import { Brand, Category, Product } from "@prisma/client";
 import { Flex, Text } from "@radix-ui/themes";
 import { getCldImageUrl } from "next-cloudinary";
 import { useRouter } from "next/navigation";
-import { useCallback, useState } from "react";
-import { useBeforeUnload, useUnmount } from "react-use";
+import { useState } from "react";
 import { toast } from "sonner";
 
+type DataKey = "name" | "description" | "price" | "quantity" | "image" | "brandId" | "categoryId";
+type TBody = Pick<Modify<Product, { price: string; quantity: string }>, DataKey>;
 const NewProductForm = () => {
   const router = useRouter();
   const [publicId, setPublicId] = useState<string[]>([]);
   const [brandId, setBrandId] = useState<null | string>(null);
   const [categoryId, setCategoryId] = useState<null | string>(null);
   const addProductMutation = useMutationHook<Product>("/api/products", ["newProduct"]);
-  const brandQuery = useQueryHook<Brand[]>("/api/brands", ["brands", "newProduct"]);
-  const categoriesQuery = useQueryHook<Category[]>("/api/categories", ["categories", "newProduct"]);
-
-  const beforeUnmount = useCallback(() => {
-    if (publicId.length > 0) {
-      setPublicId(publicId => {
-        fetch("/api/admin/upload", { method: "DELETE", body: JSON.stringify({ publicId }) });
-        return [];
-      });
-    }
-    return publicId.length > 0;
-  }, [publicId]);
-  useUnmount(beforeUnmount);
-  useBeforeUnload(beforeUnmount, "You have unsaved changes, are you sure?");
+  const brandQuery = useQueryHook<{ items: Brand[]; count: number }>("/api/brands", [
+    "brands",
+    "newProduct",
+  ]);
+  const categoriesQuery = useQueryHook<{ items: Category[]; count: number }>("/api/categories", [
+    "categories",
+    "newProduct",
+  ]);
 
   const handleSubmit = async (formData: FormData) => {
     if (publicId.length < 1) return toast.error("A product needs at least one image");
     if (!brandId || !categoryId) return toast.error("Brand and Category are required");
-    const data = getFormDataObject(formData);
+    const data = getFormDataObject<TBody>(formData);
     const ids = publicId.map(id => getCldImageUrl({ src: id }));
     const promise = new Promise<{ name: string }>(async (resolve, reject) => {
       await addProductMutation
@@ -67,9 +63,12 @@ const NewProductForm = () => {
   };
 
   return (
-    <form className="flex flex-col gap-4" action={handleSubmit}>
+    <form action={handleSubmit}>
       <Flex direction="column" gap="4" align="start">
-        <Uoload
+        <Text size="7" weight="medium">
+          New Product
+        </Text>
+        <Upload
           publicId={publicId}
           setPublicId={setPublicId}
           folder="products"
@@ -119,7 +118,7 @@ const NewProductForm = () => {
           {categoriesQuery.isSuccess && (
             <Autocomplete
               isRequired
-              defaultItems={categoriesQuery.data}
+              defaultItems={categoriesQuery.data.items}
               label="Category"
               variant="underlined"
               selectedKey={categoryId}
@@ -133,7 +132,7 @@ const NewProductForm = () => {
           {brandQuery.isSuccess && (
             <Autocomplete
               isRequired
-              defaultItems={brandQuery.data}
+              defaultItems={brandQuery.data.items}
               label="Brand"
               variant="underlined"
               selectedKey={brandId}

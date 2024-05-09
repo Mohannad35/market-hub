@@ -2,17 +2,16 @@ import { Navbar, NavbarBrand, NavbarContent, NavbarItem } from "@nextui-org/navb
 import { Heading } from "@radix-ui/themes";
 import { Store } from "lucide-react";
 import Link from "next/link";
+import Search from "../product/Search";
 import NavBarAuth from "./NavBarAuth";
-import Search from "./Search";
 import { ThemeToggle } from "./ThemeModeToggle";
 
 export default function NavBar() {
   return (
     <Navbar
-      shouldHideOnScroll
       isBordered
       maxWidth="full"
-      className="mb-5 font-inter"
+      className="font-inter"
       classNames={{
         item: [
           "flex",
@@ -43,7 +42,7 @@ export default function NavBar() {
 
       {/* Center of the navbar */}
       <NavbarContent justify="center" className="hidden w-full max-w-[30rem] md:flex">
-        <Search />
+        <Search queryName="search" api="/products" />
       </NavbarContent>
 
       {/* Right side of the navbar */}

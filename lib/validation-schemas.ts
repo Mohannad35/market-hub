@@ -113,6 +113,10 @@ export const newProductSchema = z
   })
   .strict();
 
+export const editProductSchema = newProductSchema
+  .partial()
+  .refine(data => Object.keys(data).length > 0, "At least one field is required");
+
 export const newBrandSchema = z
   .object({
     name: stringMinMaxSchema("Name", 2, 256),
@@ -120,13 +124,23 @@ export const newBrandSchema = z
   })
   .strict();
 
+export const editBrandSchema = newBrandSchema
+  .partial()
+  .refine(data => Object.keys(data).length > 0, "At least one field is required");
+
 export const newCategorySchema = z
   .object({
-    name: stringMinMaxSchema("Name", 2, 256),
-    path: regexSchema(/^\/[ \w&-]+(\/[ \w&-]+)*$/g, "Path").transform(val => val.toLowerCase()),
+    name: stringMinMaxSchema("Name", 2, 256).transform(val => val.toLowerCase()),
+    parent: regexSchema(/^\/[ \w&-]*(\/[ \w&-]+)*$/g, "Path")
+      .optional()
+      .transform(val => (val ? val.toLowerCase() : undefined)),
     image: stringSchema("Image").url("Invalid URL").optional(),
   })
   .strict();
+
+export const editCategorySchema = newCategorySchema
+  .partial()
+  .refine(data => Object.keys(data).length > 0, "At least one field is required");
 
 export const newRateSchema = z
   .object({
@@ -145,24 +159,31 @@ export const signUpSchema = z.object({
 });
 
 export const brandQuerySchema = z.object({
-  take: integerSchema("Take")
+  pageSize: integerSchema("Page Size")
     .optional()
     .transform(value => (value ? parseInt(value) : undefined)),
-  skip: integerSchema("Skip")
+  page: integerSchema("Page")
     .optional()
     .transform(value => (value ? parseInt(value) : undefined)),
+  sortBy: regexSchema(/^(name|createdAt)$/g, "Sort By").default("createdAt"),
+  direction: directionSchema("Direction"),
+  search: searchSchema("Search"),
+  populate: populateSchema(/^(products)$/g, "Populate"),
 });
 
 export const categoryQuerySchema = z.object({
-  take: integerSchema("Take")
+  pageSize: integerSchema("Page Size")
     .optional()
     .transform(value => (value ? parseInt(value) : undefined)),
-  skip: integerSchema("Skip")
+  page: integerSchema("Page")
     .optional()
     .transform(value => (value ? parseInt(value) : undefined)),
   path: regexSchema(/^\/[ \w&-]+(\/[ \w&-]+)*$/g, "Path")
     .optional()
     .transform(val => val && val.toLowerCase()),
+  sortBy: regexSchema(/^(name|createdAt)$/g, "Sort By").default("createdAt"),
+  direction: directionSchema("Direction"),
+  search: searchSchema("Search"),
   populate: populateSchema(/^(products)$/g, "Populate"),
 });
 
@@ -213,3 +234,11 @@ export const productRatesQuerySchema = z
     ({ productId, productSlug }) => productId || productSlug,
     "Product Id or Slug is required"
   );
+
+export const adminUploadSchema = z
+  .object({
+    publicId: z
+      .array(stringSchema("Public Id").min(3, "Public Id must contain at least 3 character(s)"))
+      .min(1, "Public Ids must contain at least 1 Public Id"),
+  })
+  .strict();

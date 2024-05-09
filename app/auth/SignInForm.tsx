@@ -21,7 +21,7 @@ const SigninForm = () => {
 
   const handleSubmitSignIn = async (formData: FormData) => {
     setIsLoading(true);
-    const data = getFormDataObject(formData);
+    const data = getFormDataObject<{ email: string; password: string }>(formData);
     toastId.current = toast("Signing in...", { autoClose: false, isLoading: true });
     const res = await signIn("credentials", {
       email: data.email,
