@@ -1,9 +1,10 @@
 "use client";
 
+import LoadingIndicator from "@/components/common/LoadingIndicator";
 import Rating from "@/components/common/Rating";
 import { getProduct } from "@/lib/query-functions/product";
 import { ProductWithBrandAndCategoryAndRates } from "@/lib/types";
-import { Selection, Spinner } from "@nextui-org/react";
+import { Selection } from "@nextui-org/react";
 import { Flex, Heading, Text } from "@radix-ui/themes";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
@@ -21,12 +22,7 @@ const ProductDetails = ({ slug }: { slug: string }) => {
       queryFn: getProduct,
     });
 
-  if (isLoading || isRefetching)
-    return (
-      <Flex width="100%" height="100%" justify="center" align="center">
-        <Spinner />
-      </Flex>
-    );
+  if (isLoading || isRefetching) return <LoadingIndicator />;
   else if (error) return <div className="container">Error: {error.message}</div>;
   else if (!isSuccess || !data) return <div className="container">No data</div>;
   else if (!data) return <div className="container">No data</div>;

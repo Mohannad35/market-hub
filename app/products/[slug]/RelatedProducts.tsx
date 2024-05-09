@@ -16,20 +16,18 @@ const RelatedProducts = ({ slug }: { slug: string }) => {
 
   // Get related products with the same category parent when the product is loaded
   const productCategoryParent = product?.category.parent;
-  const { data, error, isLoading, isRefetching } = useQuery<{ products: Product[]; count: number }>(
-    {
-      queryKey: ["relatedProducts", productCategoryParent],
-      queryFn: getRelatedProducts,
-      staleTime: 1000 * 60, // 1 minute
-      retry: 3,
-      enabled: !!productCategoryParent,
-    }
-  );
+  const { data, error, isLoading, isRefetching } = useQuery<{ items: Product[]; count: number }>({
+    queryKey: ["relatedProducts", productCategoryParent],
+    queryFn: getRelatedProducts,
+    staleTime: 1000 * 60, // 1 minute
+    retry: 3,
+    enabled: !!productCategoryParent,
+  });
 
   if (isLoading || isRefetching) return <></>;
   else if (error) return <Text>Error: {error.message}</Text>;
   else if (!data) return <></>;
-  const products = data.products.filter(p => p.slug !== slug);
+  const products = data.items.filter(item => item.slug !== slug);
   if (products.length < 1) return <></>;
   return (
     <>
@@ -39,7 +37,7 @@ const RelatedProducts = ({ slug }: { slug: string }) => {
       </Text>
       <Flex width="100%" direction="row" gap="3" justify="start" align="start">
         {products.map((product, index) => (
-          <ProductCard key={index} product={product} />
+          <ProductCard key={index} item={product} />
         ))}
       </Flex>
     </>

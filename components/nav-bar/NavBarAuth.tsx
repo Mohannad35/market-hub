@@ -4,34 +4,18 @@ import { Avatar } from "@nextui-org/avatar";
 import { Button } from "@nextui-org/button";
 import { Dropdown, DropdownItem, DropdownMenu, DropdownTrigger } from "@nextui-org/dropdown";
 import { Skeleton } from "@nextui-org/skeleton";
-import { CircleUserRoundIcon, LogOutIcon, SettingsIcon } from "lucide-react";
-import { signIn, signOut, useSession } from "next-auth/react";
+import { Text } from "@radix-ui/themes";
+import { CircleUserRoundIcon, LayoutDashboardIcon, LogOutIcon, SettingsIcon } from "lucide-react";
+import { signIn, useSession } from "next-auth/react";
 import Image from "next/image";
 
 const NavBarAuth = () => {
   const { status, data: session } = useSession();
 
-  const handleAction = async (key: string) => {
-    switch (key) {
-      case "profile":
-        break;
-
-      case "settings":
-        break;
-
-      case "signout":
-        await signOut({ callbackUrl: "/" });
-        break;
-
-      default:
-        break;
-    }
-  };
-
   if (status === "loading") return <Skeleton className="h-[2.5rem] w-[5rem] rounded-medium" />;
   else if (status === "authenticated")
     return (
-      <Dropdown className="w-fit min-w-0">
+      <Dropdown className="w-fit min-w-0 font-inter">
         <DropdownTrigger>
           <Avatar
             showFallback
@@ -49,27 +33,32 @@ const NavBarAuth = () => {
           hideSelectedIcon
           selectionMode="single"
           disabledKeys={["info"]}
-          onAction={key => handleAction(String(key))}
           variant="flat"
         >
           <DropdownItem key="info">
-            <p className="font-semibold">Signed in as</p>
-            <p className="font-semibold">{session.user?.email}</p>
+            <Text as="p" className="font-semibold">
+              Signed in as
+            </Text>
+            <Text className="font-semibold">{session.user?.email}</Text>
           </DropdownItem>
-          <DropdownItem key="profile" startContent={<CircleUserRoundIcon width={20} height={20} />}>
+          <DropdownItem key="profile" startContent={<CircleUserRoundIcon size={20} />}>
             Profile
           </DropdownItem>
           <DropdownItem
-            key="settings"
-            showDivider
-            startContent={<SettingsIcon width={20} height={20} />}
+            key="dashboard"
+            href="/dashboard"
+            startContent={<LayoutDashboardIcon size={20} />}
           >
+            Dashboard
+          </DropdownItem>
+          <DropdownItem key="settings" showDivider startContent={<SettingsIcon size={20} />}>
             Settings
           </DropdownItem>
           <DropdownItem
             key="signout"
             color="danger"
-            startContent={<LogOutIcon width={20} height={20} />}
+            href="/api/auth/signout?callbackUrl=%2F"
+            startContent={<LogOutIcon size={20} />}
           >
             Sign out
           </DropdownItem>

@@ -56,12 +56,13 @@ const AddRate = ({ productId, refetchProduct }: AddRateProps) => {
           <MuiRating rating={rating} setRateing={setRating} readOnly={false} precision={1} />
 
           <Textarea
-            isRequired
             variant="bordered"
             name="comment"
             label="Write a review"
             type="text"
-            validate={value => validateSchema(value, stringMinMaxSchema("Name", 2, 10_000))}
+            validate={value =>
+              validateSchema(value, stringMinMaxSchema("Name", 2, 10_000).optional())
+            }
             errorMessage={valid => valid.validationErrors}
           />
 

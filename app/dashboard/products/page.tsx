@@ -1,7 +1,7 @@
 import CardContainer from "@/components/common/CardContainer";
 import BrandSelect from "@/components/product/BrandSelect";
 import CategorySelect from "@/components/product/CategorySelect";
-import ProductCardOwner from "@/components/product/ProductCardOwner";
+import ProductCard from "@/components/product/ProductCard";
 import Search from "@/components/product/Search";
 import SortBy from "@/components/product/SortBy";
 import { Flex } from "@radix-ui/themes";
@@ -32,7 +32,7 @@ const DashboardProductsPage = () => {
           label="products"
           api="/api/products"
           uniqueKey="dashboardProducts"
-          Card={ProductCardOwner}
+          Card={ProductCard}
         />
       </Flex>
     </Flex>

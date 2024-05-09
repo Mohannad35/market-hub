@@ -3,10 +3,10 @@
 import Pagination from "@/components/common/Pagination";
 import { useQueryHook } from "@/hook/use-tanstack-hooks";
 import { Modify } from "@/lib/types";
-import { Spinner } from "@nextui-org/spinner";
 import { Flex, FlexProps, Text } from "@radix-ui/themes";
 import { useSearchParams } from "next/navigation";
 import { useEffect } from "react";
+import LoadingIndicator from "./LoadingIndicator";
 
 type Props = Modify<
   FlexProps,
@@ -28,12 +28,7 @@ const CardContainer = ({ api, uniqueKey, Card, label, ...props }: Props) => {
     refetch();
   }, [refetch, searchParams]);
 
-  if (isLoading || isRefetching)
-    return (
-      <Flex width="100%" height="100%" justify="center" align="center">
-        <Spinner />
-      </Flex>
-    );
+  if (isLoading || isRefetching) return <LoadingIndicator />;
   else if (error) return <Text>Error: {error.message}</Text>;
   else if (!isSuccess || !data) return <Text>No {label} found</Text>;
   const { items, count } = data;

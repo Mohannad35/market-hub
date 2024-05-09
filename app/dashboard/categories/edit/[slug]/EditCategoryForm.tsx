@@ -1,5 +1,6 @@
 "use client";
 
+import LoadingIndicator from "@/components/common/LoadingIndicator";
 import Upload from "@/components/common/Upload";
 import { useMutationHook, useQueryHook } from "@/hook/use-tanstack-hooks";
 import { getCategory } from "@/lib/query-functions/category";
@@ -8,7 +9,6 @@ import { stringMinMaxSchema, stringSchema } from "@/lib/validation-schemas";
 import { Autocomplete, AutocompleteItem } from "@nextui-org/autocomplete";
 import { Button } from "@nextui-org/button";
 import { Input } from "@nextui-org/input";
-import { Spinner } from "@nextui-org/react";
 import { Category } from "@prisma/client";
 import { Flex, Text } from "@radix-ui/themes";
 import { useQuery } from "@tanstack/react-query";
@@ -43,12 +43,7 @@ const EditCategoryForm = ({ slug }: { slug: string }) => {
     }
   }, [data]);
 
-  if (isLoading)
-    return (
-      <Flex width="100%" height="100%" justify="center" align="center">
-        <Spinner />
-      </Flex>
-    );
+  if (isLoading) return <LoadingIndicator />;
   if (error) return <Text>Error: {error.message}</Text>;
   if (!isSuccess || !data) return <Text>Category not found</Text>;
 

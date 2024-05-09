@@ -1,11 +1,6 @@
 "use client";
 
-import {
-  Carousel,
-  CarouselContent,
-  CarouselItem,
-  type CarouselApi,
-} from "@/components/ui/carousel";
+import { Carousel, CarouselApi, CarouselContent, CarouselItem } from "@/components/ui/carousel";
 import { Image } from "@nextui-org/image";
 import { cn } from "@nextui-org/system";
 import { Flex } from "@radix-ui/themes";

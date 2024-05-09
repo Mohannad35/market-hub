@@ -1,5 +1,6 @@
 "use client";
 
+import LoadingIndicator from "@/components/common/LoadingIndicator";
 import Upload from "@/components/common/Upload";
 import { useMutationHook, useQueryHook } from "@/hook/use-tanstack-hooks";
 import { getProduct } from "@/lib/query-functions/product";
@@ -14,7 +15,6 @@ import {
 import { Autocomplete, AutocompleteItem } from "@nextui-org/autocomplete";
 import { Button } from "@nextui-org/button";
 import { Input, Textarea } from "@nextui-org/input";
-import { Spinner } from "@nextui-org/react";
 import { Brand, Category, Product } from "@prisma/client";
 import { Flex, Text } from "@radix-ui/themes";
 import { useQuery } from "@tanstack/react-query";
@@ -57,12 +57,7 @@ const EditProductForm = ({ slug }: { slug: string }) => {
     }
   }, [data]);
 
-  if (isLoading)
-    return (
-      <Flex width="100%" height="100%" justify="center" align="center">
-        <Spinner />
-      </Flex>
-    );
+  if (isLoading) return <LoadingIndicator />;
   if (error) return <Text>Error: {error.message}</Text>;
   if (!isSuccess || !data) return <Text>Product not found</Text>;
 

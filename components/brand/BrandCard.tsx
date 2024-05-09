@@ -3,61 +3,41 @@
 import { Button } from "@nextui-org/button";
 import { Card, CardBody, CardFooter, CardProps } from "@nextui-org/card";
 import { Image } from "@nextui-org/image";
+import { Link } from "@nextui-org/react";
 import { Tooltip } from "@nextui-org/tooltip";
 import { Brand } from "@prisma/client";
 import { Flex, Text } from "@radix-ui/themes";
 import { EditIcon, Trash2Icon } from "lucide-react";
+import { useSession } from "next-auth/react";
 import NextImage from "next/image";
 import NextLink from "next/link";
+import CardImage from "../common/CardImage";
+import CardName from "../common/CardName";
 
 interface Props extends CardProps {
   item: Brand;
 }
 const BrandCard = ({ item, ...props }: Props) => {
+  const { data, status } = useSession();
   const { slug, name, image } = item;
+
+  if (status === "loading") return <></>;
   return (
-    <Card
-      radius="none"
-      shadow="none"
-      className="max-h-[30rem] min-h-[22rem] w-[14rem] bg-neutral-200 dark:bg-neutral-800"
-      {...props}
-    >
-      <CardBody className="items-center justify-normal overflow-x-clip overflow-y-visible p-0">
-        <Image
-          shadow="none"
-          radius="none"
-          width={480}
-          height={480}
-          className="max-h-[14rem] object-contain"
-          as={NextImage}
-          alt={name || "Brand Image"}
-          src={image || process.env.IMAGE_PLACEHOLDER}
+    <Card radius="none" shadow="none" className="max-h-[30rem] w-[16rem] bg-transparent" {...props}>
+      <CardBody
+        as={NextLink}
+        className="items-center justify-center overflow-x-clip overflow-y-visible p-0"
+        href={`/products?brands=${item.slug}`}
+      >
+        <CardImage
+          src={image}
+          href={`/dashboard/brands/edit/${slug}`}
+          name={name}
+          handleDelete={() => console.log("Delete")}
         />
       </CardBody>
-      <CardFooter className="justify-between p-2 text-small">
-        <Flex width="260px" gap="2" direction="column" justify="start" align="start">
-          <Tooltip content={name} radius="sm">
-            <Text size="5" weight="medium" className="line-clamp-2 w-[260px] text-start">
-              {name}
-            </Text>
-          </Tooltip>
-
-          <Flex gapX="2">
-            <Button
-              isIconOnly
-              variant="light"
-              size="sm"
-              radius="lg"
-              as={NextLink}
-              href={`/dashboard/brands/edit/${slug}`}
-            >
-              <EditIcon size={20} />
-            </Button>
-            <Button isIconOnly variant="light" size="sm" radius="lg">
-              <Trash2Icon size={20} />
-            </Button>
-          </Flex>
-        </Flex>
+      <CardFooter className="flex-col p-2 text-small">
+        <CardName href={`/products?brands=${item.slug}`} name={name} />
       </CardFooter>
     </Card>
   );
