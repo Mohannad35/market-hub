@@ -39,7 +39,7 @@ export function useQueryHook<TData, TError = Error>(
   });
 }
 
-type TVariables = { [key: string]: string[] | FormDataEntryValue };
+type TVariablesDef = { [key: string]: string[] | FormDataEntryValue };
 type TMethod = "POST" | "PUT" | "PATCH" | "DELETE";
 /**
  * This hook is used to add or edit data to the server
@@ -50,7 +50,7 @@ type TMethod = "POST" | "PUT" | "PATCH" | "DELETE";
  * @returns { UseMutationResult<TData, TError, TVariables> }
  * object from react-query contains isLoading, isSuccess, isError, error, data, mutate, mutateAsync, reset, status...
  */
-export function useMutationHook<TData, TError = Error>(
+export function useMutationHook<TData, TVariables = TVariablesDef, TError = Error>(
   url: string,
   key: string[],
   method: TMethod = "POST",

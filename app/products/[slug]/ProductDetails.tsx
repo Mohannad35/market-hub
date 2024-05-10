@@ -33,7 +33,7 @@ const ProductDetails = ({ slug }: { slug: string }) => {
       <CategoriesBreadcrumbs path={path} />
 
       <Flex width="100%" direction={{ initial: "column", lg: "row" }} gap="1rem">
-        <Slider items={image.map((img, i) => ({ id: i, url: img }))} />
+        <Slider items={image} />
 
         <Flex direction="column" gap="1rem" width="100%">
           <Heading>{name}</Heading>

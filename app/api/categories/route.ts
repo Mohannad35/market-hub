@@ -25,7 +25,7 @@ async function POST_handler(request: NextRequest): Promise<NextResponse<Category
   // Check if the parent doesn't exists
   if (parent && parent !== "/" && !(await prisma.category.findUnique({ where: { path: parent } })))
     throw new ApiError(400, "Parent doesn't exist");
-  const path = parent ? `${parent}/${name}` : `/${name}`;
+  const path = parent && parent !== "/" ? `${parent}/${name}` : `/${name}`;
   // Check if the category already exists
   if (await prisma.category.findUnique({ where: { path } }))
     throw new ApiError(400, "Category already exists");

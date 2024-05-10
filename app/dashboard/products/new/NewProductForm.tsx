@@ -15,7 +15,6 @@ import { Button } from "@nextui-org/button";
 import { Input, Textarea } from "@nextui-org/input";
 import { Brand, Category, Product } from "@prisma/client";
 import { Flex, Text } from "@radix-ui/themes";
-import { getCldImageUrl } from "next-cloudinary";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -24,10 +23,11 @@ type DataKey = "name" | "description" | "price" | "quantity" | "image" | "brandI
 type TBody = Pick<Modify<Product, { price: string; quantity: string }>, DataKey>;
 const NewProductForm = () => {
   const router = useRouter();
-  const [publicId, setPublicId] = useState<string[]>([]);
+  const [resources, setResources] = useState<{ public_id: string; secure_url: string }[]>([]);
+  const [toBeDeletedIds, setToBeDeletedIds] = useState<string[]>([]);
   const [brandId, setBrandId] = useState<null | string>(null);
   const [categoryId, setCategoryId] = useState<null | string>(null);
-  const addProductMutation = useMutationHook<Product>("/api/products", ["newProduct"]);
+  const addProductMutation = useMutationHook<Product, TBody>("/api/products", ["newProduct"]);
   const brandQuery = useQueryHook<{ items: Brand[]; count: number }>("/api/brands", [
     "brands",
     "newProduct",
@@ -38,20 +38,20 @@ const NewProductForm = () => {
   ]);
 
   const handleSubmit = async (formData: FormData) => {
-    if (publicId.length < 1) return toast.error("A product needs at least one image");
+    if (resources.length < 1) return toast.error("A product needs at least one image");
     if (!brandId || !categoryId) return toast.error("Brand and Category are required");
     const data = getFormDataObject<TBody>(formData);
-    const ids = publicId.map(id => getCldImageUrl({ src: id }));
     const promise = new Promise<{ name: string }>(async (resolve, reject) => {
       await addProductMutation
-        .mutateAsync({ ...data, image: ids, brandId, categoryId })
+        .mutateAsync({ ...data, image: resources, brandId, categoryId })
         .then(resolve)
         .catch(reject);
     });
     toast.promise(promise, {
       loading: "Adding product...",
       success: data => {
-        setPublicId([]);
+        setResources([]);
+        setToBeDeletedIds([]);
         setTimeout(() => {
           router.push("/products");
           router.refresh();
@@ -69,8 +69,10 @@ const NewProductForm = () => {
           New Product
         </Text>
         <Upload
-          publicId={publicId}
-          setPublicId={setPublicId}
+          resources={resources}
+          setResources={setResources}
+          toBeDeletedIds={toBeDeletedIds}
+          setToBeDeletedIds={setToBeDeletedIds}
           folder="products"
           maxFiles={10}
           multiple

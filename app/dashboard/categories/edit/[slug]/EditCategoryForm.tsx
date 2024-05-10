@@ -12,7 +12,7 @@ import { Input } from "@nextui-org/input";
 import { Category } from "@prisma/client";
 import { Flex, Text } from "@radix-ui/themes";
 import { useQuery } from "@tanstack/react-query";
-import { pick } from "lodash";
+import { isEqual, pick } from "lodash";
 import { getCldImageUrl } from "next-cloudinary";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -21,13 +21,13 @@ import { toast } from "sonner";
 type DataKey = "name" | "image" | "parent";
 const EditCategoryForm = ({ slug }: { slug: string }) => {
   const router = useRouter();
-  const [publicId, setPublicId] = useState<string[]>([]);
+  const [resources, setResources] = useState<{ public_id: string; secure_url: string }[]>([]);
+  const [toBeDeletedIds, setToBeDeletedIds] = useState<string[]>([]);
   const [parentPath, setParentPath] = useState<string>("/");
-  const editCategoryMutation = useMutationHook<Category>(
-    `/api/categories/${slug}`,
-    ["editCategory", slug],
-    "PATCH"
-  );
+  const editCategoryMutation = useMutationHook<
+    Category,
+    Partial<Pick<Category, "name" | "image" | "parent">>
+  >(`/api/categories/${slug}`, ["editCategory", slug], "PATCH");
   const categoriesQuery = useQueryHook<{ items: Category[]; count: number }>("/api/categories", [
     "categories",
     "editCategory",
@@ -38,7 +38,7 @@ const EditCategoryForm = ({ slug }: { slug: string }) => {
   });
   useEffect(() => {
     if (data) {
-      data.image && setPublicId([data.image]);
+      data.image && setResources([data.image]);
       data.parent !== "/" && setParentPath(data.parent);
     }
   }, [data]);
@@ -48,13 +48,12 @@ const EditCategoryForm = ({ slug }: { slug: string }) => {
   if (!isSuccess || !data) return <Text>Category not found</Text>;
 
   const handleSubmit = async (formData: FormData) => {
-    if (publicId.length < 1) return toast.error("A category needs an image");
+    if (resources.length < 1) return toast.error("A category needs an image");
     const { name } = getFormDataObject<Pick<Category, "name">>(formData);
-    const ids = publicId.map(id => (id.startsWith("http") ? id : getCldImageUrl({ src: id })));
     // compare old category data with new data
-    const newData = { name, image: ids[0], parent: parentPath ? parentPath : "/" };
+    const newData = { name, image: resources[0], parent: parentPath ? parentPath : "/" };
     const differences = Object.keys(newData).filter(
-      key => newData[key as DataKey] !== data[key as DataKey]
+      key => !isEqual(newData[key as DataKey], data[key as DataKey])
     );
     // if no changes detected, return
     if (differences.length < 1) return toast.error("No changes detected");
@@ -65,7 +64,8 @@ const EditCategoryForm = ({ slug }: { slug: string }) => {
     toast.promise(promise, {
       loading: "Editing category...",
       success: data => {
-        setPublicId([]);
+        setResources([]);
+        setToBeDeletedIds([]);
         setTimeout(() => {
           refetch();
           router.replace("/dashboard/categories");
@@ -83,7 +83,13 @@ const EditCategoryForm = ({ slug }: { slug: string }) => {
         <Text size="7" weight="medium">
           Edit {data.name}
         </Text>
-        <Upload publicId={publicId} setPublicId={setPublicId} folder="categories" />
+        <Upload
+          resources={resources}
+          setResources={setResources}
+          toBeDeletedIds={toBeDeletedIds}
+          setToBeDeletedIds={setToBeDeletedIds}
+          folder="categories"
+        />
         <Input
           isRequired
           variant="underlined"

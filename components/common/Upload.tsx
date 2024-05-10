@@ -4,58 +4,72 @@ import { Modify } from "@/lib/types";
 import { Button } from "@nextui-org/button";
 import { Card, CardFooter } from "@nextui-org/react";
 import { Flex, Text } from "@radix-ui/themes";
+import { uniq } from "lodash";
 import { CloudUploadIcon, Trash2Icon } from "lucide-react";
-import { CldImage, CldUploadWidget, CldUploadWidgetProps } from "next-cloudinary";
+import {
+  CldImage,
+  CldUploadWidget,
+  CldUploadWidgetProps,
+  CloudinaryUploadWidgetResults,
+} from "next-cloudinary";
 import { useTheme } from "next-themes";
-import { Dispatch, SetStateAction, useCallback } from "react";
+import { Dispatch, SetStateAction, useCallback, useState } from "react";
 import { useBeforeUnload, useUnmount } from "react-use";
 
 interface CloudinaryResult {
   public_id: string;
+  secure_url: string;
 }
 type Props = Modify<
   CldUploadWidgetProps,
   {
-    publicId: string[];
-    setPublicId: Dispatch<SetStateAction<string[]>>;
+    resources: { public_id: string; secure_url: string }[];
+    setResources: Dispatch<SetStateAction<{ public_id: string; secure_url: string }[]>>;
     folder: string;
     multiple?: boolean;
     maxFiles?: number;
+    toBeDeletedIds: string[];
+    setToBeDeletedIds: Dispatch<SetStateAction<string[]>>;
   }
 >;
-const Uoload = ({ publicId, setPublicId, folder, multiple = false, maxFiles, ...props }: Props) => {
+const Uoload = ({
+  resources,
+  setResources,
+  folder,
+  multiple = false,
+  maxFiles,
+  toBeDeletedIds,
+  setToBeDeletedIds,
+  ...props
+}: Props) => {
   const { theme, systemTheme } = useTheme();
   const onAbort = useCallback(() => {
-    if (publicId.length < 1) return false;
-    setPublicId(publicId => {
-      const ids = publicId.filter(id => id.startsWith("https"));
-      const deleted = publicId.filter(id => !id.startsWith("https"));
-      fetch("/api/admin/upload", { method: "DELETE", body: JSON.stringify({ publicId: deleted }) });
-      return ids;
-    });
-    return true;
-  }, [publicId.length, setPublicId]);
+    if (toBeDeletedIds.length > 0) {
+      fetch("/api/admin/upload", {
+        method: "DELETE",
+        body: JSON.stringify({ publicId: toBeDeletedIds }),
+      });
+      return true;
+    }
+    return false;
+  }, [toBeDeletedIds]);
   useUnmount(onAbort);
   useBeforeUnload(onAbort, "You have unsaved changes, are you sure?");
 
   const handleDelete = async (id: string[]) => {
-    const regex = new RegExp(`market-hub\/${folder}\/\\w+`);
-    const ids = id.map(i => (i.startsWith("http") ? i.match(regex) : i));
-    setPublicId(publicId => {
-      fetch("/api/admin/upload", { method: "DELETE", body: JSON.stringify({ publicId: ids }) });
-      return publicId.filter(i => !id.includes(i));
-    });
+    setResources(publicId => publicId.filter(({ public_id }) => !id.includes(public_id)));
+    setToBeDeletedIds(ids => uniq([...ids, ...id]));
   };
   return (
     <Flex direction="column" gap="5" justify="start" align="start">
       <Flex wrap="wrap" gap="4">
-        {publicId?.length > 0 &&
-          publicId?.map(id => (
-            <Card key={id} className="h-[200px] w-[200px] border-none ">
+        {resources?.length > 0 &&
+          resources?.map(({ public_id }) => (
+            <Card key={public_id} className="h-[200px] w-[200px] border-none ">
               <Flex className="h-[200px] w-[200px]">
                 <CldImage
-                  key={id}
-                  src={id}
+                  key={public_id}
+                  src={public_id}
                   alt={""}
                   width={200}
                   height={200}
@@ -70,7 +84,7 @@ const Uoload = ({ publicId, setPublicId, folder, multiple = false, maxFiles, ...
                   size="sm"
                   className="z-50"
                   radius="lg"
-                  onPress={() => handleDelete([id])}
+                  onPress={() => handleDelete([public_id])}
                 >
                   <Trash2Icon size={20} />
                 </Button>
@@ -136,7 +150,9 @@ const Uoload = ({ publicId, setPublicId, folder, multiple = false, maxFiles, ...
           },
         }}
         onSuccess={(result, { widget }) => {
-          setPublicId(publicIds => [...publicIds, (result.info as CloudinaryResult).public_id]);
+          const { public_id, secure_url } = result.info as CloudinaryResult;
+          setResources(publicIds => [...publicIds, { public_id, secure_url }]);
+          setToBeDeletedIds(ids => [...ids, public_id]);
         }}
         onAbort={onAbort}
         onError={async (error, widget) => {
@@ -151,7 +167,7 @@ const Uoload = ({ publicId, setPublicId, folder, multiple = false, maxFiles, ...
             variant="solid"
             color="primary"
             onClick={() => {
-              if (!multiple) handleDelete(publicId);
+              if (!multiple) handleDelete(resources.map(({ public_id }) => public_id));
               open();
             }}
           >

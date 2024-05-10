@@ -18,8 +18,7 @@ import { Input, Textarea } from "@nextui-org/input";
 import { Brand, Category, Product } from "@prisma/client";
 import { Flex, Text } from "@radix-ui/themes";
 import { useQuery } from "@tanstack/react-query";
-import { pick } from "lodash";
-import { getCldImageUrl } from "next-cloudinary";
+import { difference, pick } from "lodash";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -28,10 +27,11 @@ type DataKey = "name" | "description" | "price" | "quantity" | "image" | "brandI
 type TBody = Pick<Modify<Product, { price: string; quantity: string }>, DataKey>;
 const EditProductForm = ({ slug }: { slug: string }) => {
   const router = useRouter();
-  const [publicId, setPublicId] = useState<string[]>([]);
+  const [resources, setResources] = useState<{ public_id: string; secure_url: string }[]>([]);
+  const [toBeDeletedIds, setToBeDeletedIds] = useState<string[]>([]);
   const [brandId, setBrandId] = useState<null | string>(null);
   const [categoryId, setCategoryId] = useState<null | string>(null);
-  const editProductMutation = useMutationHook<Product>(
+  const editProductMutation = useMutationHook<Product, Partial<TBody>>(
     `/api/products/${slug}`,
     ["editProduct"],
     "PATCH"
@@ -51,7 +51,7 @@ const EditProductForm = ({ slug }: { slug: string }) => {
 
   useEffect(() => {
     if (data) {
-      setPublicId(data.image);
+      setResources(data.image);
       setBrandId(data.brandId);
       setCategoryId(data.categoryId);
     }
@@ -62,19 +62,17 @@ const EditProductForm = ({ slug }: { slug: string }) => {
   if (!isSuccess || !data) return <Text>Product not found</Text>;
 
   const handleSubmit = async (formData: FormData) => {
-    if (publicId.length < 1) return toast.error("A product needs at least one image");
+    if (resources.length < 1) return toast.error("A product needs at least one image");
     if (!brandId || !categoryId) return toast.error("Brand and Category are required");
     const body = getFormDataObject<TBody>(formData);
-    const ids = [
-      ...publicId.filter(id => id.startsWith("http")),
-      ...publicId.filter(id => !id.startsWith("http")).map(id => getCldImageUrl({ src: id })),
-    ];
     // compare old product data with new data
-    const newData = { ...body, image: ids, brandId, categoryId };
+    const newData = { ...body, image: resources, brandId, categoryId };
     const differences = Object.keys(newData).filter(key => {
       switch (key) {
         case "image":
-          return (newData[key as DataKey] as string[]).some((id, i) => id !== data.image[i]);
+          return difference(newData.image, data.image).length > 0;
+        // newData.image.some(({ public_id }) =>
+        //   data.image.some(({ public_id: id }) => id === public_id));
         case "price":
           return newData[key as DataKey] !== data.price.toString();
         case "quantity":
@@ -92,7 +90,8 @@ const EditProductForm = ({ slug }: { slug: string }) => {
     toast.promise(promise, {
       loading: "Editing product...",
       success: data => {
-        setPublicId([]);
+        setResources([]);
+        setToBeDeletedIds([]);
         setTimeout(() => {
           refetch();
           if (differences.includes("name")) router.push(`/dashboard/products/edit/${data.slug}`);
@@ -109,8 +108,10 @@ const EditProductForm = ({ slug }: { slug: string }) => {
           Edit {data.name}
         </Text>
         <Upload
-          publicId={publicId}
-          setPublicId={setPublicId}
+          resources={resources}
+          setResources={setResources}
+          toBeDeletedIds={toBeDeletedIds}
+          setToBeDeletedIds={setToBeDeletedIds}
           folder="products"
           maxFiles={10}
           multiple

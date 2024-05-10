@@ -11,8 +11,7 @@ import { Input } from "@nextui-org/input";
 import { Brand } from "@prisma/client";
 import { Flex, Text } from "@radix-ui/themes";
 import { useQuery } from "@tanstack/react-query";
-import { pick } from "lodash";
-import { getCldImageUrl } from "next-cloudinary";
+import { isEqual, pick } from "lodash";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -20,14 +19,19 @@ import { toast } from "sonner";
 type DataKey = "name" | "image";
 const EditBrandForm = ({ slug }: { slug: string }) => {
   const router = useRouter();
-  const [publicId, setPublicId] = useState<string[]>([]);
-  const editBrandMutation = useMutationHook<Brand>(`/api/brands/${slug}`, ["editBrand"], "PATCH");
+  const [resources, setResources] = useState<{ public_id: string; secure_url: string }[]>([]);
+  const [toBeDeletedIds, setToBeDeletedIds] = useState<string[]>([]);
+  const editBrandMutation = useMutationHook<Brand, Partial<Pick<Brand, "name" | "image">>>(
+    `/api/brands/${slug}`,
+    ["editBrand"],
+    "PATCH"
+  );
   const { data, error, isSuccess, isLoading, refetch } = useQuery<Brand>({
     queryKey: ["getBrandEdit", slug],
     queryFn: getBrand,
   });
   useEffect(() => {
-    if (data && data.image) setPublicId([data.image]);
+    if (data && data.image) setResources([data.image]);
   }, [data]);
 
   if (isLoading) return <LoadingIndicator />;
@@ -35,13 +39,12 @@ const EditBrandForm = ({ slug }: { slug: string }) => {
   if (!isSuccess || !data) return <Text>Brand not found</Text>;
 
   const handleSubmit = async (formData: FormData) => {
-    if (publicId.length < 1) return toast.error("A brand needs at least one image");
+    if (resources.length < 1) return toast.error("A brand needs at least one image");
     const { name } = getFormDataObject<Pick<Brand, "name">>(formData);
-    const ids = publicId.map(id => (id.startsWith("http") ? id : getCldImageUrl({ src: id })));
     // compare old brand data with new data
-    const newData = { name, image: ids[0] };
+    const newData = { name, image: resources[0] };
     const differences = Object.keys(newData).filter(
-      key => newData[key as DataKey] !== data[key as DataKey]
+      key => !isEqual(newData[key as DataKey], data[key as DataKey])
     );
     // if no changes detected, return
     if (differences.length < 1) return toast.error("No changes detected");
@@ -52,7 +55,8 @@ const EditBrandForm = ({ slug }: { slug: string }) => {
     toast.promise(promise, {
       loading: "Editing brand...",
       success: data => {
-        setPublicId([]);
+        setResources([]);
+        setToBeDeletedIds([]);
         setTimeout(() => {
           refetch();
           router.replace("/dashboard/brands");
@@ -70,7 +74,13 @@ const EditBrandForm = ({ slug }: { slug: string }) => {
         <Text size="7" weight="medium">
           Edit {data.name}
         </Text>
-        <Upload publicId={publicId} setPublicId={setPublicId} folder="brands" />
+        <Upload
+          resources={resources}
+          setResources={setResources}
+          toBeDeletedIds={toBeDeletedIds}
+          setToBeDeletedIds={setToBeDeletedIds}
+          folder="brands"
+        />
         <Input
           isRequired
           variant="underlined"

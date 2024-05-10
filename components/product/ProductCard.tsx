@@ -18,18 +18,19 @@ interface Props extends CardProps {
 }
 const ProductCard = ({ item, ...props }: Props) => {
   const { name, image, price, slug, rating, ratingCount } = item;
+  const handleDelete = () => {
+    console.log("Delete", item.slug);
+  };
+
   return (
     <Card radius="none" shadow="none" className="max-h-[30rem] w-[16rem] bg-card" {...props}>
-      <CardBody
-        as={NextLink}
-        className="items-center justify-normal overflow-x-clip overflow-y-visible p-0"
-        href={`/products/${slug}`}
-      >
+      <CardBody className="p-0">
         <CardImage
-          src={image[0]}
-          href={`/dashboard/products/edit/${slug}`}
+          src={image[0].secure_url}
+          href={`/products/${slug}`}
+          edit={`/dashboard/products/edit/${slug}`}
           name={name}
-          handleDelete={() => console.log("Delete")}
+          handleDelete={handleDelete}
         />
       </CardBody>
       <CardFooter className="justify-between p-2 text-small">

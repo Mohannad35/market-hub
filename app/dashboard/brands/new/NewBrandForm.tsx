@@ -15,22 +15,25 @@ import { toast } from "react-toastify";
 
 const NewBrandForm = () => {
   const router = useRouter();
-  const [publicId, setPublicId] = useState<string[]>([]);
-  const addBrandMutation = useMutationHook<Brand>("/api/brands", ["newBrand"]);
+  const [resources, setResources] = useState<{ public_id: string; secure_url: string }[]>([]);
+  const [toBeDeletedIds, setToBeDeletedIds] = useState<string[]>([]);
+  const addBrandMutation = useMutationHook<Brand, Pick<Brand, "name" | "image">>("/api/brands", [
+    "newBrand",
+  ]);
 
   const handleSubmit = async (formData: FormData) => {
-    if (publicId.length < 1) return toast.error("A brand needs at least one image");
+    if (resources.length < 1) return toast.error("A brand needs at least one image");
     const data = getFormDataObject<Pick<Brand, "name">>(formData);
-    const ids = publicId.map(id => getCldImageUrl({ src: id }));
     const { name } = data;
-    const promise = new Promise<{ name: string }>(async (resolve, reject) =>
-      addBrandMutation.mutateAsync({ name, image: ids[0] }).then(resolve).catch(reject)
+    const promise = new Promise<Brand>(async (resolve, reject) =>
+      addBrandMutation.mutateAsync({ name, image: resources[0] }).then(resolve).catch(reject)
     );
     toast.promise(promise, {
       pending: "Adding Brand...",
       success: {
         render: ({ data }) => {
-          setPublicId([]);
+          setResources([]);
+          setToBeDeletedIds([]);
           setTimeout(() => {
             router.push("/dashboard/brands");
             router.refresh();
@@ -50,7 +53,13 @@ const NewBrandForm = () => {
         <Text size="7" weight="medium">
           New Brand
         </Text>
-        <Upload publicId={publicId} setPublicId={setPublicId} folder="brands" />
+        <Upload
+          resources={resources}
+          setResources={setResources}
+          toBeDeletedIds={toBeDeletedIds}
+          setToBeDeletedIds={setToBeDeletedIds}
+          folder="brands"
+        />
         <Input
           isRequired
           variant="underlined"

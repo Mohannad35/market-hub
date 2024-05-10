@@ -69,5 +69,26 @@ const PATCH_handler = async (
   return NextResponse.json(product);
 };
 
+const DELETE_handler = async (
+  request: NextRequest,
+  { params: { slug } }: { params: { slug: string } }
+): Promise<NextResponse<ProductWithBrandAndCategoryAndRates | Product | null>> => {
+  const user = JSON.parse(request.cookies.get("user")!.value!) as User;
+  // Check if the product exists
+  const product = await prisma.product.findUnique({ where: { slug } });
+  if (!product) throw new ApiError(404, "Product not found");
+  // Check if the user is the vendor of the product or an admin
+  if (!user.isAdmin && product.vendorId !== user.id) throw new ApiError(403, "Unauthorized");
+  for (const image of product.image) {
+    
+  }
+  // Delete the product
+  const deletedProduct = await prisma.product.delete({
+    where: { slug },
+  });
+  return NextResponse.json(product);
+};
+
 export const GET = wrapperMiddleware(GET_handler);
 export const PATCH = wrapperMiddleware(authMiddleware, PATCH_handler);
+export const DELETE = wrapperMiddleware(authMiddleware, DELETE_handler);

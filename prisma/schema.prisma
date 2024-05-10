@@ -13,6 +13,17 @@ generator client {
   provider = "prisma-client-js"
 }
 
+type Image {
+  public_id  String
+  secure_url String
+}
+
+type Item {
+  quantity   Int
+  priceAfter Float
+  product    String @db.ObjectId
+}
+
 enum CouponType {
   admin
   vendor
@@ -85,7 +96,7 @@ model Product {
   description String
   price       Float
   quantity    Int
-  image       String[]
+  image       Image[]
   sold        Int        @default(0)
   rating      Float      @default(0)
   ratingCount Int        @default(0)
@@ -108,7 +119,7 @@ model Brand {
   id       String    @id @default(auto()) @map("_id") @db.ObjectId
   name     String
   slug     String    @unique
-  image    String?
+  image    Image?
   products Product[]
 
   createdAt DateTime @default(now())
@@ -120,7 +131,7 @@ model Category {
   name     String
   path     String    @unique
   parent   String
-  image    String?
+  image    Image?
   products Product[]
 
   createdAt DateTime @default(now())
@@ -162,12 +173,6 @@ model Cart {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-}
-
-type Item {
-  quantity   Int
-  priceAfter Float
-  product    String @db.ObjectId
 }
 
 model CartItem {

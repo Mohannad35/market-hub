@@ -16,30 +16,33 @@ import { toast } from "sonner";
 
 const NewCategoryForm = () => {
   const router = useRouter();
-  const [publicId, setPublicId] = useState<string[]>([]);
+  const [resources, setResources] = useState<{ public_id: string; secure_url: string }[]>([]);
+  const [toBeDeletedIds, setToBeDeletedIds] = useState<string[]>([]);
   const [parentPath, setParentPath] = useState<string>("/");
-  const addCategoryMutation = useMutationHook<Category>("/api/categories", ["newCategory"]);
+  const addCategoryMutation = useMutationHook<
+    Category,
+    Pick<Category, "name" | "image" | "parent">
+  >("/api/categories", ["newCategory"]);
   const categoriesQuery = useQueryHook<{ items: Category[]; count: number }>("/api/categories", [
     "categories",
     "new",
   ]);
 
   const handleSubmit = async (formData: FormData) => {
-    if (publicId.length < 1) return toast.error("A category needs at least one image");
+    if (resources.length < 1) return toast.error("A category needs at least one image");
     const data = getFormDataObject<Pick<Category, "name">>(formData);
-    const ids = publicId.map(id => getCldImageUrl({ src: id }));
     const { name } = data;
-    console.log(parentPath);
-    const promise = new Promise<{ name: string }>(async (resolve, reject) =>
+    const promise = new Promise<Category>(async (resolve, reject) =>
       addCategoryMutation
-        .mutateAsync({ name, parent: parentPath, image: ids[0] })
+        .mutateAsync({ name, parent: parentPath, image: resources[0] })
         .then(resolve)
         .catch(reject)
     );
     toast.promise(promise, {
       loading: "Adding Cateogry",
       success: data => {
-        setPublicId([]);
+        setResources([]);
+        setToBeDeletedIds([]);
         setTimeout(() => {
           router.push("/dashboard/categories");
           router.refresh();
@@ -56,7 +59,13 @@ const NewCategoryForm = () => {
         <Text size="7" weight="medium">
           New Category
         </Text>
-        <Upload publicId={publicId} setPublicId={setPublicId} folder="categories" />
+        <Upload
+          resources={resources}
+          setResources={setResources}
+          toBeDeletedIds={toBeDeletedIds}
+          setToBeDeletedIds={setToBeDeletedIds}
+          folder="categories"
+        />
         <Input
           isRequired
           variant="underlined"

@@ -7,7 +7,7 @@ import { Flex } from "@radix-ui/themes";
 import NextImage from "next/image";
 import { useCallback, useEffect, useState } from "react";
 
-export function Slider({ items }: { items: { id: number; url: string }[] }) {
+export function Slider({ items }: { items: { public_id: string; secure_url: string }[] }) {
   const [emblaMainApi, setEmblaMainApi] = useState<CarouselApi>();
   const [emblaThumbsApi, setEmblaThumbsApi] = useState<CarouselApi>();
   const [selectedIndex, setSelectedIndex] = useState(0);
@@ -50,7 +50,7 @@ export function Slider({ items }: { items: { id: number; url: string }[] }) {
                   height={720}
                   shadow="none"
                   radius="none"
-                  src={item.url}
+                  src={item.secure_url}
                   alt=""
                   className={cn(
                     "max-h-[5rem] object-contain",
@@ -75,7 +75,7 @@ export function Slider({ items }: { items: { id: number; url: string }[] }) {
                   shadow="none"
                   radius="none"
                   className="max-h-[30rem] object-contain"
-                  src={item.url}
+                  src={item.secure_url}
                   alt=""
                 />
               </CarouselItem>

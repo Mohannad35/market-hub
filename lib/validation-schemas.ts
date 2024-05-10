@@ -15,6 +15,11 @@ export const stringMinMaxSchema = (label: string, min: number, max: number) =>
     .min(min, `${label} must contain at least ${min} character(s)`)
     .max(max, `${label} must contain at most ${max} character(s)`);
 
+const imageSchema = z.object({
+  public_id: stringSchema("Public Id"),
+  secure_url: stringSchema("Secure URL").url("Invalid Secure URL"),
+});
+
 export const idSchema = (label?: string) =>
   z
     .string({
@@ -93,21 +98,19 @@ const populateProductSchema = populateSchema(
   "Populate"
 );
 
-const imageSchema = z
-  .array(stringSchema("URL").url("Invalid URL"), {
-    invalid_type_error: "Image must be an array",
-    required_error: "Image is required",
-  })
-  .min(1, "Image must contain at least 1 image(s)")
-  .max(10, "Image must contain at most 10 image(s)");
-
 export const newProductSchema = z
   .object({
     name: stringMinMaxSchema("Name", 4, 256),
     description: stringMinMaxSchema("Name", 2, 10_000),
     price: numberSchema("Price").transform(value => parseFloat(value)),
     quantity: integerSchema("Quantity").transform(value => parseInt(value)),
-    image: imageSchema,
+    image: z
+      .array(imageSchema, {
+        invalid_type_error: "Image must be an array",
+        required_error: "Image is required",
+      })
+      .min(1, "Image must contain at least 1 image(s)")
+      .max(10, "Image must contain at most 10 image(s)"),
     categoryId: idSchema("Category"),
     brandId: idSchema("Brand"),
   })
@@ -120,7 +123,7 @@ export const editProductSchema = newProductSchema
 export const newBrandSchema = z
   .object({
     name: stringMinMaxSchema("Name", 2, 256),
-    image: stringSchema("Image").url("Invalid URL").optional(),
+    image: imageSchema.optional(),
   })
   .strict();
 
@@ -134,7 +137,7 @@ export const newCategorySchema = z
     parent: regexSchema(/^\/[ \w&-]*(\/[ \w&-]+)*$/g, "Path")
       .optional()
       .transform(val => (val ? val.toLowerCase() : undefined)),
-    image: stringSchema("Image").url("Invalid URL").optional(),
+    image: imageSchema.optional(),
   })
   .strict();
 
