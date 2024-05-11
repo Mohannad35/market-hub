@@ -1,4 +1,3 @@
-import { authMiddleware } from "@/lib/middleware/auth";
 import { wrapperMiddleware } from "@/lib/middleware/wrapper";
 import { formatErrors } from "@/lib/utils";
 import { signUpSchema } from "@/lib/validation-schemas";

@@ -1,4 +1,5 @@
 import cloudinary from "@/lib/cloudinary";
+import { authMiddleware } from "@/lib/middleware/auth";
 import { wrapperMiddleware } from "@/lib/middleware/wrapper";
 import { formatErrors } from "@/lib/utils";
 import { adminUploadSchema } from "@/lib/validation-schemas";
@@ -19,4 +20,4 @@ async function DELETE_handler(request: NextRequest) {
   return NextResponse.json({}, { status: 202 });
 }
 
-export const DELETE = wrapperMiddleware(DELETE_handler);
+export const DELETE = wrapperMiddleware(authMiddleware, DELETE_handler);

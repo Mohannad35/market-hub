@@ -1,17 +1,12 @@
 import cloudinary from "@/lib/cloudinary";
-import { authMiddleware } from "@/lib/middleware/auth";
+import { allowedMiddleware } from "@/lib/middleware/permissions";
 import { wrapperMiddleware } from "@/lib/middleware/wrapper";
 import { CategoryWithProducts } from "@/lib/types";
 import { formatErrors, getQueryObject } from "@/lib/utils";
-import {
-  categoryQuerySchema,
-  editCategorySchema,
-  editProductSchema,
-} from "@/lib/validation-schemas";
+import { categoryQuerySchema, editCategorySchema } from "@/lib/validation-schemas";
 import prisma from "@/prisma/client";
 import { Category, User } from "@prisma/client";
 import { startCase, uniq } from "lodash";
-import { nanoid } from "nanoid";
 import { ApiError } from "next/dist/server/api-utils";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -47,12 +42,9 @@ const PATCH_handler = async (
   { params: { slug } }: { params: { slug: string } }
 ): Promise<NextResponse<Category>> => {
   const path = decodeURI("/" + slug.replace(/\-/g, "/"));
-  const user = JSON.parse(request.cookies.get("user")!.value!) as User;
   // Get the category from the database and check if it exists
   const category = await prisma.category.findUnique({ where: { path } });
   if (!category) throw new ApiError(404, "Category not found");
-  // Check if the user is the vendor of the category or an admin
-  if (!user.isAdmin) throw new ApiError(403, "Unauthorized");
   // Get the body of the request and validate it
   const body = await request.json();
   const { success, data, error } = editCategorySchema.safeParse(body);
@@ -87,14 +79,10 @@ const DELETE_handler = async (
   request: NextRequest,
   { params: { slug } }: { params: { slug: string } }
 ): Promise<NextResponse<Category>> => {
-  const user = JSON.parse(request.cookies.get("user")!.value!) as User;
   const path = decodeURI("/" + slug.replace(/\-/g, "/"));
   // Check if the category exists
   const category = await prisma.category.findUnique({ where: { path } });
-  console.log(category);
   if (!category) throw new ApiError(404, "Category not found");
-  // Check if the user is the vendor of the category or an admin
-  if (!user.isAdmin) throw new ApiError(403, "Unauthorized");
   // Check if the category has products
   const products = await prisma.product.findMany({ where: { categoryId: category.id } });
   if (products.length) throw new ApiError(400, "Category has products. Move or delete them first");
@@ -113,5 +101,5 @@ const DELETE_handler = async (
 };
 
 export const GET = wrapperMiddleware(GET_handler);
-export const PATCH = wrapperMiddleware(authMiddleware, PATCH_handler);
-export const DELETE = wrapperMiddleware(authMiddleware, DELETE_handler);
+export const PATCH = wrapperMiddleware(allowedMiddleware({ isAdmin: true }), PATCH_handler);
+export const DELETE = wrapperMiddleware(allowedMiddleware({ isAdmin: true }), DELETE_handler);

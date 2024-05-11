@@ -1,13 +1,12 @@
-import { auth } from "@/auth";
-import { brandQuerySchema, newBrandSchema } from "@/lib/validation-schemas";
+import { allowedMiddleware } from "@/lib/middleware/permissions";
+import { wrapperMiddleware } from "@/lib/middleware/wrapper";
 import { formatErrors, getQueryObject } from "@/lib/utils";
+import { brandQuerySchema, newBrandSchema } from "@/lib/validation-schemas";
 import prisma from "@/prisma/client";
+import { Brand, Prisma } from "@prisma/client";
+import { ApiError } from "next/dist/server/api-utils";
 import { NextRequest, NextResponse } from "next/server";
 import slugify from "slugify";
-import { Brand, Prisma, User } from "@prisma/client";
-import { wrapperMiddleware } from "@/lib/middleware/wrapper";
-import { ApiError } from "next/dist/server/api-utils";
-import { authMiddleware } from "@/lib/middleware/auth";
 
 /**
  * API route handler to create a new brand
@@ -62,5 +61,5 @@ async function GET_handler(
   return NextResponse.json({ items, count });
 }
 
-export const POST = wrapperMiddleware(authMiddleware, POST_handler);
 export const GET = wrapperMiddleware(GET_handler);
+export const POST = wrapperMiddleware(allowedMiddleware({ isAdmin: true }), POST_handler);

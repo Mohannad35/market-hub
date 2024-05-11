@@ -1,10 +1,10 @@
-import { auth } from "@/auth";
+import { allowedMiddleware } from "@/lib/middleware/permissions";
 import { wrapperMiddleware } from "@/lib/middleware/wrapper";
 import { formatErrors, getQueryObject } from "@/lib/utils";
 import { categoryQuerySchema, newCategorySchema } from "@/lib/validation-schemas";
 import prisma from "@/prisma/client";
-import { Category, Prisma, User } from "@prisma/client";
-import { difference, startCase, uniq } from "lodash";
+import { Category, Prisma } from "@prisma/client";
+import { startCase, uniq } from "lodash";
 import { ApiError } from "next/dist/server/api-utils";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -70,5 +70,5 @@ async function GET_handler(
   return NextResponse.json({ items, count });
 }
 
-export const POST = wrapperMiddleware(POST_handler);
 export const GET = wrapperMiddleware(GET_handler);
+export const POST = wrapperMiddleware(allowedMiddleware({ isAdmin: true }), POST_handler);

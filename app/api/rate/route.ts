@@ -1,11 +1,7 @@
 import { authMiddleware } from "@/lib/middleware/auth";
 import { wrapperMiddleware } from "@/lib/middleware/wrapper";
 import { formatErrors, getQueryObject } from "@/lib/utils";
-import {
-  newRateSchema,
-  productQuerySchema,
-  productRatesQuerySchema,
-} from "@/lib/validation-schemas";
+import { productRatesQuerySchema } from "@/lib/validation-schemas";
 import prisma from "@/prisma/client";
 import { User } from "@prisma/client";
 import { ApiError } from "next/dist/server/api-utils";

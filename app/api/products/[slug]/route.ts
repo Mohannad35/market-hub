@@ -1,5 +1,5 @@
 import cloudinary from "@/lib/cloudinary";
-import { authMiddleware } from "@/lib/middleware/auth";
+import { allowedMiddleware } from "@/lib/middleware/permissions";
 import { wrapperMiddleware } from "@/lib/middleware/wrapper";
 import { ProductWithBrandAndCategory, ProductWithBrandAndCategoryAndRates } from "@/lib/types";
 import { formatErrors, getQueryObject } from "@/lib/utils";
@@ -51,6 +51,11 @@ const PATCH_handler = async (
   { params: { slug } }: { params: { slug: string } }
 ): Promise<NextResponse<ProductWithBrandAndCategory | Product | {}>> => {
   const user = JSON.parse(request.cookies.get("user")!.value!) as User;
+  // Check if the product exists
+  const product = await prisma.product.findUnique({ where: { slug } });
+  if (!product) throw new ApiError(404, "Product not found");
+  // Check if the user is the vendor of the product or an admin
+  if (!user.isAdmin && !(product.vendorId === user.id)) throw new ApiError(403, "Unauthorized");
   // Get the body of the request and validate it
   const body = await request.json();
   const { success, data, error } = editProductSchema.safeParse(body);
@@ -63,11 +68,11 @@ const PATCH_handler = async (
       newSlug = `${newSlug}-${nanoid(8)}`;
   }
   // Edit the product
-  const product = await prisma.product.update({
+  const updatedProduct = await prisma.product.update({
     where: { slug },
     data: { ...data, slug: newSlug, vendorId: user.id },
   });
-  return NextResponse.json(product);
+  return NextResponse.json(updatedProduct);
 };
 
 const DELETE_handler = async (
@@ -79,7 +84,7 @@ const DELETE_handler = async (
   const product = await prisma.product.findUnique({ where: { slug } });
   if (!product) throw new ApiError(404, "Product not found");
   // Check if the user is the vendor of the product or an admin
-  if (!user.isAdmin && product.vendorId !== user.id) throw new ApiError(403, "Unauthorized");
+  if (!user.isAdmin && !(product.vendorId === user.id)) throw new ApiError(403, "Unauthorized");
   for (const { public_id } of product.image) {
     console.log("Deleting image:", public_id);
     const { result } = await cloudinary.uploader.destroy(public_id, { invalidate: true });
@@ -91,5 +96,11 @@ const DELETE_handler = async (
 };
 
 export const GET = wrapperMiddleware(GET_handler);
-export const PATCH = wrapperMiddleware(authMiddleware, PATCH_handler);
-export const DELETE = wrapperMiddleware(authMiddleware, DELETE_handler);
+export const PATCH = wrapperMiddleware(
+  allowedMiddleware({ isAdmin: true, isVendor: true }),
+  PATCH_handler
+);
+export const DELETE = wrapperMiddleware(
+  allowedMiddleware({ isAdmin: true, isVendor: true }),
+  DELETE_handler
+);

@@ -1,15 +1,14 @@
-import { auth } from "@/auth";
-import { newProductSchema, productQuerySchema } from "@/lib/validation-schemas";
+import { allowedMiddleware } from "@/lib/middleware/permissions";
+import { wrapperMiddleware } from "@/lib/middleware/wrapper";
 import { formatErrors, getQueryObject } from "@/lib/utils";
+import { newProductSchema, productQuerySchema } from "@/lib/validation-schemas";
 import prisma from "@/prisma/client";
 import { Prisma, Product, User } from "@prisma/client";
 import { DefaultArgs } from "@prisma/client/runtime/library";
 import { nanoid } from "nanoid";
+import { ApiError } from "next/dist/server/api-utils";
 import { NextRequest, NextResponse } from "next/server";
 import slugify from "slugify";
-import { ApiError } from "next/dist/server/api-utils";
-import { wrapperMiddleware } from "@/lib/middleware/wrapper";
-import { authMiddleware } from "@/lib/middleware/auth";
 
 /**
  * API route to create a new product
@@ -95,5 +94,8 @@ async function GET_handler(
   return NextResponse.json({ items, count });
 }
 
-export const POST = wrapperMiddleware(authMiddleware, POST_handler);
 export const GET = wrapperMiddleware(GET_handler);
+export const POST = wrapperMiddleware(
+  allowedMiddleware({ isAdmin: true, isVendor: true }),
+  POST_handler
+);

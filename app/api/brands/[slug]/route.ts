@@ -1,11 +1,11 @@
 import cloudinary from "@/lib/cloudinary";
-import { authMiddleware } from "@/lib/middleware/auth";
+import { allowedMiddleware } from "@/lib/middleware/permissions";
 import { wrapperMiddleware } from "@/lib/middleware/wrapper";
 import { BrandWithProducts } from "@/lib/types";
 import { formatErrors, getQueryObject } from "@/lib/utils";
 import { brandQuerySchema, editBrandSchema } from "@/lib/validation-schemas";
 import prisma from "@/prisma/client";
-import { Brand, User } from "@prisma/client";
+import { Brand } from "@prisma/client";
 import { ApiError } from "next/dist/server/api-utils";
 import { NextRequest, NextResponse } from "next/server";
 import slugify from "slugify";
@@ -27,7 +27,6 @@ const PATCH_handler = async (
   request: NextRequest,
   { params: { slug } }: { params: { slug: string } }
 ): Promise<NextResponse<Brand>> => {
-  // const user = JSON.parse(request.cookies.get("user")!.value!) as User;
   // Get the brand from the database and check if it exists
   const brand = await prisma.brand.findUnique({ where: { slug } });
   if (!brand) throw new ApiError(404, "Brand not found");
@@ -55,12 +54,9 @@ const DELETE_handler = async (
   request: NextRequest,
   { params: { slug } }: { params: { slug: string } }
 ): Promise<NextResponse<Brand>> => {
-  const user = JSON.parse(request.cookies.get("user")!.value!) as User;
   // Check if the brand exists
   const brand = await prisma.brand.findUnique({ where: { slug } });
   if (!brand) throw new ApiError(404, "Brand not found");
-  // Check if the user is an admin
-  if (!user.isAdmin) throw new ApiError(403, "Unauthorized");
   // Check if the brand has products
   const products = await prisma.product.findMany({ where: { brandId: brand.id } });
   if (products.length) throw new ApiError(400, "Brand has products. Move or delete them first");
@@ -76,5 +72,5 @@ const DELETE_handler = async (
 };
 
 export const GET = wrapperMiddleware(GET_handler);
-export const PATCH = wrapperMiddleware(authMiddleware, PATCH_handler);
-export const DELETE = wrapperMiddleware(authMiddleware, DELETE_handler);
+export const PATCH = wrapperMiddleware(allowedMiddleware({ isAdmin: true }), PATCH_handler);
+export const DELETE = wrapperMiddleware(allowedMiddleware({ isAdmin: true }), DELETE_handler);
