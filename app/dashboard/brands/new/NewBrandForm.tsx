@@ -8,7 +8,6 @@ import { Button } from "@nextui-org/button";
 import { Input } from "@nextui-org/input";
 import { Brand } from "@prisma/client";
 import { Flex, Text } from "@radix-ui/themes";
-import { getCldImageUrl } from "next-cloudinary";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "react-toastify";
@@ -16,7 +15,8 @@ import { toast } from "react-toastify";
 const NewBrandForm = () => {
   const router = useRouter();
   const [resources, setResources] = useState<{ public_id: string; secure_url: string }[]>([]);
-  const [toBeDeletedIds, setToBeDeletedIds] = useState<string[]>([]);
+  const [deletedRes, setDeletedRes] = useState<string[]>([]);
+  const [temp, setTemp] = useState<string[]>([]);
   const addBrandMutation = useMutationHook<Brand, Pick<Brand, "name" | "image">>("/api/brands", [
     "newBrand",
   ]);
@@ -33,7 +33,11 @@ const NewBrandForm = () => {
       success: {
         render: ({ data }) => {
           setResources([]);
-          setToBeDeletedIds([]);
+          setTemp([]);
+          fetch("/api/admin/upload", {
+            method: "DELETE",
+            body: JSON.stringify({ publicId: deletedRes }),
+          });
           setTimeout(() => {
             router.push("/dashboard/brands");
             router.refresh();
@@ -56,8 +60,9 @@ const NewBrandForm = () => {
         <Upload
           resources={resources}
           setResources={setResources}
-          toBeDeletedIds={toBeDeletedIds}
-          setToBeDeletedIds={setToBeDeletedIds}
+          temp={temp}
+          setTemp={setTemp}
+          setDeletedRes={setDeletedRes}
           folder="brands"
         />
         <Input

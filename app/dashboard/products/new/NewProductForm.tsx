@@ -24,7 +24,8 @@ type TBody = Pick<Modify<Product, { price: string; quantity: string }>, DataKey>
 const NewProductForm = () => {
   const router = useRouter();
   const [resources, setResources] = useState<{ public_id: string; secure_url: string }[]>([]);
-  const [toBeDeletedIds, setToBeDeletedIds] = useState<string[]>([]);
+  const [deletedRes, setDeletedRes] = useState<string[]>([]);
+  const [temp, setTemp] = useState<string[]>([]);
   const [brandId, setBrandId] = useState<null | string>(null);
   const [categoryId, setCategoryId] = useState<null | string>(null);
   const addProductMutation = useMutationHook<Product, TBody>("/api/products", ["newProduct"]);
@@ -51,7 +52,11 @@ const NewProductForm = () => {
       loading: "Adding product...",
       success: data => {
         setResources([]);
-        setToBeDeletedIds([]);
+        setTemp([]);
+        fetch("/api/admin/upload", {
+          method: "DELETE",
+          body: JSON.stringify({ publicId: deletedRes }),
+        });
         setTimeout(() => {
           router.push("/products");
           router.refresh();
@@ -71,8 +76,9 @@ const NewProductForm = () => {
         <Upload
           resources={resources}
           setResources={setResources}
-          toBeDeletedIds={toBeDeletedIds}
-          setToBeDeletedIds={setToBeDeletedIds}
+          temp={temp}
+          setTemp={setTemp}
+          setDeletedRes={setDeletedRes}
           folder="products"
           maxFiles={10}
           multiple

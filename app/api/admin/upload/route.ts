@@ -1,14 +1,9 @@
+import cloudinary from "@/lib/cloudinary";
 import { wrapperMiddleware } from "@/lib/middleware/wrapper";
 import { formatErrors } from "@/lib/utils";
 import { adminUploadSchema } from "@/lib/validation-schemas";
-import { v2 as cloudinary } from "cloudinary";
 import { ApiError } from "next/dist/server/api-utils";
 import { NextRequest, NextResponse } from "next/server";
-cloudinary.config({
-  api_key: process.env.NEXT_PUBLIC_CLOUDINARY_API_KEY,
-  api_secret: process.env.NEXT_PUBLIC_CLOUDINARY_API_SECRET,
-  cloud_name: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
-});
 
 async function DELETE_handler(request: NextRequest) {
   // Get the body of the request and validate it

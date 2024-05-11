@@ -13,7 +13,6 @@ import { Category } from "@prisma/client";
 import { Flex, Text } from "@radix-ui/themes";
 import { useQuery } from "@tanstack/react-query";
 import { isEqual, pick } from "lodash";
-import { getCldImageUrl } from "next-cloudinary";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -22,7 +21,8 @@ type DataKey = "name" | "image" | "parent";
 const EditCategoryForm = ({ slug }: { slug: string }) => {
   const router = useRouter();
   const [resources, setResources] = useState<{ public_id: string; secure_url: string }[]>([]);
-  const [toBeDeletedIds, setToBeDeletedIds] = useState<string[]>([]);
+  const [deletedRes, setDeletedRes] = useState<string[]>([]);
+  const [temp, setTemp] = useState<string[]>([]);
   const [parentPath, setParentPath] = useState<string>("/");
   const editCategoryMutation = useMutationHook<
     Category,
@@ -65,7 +65,11 @@ const EditCategoryForm = ({ slug }: { slug: string }) => {
       loading: "Editing category...",
       success: data => {
         setResources([]);
-        setToBeDeletedIds([]);
+        setTemp([]);
+        fetch("/api/admin/upload", {
+          method: "DELETE",
+          body: JSON.stringify({ publicId: deletedRes }),
+        });
         setTimeout(() => {
           refetch();
           router.replace("/dashboard/categories");
@@ -86,8 +90,9 @@ const EditCategoryForm = ({ slug }: { slug: string }) => {
         <Upload
           resources={resources}
           setResources={setResources}
-          toBeDeletedIds={toBeDeletedIds}
-          setToBeDeletedIds={setToBeDeletedIds}
+          temp={temp}
+          setTemp={setTemp}
+          setDeletedRes={setDeletedRes}
           folder="categories"
         />
         <Input

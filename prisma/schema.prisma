@@ -102,11 +102,11 @@ model Product {
   ratingCount Int        @default(0)
   cartItems   CartItem[]
   vendorId    String     @db.ObjectId
-  vendor      User       @relation(fields: [vendorId], references: [id])
+  vendor      User       @relation(fields: [vendorId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   brandId     String     @db.ObjectId
-  brand       Brand      @relation(fields: [brandId], references: [id])
+  brand       Brand      @relation(fields: [brandId], references: [id], onDelete: Restrict, onUpdate: Cascade)
   categoryId  String     @db.ObjectId
-  category    Category   @relation(fields: [categoryId], references: [id])
+  category    Category   @relation(fields: [categoryId], references: [id], onDelete: Restrict, onUpdate: Cascade)
   listsId     String[]   @db.ObjectId
   lists       List[]     @relation(fields: [listsId], references: [id])
   rates       Rate[]
@@ -153,7 +153,7 @@ model Coupon {
   cartsId     String[]   @db.ObjectId
   carts       Cart[]     @relation(fields: [cartsId], references: [id])
   userId      String     @db.ObjectId
-  user        User       @relation(fields: [userId], references: [id])
+  user        User       @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -162,7 +162,7 @@ model Coupon {
 model Cart {
   id         String     @id @default(auto()) @map("_id") @db.ObjectId
   userId     String     @unique @db.ObjectId
-  user       User       @relation(fields: [userId], references: [id])
+  user       User       @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   couponsId  String[]   @db.ObjectId
   coupons    Coupon[]   @relation(fields: [couponsId], references: [id])
   bill       Float
@@ -181,8 +181,8 @@ model CartItem {
   priceAfter Float
   cartId     String  @db.ObjectId
   productId  String  @db.ObjectId
-  cart       Cart    @relation(fields: [cartId], references: [id])
-  product    Product @relation(fields: [productId], references: [id])
+  cart       Cart    @relation(fields: [cartId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  product    Product @relation(fields: [productId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -195,7 +195,7 @@ model List {
   name        String
   description String?
   userId      String    @db.ObjectId
-  user        User      @relation(fields: [userId], references: [id])
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   productsId  String[]  @db.ObjectId
   Products    Product[] @relation(fields: [productsId], references: [id])
 
@@ -209,9 +209,9 @@ model Order {
   id      String @id @default(auto()) @map("_id") @db.ObjectId
   code    String @unique
   userId  String @db.ObjectId
-  user    User   @relation(fields: [userId], references: [id])
+  user    User   @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   cartId  String @unique @db.ObjectId
-  cart    Cart   @relation(fields: [cartId], references: [id])
+  cart    Cart   @relation(fields: [cartId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   address String
   phone   String
   email   String
@@ -229,9 +229,9 @@ model Rate {
   rate      Float
   comment   String?
   productId String  @db.ObjectId
-  product   Product @relation(fields: [productId], references: [id])
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   userId    String  @db.ObjectId
-  user      User    @relation(fields: [userId], references: [id])
+  user      User    @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -243,7 +243,7 @@ model Request {
   id      String        @id @default(auto()) @map("_id") @db.ObjectId
   type    String
   userId  String        @db.ObjectId
-  user    User          @relation(fields: [userId], references: [id])
+  user    User          @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   details String
   status  RequestStatus @default(pending)
 
@@ -270,7 +270,7 @@ model Account {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
   @@unique([provider, providerAccountId])
 }
@@ -280,7 +280,7 @@ model Session {
   sessionToken String   @unique
   userId       String   @db.ObjectId
   expires      DateTime
-  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -307,5 +307,5 @@ model Authenticator {
   credentialBackedUp   Boolean
   transports           String?
 
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 }

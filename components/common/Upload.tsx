@@ -6,12 +6,7 @@ import { Card, CardFooter } from "@nextui-org/react";
 import { Flex, Text } from "@radix-ui/themes";
 import { uniq } from "lodash";
 import { CloudUploadIcon, Trash2Icon } from "lucide-react";
-import {
-  CldImage,
-  CldUploadWidget,
-  CldUploadWidgetProps,
-  CloudinaryUploadWidgetResults,
-} from "next-cloudinary";
+import { CldImage, CldUploadWidget, CldUploadWidgetProps } from "next-cloudinary";
 import { useTheme } from "next-themes";
 import { Dispatch, SetStateAction, useCallback, useState } from "react";
 import { useBeforeUnload, useUnmount } from "react-use";
@@ -25,40 +20,58 @@ type Props = Modify<
   {
     resources: { public_id: string; secure_url: string }[];
     setResources: Dispatch<SetStateAction<{ public_id: string; secure_url: string }[]>>;
+    temp: string[];
+    setTemp: Dispatch<SetStateAction<string[]>>;
+    setDeletedRes: Dispatch<SetStateAction<string[]>>;
     folder: string;
     multiple?: boolean;
     maxFiles?: number;
-    toBeDeletedIds: string[];
-    setToBeDeletedIds: Dispatch<SetStateAction<string[]>>;
   }
 >;
+/**
+ * This component is a wrapper around the Cloudinary Upload Widget that handles image uploads.
+ * It also displays the uploaded images and allows the user to delete them.
+ * It also handles the deletion of images that were uploaded but not saved (user aborts creating or editing).
+ * It requires the following props:
+ * @property `resources` array to store the uploaded images and show them
+ * @prop `setResources` set state function for the resources
+ * @prop `temp` array to store the public_ids of the images that have been uploaded but not saved (to be deleted upon abort). Should be cleared on successful save
+ * @prop `setTemp` set state function for the temp array
+ * @prop `setDeletedRes` set state function for the deletedRes array (to store the public_ids of the images that should be deleted from Cloudinary on successful save)
+ * @prop `folder` the folder in which the images should be stored in Cloudinary
+ * @prop `multiple` whether the user can upload multiple images or not (default: false)
+ * @prop `maxFiles` the maximum number of files the user can upload (default: undefined - no limit)
+ * @returns
+ */
 const Uoload = ({
   resources,
   setResources,
+  temp,
+  setTemp,
+  setDeletedRes,
   folder,
   multiple = false,
   maxFiles,
-  toBeDeletedIds,
-  setToBeDeletedIds,
   ...props
 }: Props) => {
   const { theme, systemTheme } = useTheme();
+  // If the user aborts creating or editing, we delete temp images on unmount
   const onAbort = useCallback(() => {
-    if (toBeDeletedIds.length > 0) {
+    if (temp.length) {
       fetch("/api/admin/upload", {
         method: "DELETE",
-        body: JSON.stringify({ publicId: toBeDeletedIds }),
+        body: JSON.stringify({ publicId: temp }),
       });
       return true;
     }
     return false;
-  }, [toBeDeletedIds]);
+  }, [temp]);
   useUnmount(onAbort);
   useBeforeUnload(onAbort, "You have unsaved changes, are you sure?");
 
   const handleDelete = async (id: string[]) => {
     setResources(publicId => publicId.filter(({ public_id }) => !id.includes(public_id)));
-    setToBeDeletedIds(ids => uniq([...ids, ...id]));
+    setDeletedRes(ids => uniq([...ids, ...id]));
   };
   return (
     <Flex direction="column" gap="5" justify="start" align="start">
@@ -152,7 +165,7 @@ const Uoload = ({
         onSuccess={(result, { widget }) => {
           const { public_id, secure_url } = result.info as CloudinaryResult;
           setResources(publicIds => [...publicIds, { public_id, secure_url }]);
-          setToBeDeletedIds(ids => [...ids, public_id]);
+          setTemp(ids => [...ids, public_id]);
         }}
         onAbort={onAbort}
         onError={async (error, widget) => {

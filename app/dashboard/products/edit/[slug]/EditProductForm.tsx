@@ -28,7 +28,8 @@ type TBody = Pick<Modify<Product, { price: string; quantity: string }>, DataKey>
 const EditProductForm = ({ slug }: { slug: string }) => {
   const router = useRouter();
   const [resources, setResources] = useState<{ public_id: string; secure_url: string }[]>([]);
-  const [toBeDeletedIds, setToBeDeletedIds] = useState<string[]>([]);
+  const [deletedRes, setDeletedRes] = useState<string[]>([]);
+  const [temp, setTemp] = useState<string[]>([]);
   const [brandId, setBrandId] = useState<null | string>(null);
   const [categoryId, setCategoryId] = useState<null | string>(null);
   const editProductMutation = useMutationHook<Product, Partial<TBody>>(
@@ -91,7 +92,11 @@ const EditProductForm = ({ slug }: { slug: string }) => {
       loading: "Editing product...",
       success: data => {
         setResources([]);
-        setToBeDeletedIds([]);
+        setTemp([]);
+        fetch("/api/admin/upload", {
+          method: "DELETE",
+          body: JSON.stringify({ publicId: deletedRes }),
+        });
         setTimeout(() => {
           refetch();
           if (differences.includes("name")) router.push(`/dashboard/products/edit/${data.slug}`);
@@ -110,8 +115,9 @@ const EditProductForm = ({ slug }: { slug: string }) => {
         <Upload
           resources={resources}
           setResources={setResources}
-          toBeDeletedIds={toBeDeletedIds}
-          setToBeDeletedIds={setToBeDeletedIds}
+          temp={temp}
+          setTemp={setTemp}
+          setDeletedRes={setDeletedRes}
           folder="products"
           maxFiles={10}
           multiple

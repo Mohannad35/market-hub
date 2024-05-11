@@ -9,7 +9,6 @@ import { Button } from "@nextui-org/button";
 import { Input } from "@nextui-org/input";
 import { Category } from "@prisma/client";
 import { Flex, Text } from "@radix-ui/themes";
-import { getCldImageUrl } from "next-cloudinary";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -17,7 +16,8 @@ import { toast } from "sonner";
 const NewCategoryForm = () => {
   const router = useRouter();
   const [resources, setResources] = useState<{ public_id: string; secure_url: string }[]>([]);
-  const [toBeDeletedIds, setToBeDeletedIds] = useState<string[]>([]);
+  const [deletedRes, setDeletedRes] = useState<string[]>([]);
+  const [temp, setTemp] = useState<string[]>([]);
   const [parentPath, setParentPath] = useState<string>("/");
   const addCategoryMutation = useMutationHook<
     Category,
@@ -42,7 +42,11 @@ const NewCategoryForm = () => {
       loading: "Adding Cateogry",
       success: data => {
         setResources([]);
-        setToBeDeletedIds([]);
+        setTemp([]);
+        fetch("/api/admin/upload", {
+          method: "DELETE",
+          body: JSON.stringify({ publicId: deletedRes }),
+        });
         setTimeout(() => {
           router.push("/dashboard/categories");
           router.refresh();
@@ -62,8 +66,9 @@ const NewCategoryForm = () => {
         <Upload
           resources={resources}
           setResources={setResources}
-          toBeDeletedIds={toBeDeletedIds}
-          setToBeDeletedIds={setToBeDeletedIds}
+          temp={temp}
+          setTemp={setTemp}
+          setDeletedRes={setDeletedRes}
           folder="categories"
         />
         <Input

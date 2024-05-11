@@ -20,7 +20,8 @@ type DataKey = "name" | "image";
 const EditBrandForm = ({ slug }: { slug: string }) => {
   const router = useRouter();
   const [resources, setResources] = useState<{ public_id: string; secure_url: string }[]>([]);
-  const [toBeDeletedIds, setToBeDeletedIds] = useState<string[]>([]);
+  const [deletedRes, setDeletedRes] = useState<string[]>([]);
+  const [temp, setTemp] = useState<string[]>([]);
   const editBrandMutation = useMutationHook<Brand, Partial<Pick<Brand, "name" | "image">>>(
     `/api/brands/${slug}`,
     ["editBrand"],
@@ -56,7 +57,11 @@ const EditBrandForm = ({ slug }: { slug: string }) => {
       loading: "Editing brand...",
       success: data => {
         setResources([]);
-        setToBeDeletedIds([]);
+        setTemp([]);
+        fetch("/api/admin/upload", {
+          method: "DELETE",
+          body: JSON.stringify({ publicId: deletedRes }),
+        });
         setTimeout(() => {
           refetch();
           router.replace("/dashboard/brands");
@@ -77,8 +82,9 @@ const EditBrandForm = ({ slug }: { slug: string }) => {
         <Upload
           resources={resources}
           setResources={setResources}
-          toBeDeletedIds={toBeDeletedIds}
-          setToBeDeletedIds={setToBeDeletedIds}
+          temp={temp}
+          setTemp={setTemp}
+          setDeletedRes={setDeletedRes}
           folder="brands"
         />
         <Input

@@ -1,3 +1,4 @@
+import cloudinary from "@/lib/cloudinary";
 import { authMiddleware } from "@/lib/middleware/auth";
 import { wrapperMiddleware } from "@/lib/middleware/wrapper";
 import { CategoryWithProducts } from "@/lib/types";
@@ -8,10 +9,9 @@ import {
   editProductSchema,
 } from "@/lib/validation-schemas";
 import prisma from "@/prisma/client";
-import { Category } from "@prisma/client";
+import { Category, User } from "@prisma/client";
 import { startCase, uniq } from "lodash";
 import { nanoid } from "nanoid";
-import { User } from "next-auth";
 import { ApiError } from "next/dist/server/api-utils";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -47,10 +47,12 @@ const PATCH_handler = async (
   { params: { slug } }: { params: { slug: string } }
 ): Promise<NextResponse<Category>> => {
   const path = decodeURI("/" + slug.replace(/\-/g, "/"));
-  // const user = JSON.parse(request.cookies.get("user")!.value!) as User;
+  const user = JSON.parse(request.cookies.get("user")!.value!) as User;
   // Get the category from the database and check if it exists
   const category = await prisma.category.findUnique({ where: { path } });
   if (!category) throw new ApiError(404, "Category not found");
+  // Check if the user is the vendor of the category or an admin
+  if (!user.isAdmin) throw new ApiError(403, "Unauthorized");
   // Get the body of the request and validate it
   const body = await request.json();
   const { success, data, error } = editCategorySchema.safeParse(body);
@@ -58,31 +60,58 @@ const PATCH_handler = async (
   const { name, image, parent } = data;
   let newPath: string | undefined = undefined;
   // Check if the parent doesn't exists
-  if (parent) {
-    if (parent === "/") {
-      newPath = `/${category.name}`;
-    } else {
-      newPath = `${parent}/${category.name}`;
-      if (!(await prisma.category.findUnique({ where: { path: parent } })))
-        throw new ApiError(400, "Parent doesn't exist");
-    }
+  if (parent && parent !== "/" && !(await prisma.category.findUnique({ where: { path: parent } })))
+    throw new ApiError(400, "Parent doesn't exist");
+  if (parent && name) {
+    newPath = `${parent}${!parent.endsWith("/") && "/"}${name.toLowerCase()}`;
+  } else if (parent && !name) {
+    newPath = `${parent}${!parent.endsWith("/") && "/"}${category.name.toLowerCase()}`;
+  } else if (!parent && name) {
+    newPath = `${category.parent}/${name.toLowerCase()}`;
   }
-  if (name) {
-    newPath = parent ? `${parent === "/" ? "" : parent}/${name}` : `${category.parent}/${name}`;
-    // Check if the category already exists
-    if (await prisma.category.findUnique({ where: { path: newPath } }))
-      throw new ApiError(400, "Category already exists");
-  }
+  // Check if the category already exists
+  if (newPath && (await prisma.category.findUnique({ where: { path: newPath } })))
+    throw new ApiError(400, "Category already exists");
   // Check if category is dublicate
   if (newPath && uniq(newPath.split("/")).length !== newPath.split("/").length)
     throw new ApiError(400, "The category is a duplicate of one of its parent categories.");
   // Edit the category
   const newCategory = await prisma.category.update({
     where: { path },
-    data: { name: startCase(name), image, parent, path: newPath },
+    data: { name: name ? startCase(name) : undefined, image, parent, path: newPath },
   });
   return NextResponse.json(newCategory);
 };
 
+const DELETE_handler = async (
+  request: NextRequest,
+  { params: { slug } }: { params: { slug: string } }
+): Promise<NextResponse<Category>> => {
+  const user = JSON.parse(request.cookies.get("user")!.value!) as User;
+  const path = decodeURI("/" + slug.replace(/\-/g, "/"));
+  // Check if the category exists
+  const category = await prisma.category.findUnique({ where: { path } });
+  console.log(category);
+  if (!category) throw new ApiError(404, "Category not found");
+  // Check if the user is the vendor of the category or an admin
+  if (!user.isAdmin) throw new ApiError(403, "Unauthorized");
+  // Check if the category has products
+  const products = await prisma.product.findMany({ where: { categoryId: category.id } });
+  if (products.length) throw new ApiError(400, "Category has products. Move or delete them first");
+  // Check if the category has subcategories
+  const subcategories = await prisma.category.findMany({ where: { parent: path } });
+  if (subcategories.length)
+    throw new ApiError(400, "Category has subcategories. Move or delete them first");
+  // Delete the category
+  const deletedCategory = await prisma.category.delete({ where: { path } });
+  if (deletedCategory.image) {
+    console.log("Deleting image:", deletedCategory.image.public_id);
+    const { result } = await cloudinary.uploader.destroy(deletedCategory.image.public_id);
+    console.log(deletedCategory.image.public_id, result);
+  }
+  return NextResponse.json(deletedCategory);
+};
+
 export const GET = wrapperMiddleware(GET_handler);
 export const PATCH = wrapperMiddleware(authMiddleware, PATCH_handler);
+export const DELETE = wrapperMiddleware(authMiddleware, DELETE_handler);

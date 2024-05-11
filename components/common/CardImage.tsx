@@ -29,7 +29,8 @@ const CardImage = ({ src, href, edit, name, handleDelete }: Props) => {
       >
         <Flex width="16rem" height="16rem" justify="center" align="center">
           <Image
-            shadow="none"
+            isZoomed
+            removeWrapper
             radius="none"
             width={480}
             height={480}
