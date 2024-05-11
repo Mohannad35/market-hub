@@ -14,10 +14,7 @@ interface Params {
 export default async function ProductDetailsPage({ params: { slug } }: Params) {
   const queryClient = new QueryClient();
 
-  await queryClient.prefetchQuery({
-    queryKey: ["product", slug],
-    queryFn: getProduct,
-  });
+  await queryClient.prefetchQuery({ queryKey: ["product", slug], queryFn: getProduct });
 
   return (
     // Neat! Serialization is now as easy as passing props.
