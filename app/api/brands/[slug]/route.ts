@@ -3,7 +3,7 @@ import { allowedMiddleware } from "@/lib/middleware/permissions";
 import { wrapperMiddleware } from "@/lib/middleware/wrapper";
 import { BrandWithProducts } from "@/lib/types";
 import { formatErrors, getQueryObject } from "@/lib/utils";
-import { brandQuerySchema, editBrandSchema } from "@/lib/validation-schemas";
+import { brandQuerySchema, editBrandSchema } from "@/lib/validation/brand-schema";
 import prisma from "@/prisma/client";
 import { Brand } from "@prisma/client";
 import { ApiError } from "next/dist/server/api-utils";

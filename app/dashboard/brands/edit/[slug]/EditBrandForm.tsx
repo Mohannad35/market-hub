@@ -5,7 +5,7 @@ import Upload from "@/components/common/Upload";
 import { useMutationHook } from "@/hook/use-tanstack-hooks";
 import { getBrand } from "@/lib/query-functions/brand";
 import { getFormDataObject, validateSchema } from "@/lib/utils";
-import { stringMinMaxSchema } from "@/lib/validation-schemas";
+import { stringMinMaxSchema } from "@/lib/validation/common-schema";
 import { Button } from "@nextui-org/button";
 import { Input } from "@nextui-org/input";
 import { Brand } from "@prisma/client";

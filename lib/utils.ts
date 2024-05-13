@@ -1,3 +1,4 @@
+import { DateValue } from "@internationalized/date";
 import { type ClassValue, clsx } from "clsx";
 import { capitalize as _capitalize, update } from "lodash";
 import { ReadonlyURLSearchParams } from "next/navigation";
@@ -21,7 +22,7 @@ export function capitalize(value: string): string {
 }
 
 export const validateSchema = (
-  value: string | number | null | undefined,
+  value: DateValue | Date | string | number | null | undefined,
   schema: ZodSchema
 ): string | true => {
   const valid = schema.safeParse(value);

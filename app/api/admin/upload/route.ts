@@ -2,7 +2,7 @@ import cloudinary from "@/lib/cloudinary";
 import { authMiddleware } from "@/lib/middleware/auth";
 import { wrapperMiddleware } from "@/lib/middleware/wrapper";
 import { formatErrors } from "@/lib/utils";
-import { adminUploadSchema } from "@/lib/validation-schemas";
+import { adminUploadSchema } from "@/lib/validation/common-schema";
 import { ApiError } from "next/dist/server/api-utils";
 import { NextRequest, NextResponse } from "next/server";
 

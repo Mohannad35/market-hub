@@ -1,7 +1,7 @@
 import { allowedMiddleware } from "@/lib/middleware/permissions";
 import { wrapperMiddleware } from "@/lib/middleware/wrapper";
 import { formatErrors, getQueryObject } from "@/lib/utils";
-import { newProductSchema, productQuerySchema } from "@/lib/validation-schemas";
+import { newProductSchema, productQuerySchema } from "@/lib/validation/product-schema";
 import prisma from "@/prisma/client";
 import { Prisma, Product, User } from "@prisma/client";
 import { DefaultArgs } from "@prisma/client/runtime/library";

@@ -41,7 +41,11 @@ const NavBarAuth = () => {
             </Text>
             <Text className="font-semibold">{session.user?.email}</Text>
           </DropdownItem>
-          <DropdownItem key="profile" startContent={<CircleUserRoundIcon size={20} />}>
+          <DropdownItem
+            key="profile"
+            href="/dashboard/settings/profile"
+            startContent={<CircleUserRoundIcon size={20} />}
+          >
             Profile
           </DropdownItem>
           <DropdownItem
@@ -51,7 +55,12 @@ const NavBarAuth = () => {
           >
             Dashboard
           </DropdownItem>
-          <DropdownItem key="settings" showDivider startContent={<SettingsIcon size={20} />}>
+          <DropdownItem
+            key="settings"
+            href="/dashboard/settings"
+            showDivider
+            startContent={<SettingsIcon size={20} />}
+          >
             Settings
           </DropdownItem>
           <DropdownItem

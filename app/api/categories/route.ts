@@ -1,7 +1,7 @@
 import { allowedMiddleware } from "@/lib/middleware/permissions";
 import { wrapperMiddleware } from "@/lib/middleware/wrapper";
 import { formatErrors, getQueryObject } from "@/lib/utils";
-import { categoryQuerySchema, newCategorySchema } from "@/lib/validation-schemas";
+import { categoryQuerySchema, newCategorySchema } from "@/lib/validation/category-schema";
 import prisma from "@/prisma/client";
 import { Category, Prisma } from "@prisma/client";
 import { startCase, uniq } from "lodash";

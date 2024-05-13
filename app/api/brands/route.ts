@@ -1,7 +1,7 @@
 import { allowedMiddleware } from "@/lib/middleware/permissions";
 import { wrapperMiddleware } from "@/lib/middleware/wrapper";
 import { formatErrors, getQueryObject } from "@/lib/utils";
-import { brandQuerySchema, newBrandSchema } from "@/lib/validation-schemas";
+import { brandQuerySchema, newBrandSchema } from "@/lib/validation/brand-schema";
 import prisma from "@/prisma/client";
 import { Brand, Prisma } from "@prisma/client";
 import { ApiError } from "next/dist/server/api-utils";

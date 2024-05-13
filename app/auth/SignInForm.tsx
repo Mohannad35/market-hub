@@ -1,7 +1,7 @@
 "use client";
 
 import { getFormDataObject, validateSchema } from "@/lib/utils";
-import { stringMinMaxSchema, stringSchema } from "@/lib/validation-schemas";
+import { stringMinMaxSchema, stringSchema } from "@/lib/validation/common-schema";
 import { Button } from "@nextui-org/button";
 import { Input } from "@nextui-org/input";
 import { Text } from "@radix-ui/themes";

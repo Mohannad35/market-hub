@@ -3,7 +3,7 @@ import { allowedMiddleware } from "@/lib/middleware/permissions";
 import { wrapperMiddleware } from "@/lib/middleware/wrapper";
 import { CategoryWithProducts } from "@/lib/types";
 import { formatErrors, getQueryObject } from "@/lib/utils";
-import { categoryQuerySchema, editCategorySchema } from "@/lib/validation-schemas";
+import { categoryQuerySchema, editCategorySchema } from "@/lib/validation/category-schema";
 import prisma from "@/prisma/client";
 import { Category, User } from "@prisma/client";
 import { startCase, uniq } from "lodash";

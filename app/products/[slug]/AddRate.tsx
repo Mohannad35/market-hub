@@ -5,7 +5,7 @@ import { useMutationHook } from "@/hook/use-tanstack-hooks";
 import { getRate } from "@/lib/query-functions/rate";
 import { ProductWithBrandAndCategoryAndRates } from "@/lib/types";
 import { getFormDataObject, validateSchema } from "@/lib/utils";
-import { stringMinMaxSchema } from "@/lib/validation-schemas";
+import { stringMinMaxSchema } from "@/lib/validation/common-schema";
 import { Button, Textarea } from "@nextui-org/react";
 import { Rate } from "@prisma/client";
 import { Flex, Text } from "@radix-ui/themes";

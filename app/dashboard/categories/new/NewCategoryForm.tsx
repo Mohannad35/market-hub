@@ -3,7 +3,7 @@
 import Upload from "@/components/common/Upload";
 import { useMutationHook, useQueryHook } from "@/hook/use-tanstack-hooks";
 import { getFormDataObject, validateSchema } from "@/lib/utils";
-import { stringMinMaxSchema, stringSchema } from "@/lib/validation-schemas";
+import { stringMinMaxSchema, stringSchema } from "@/lib/validation/common-schema";
 import { Autocomplete, AutocompleteItem } from "@nextui-org/autocomplete";
 import { Button } from "@nextui-org/button";
 import { Input } from "@nextui-org/input";

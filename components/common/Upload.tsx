@@ -26,6 +26,7 @@ type Props = Modify<
     folder: string;
     multiple?: boolean;
     maxFiles?: number;
+    cropping?: boolean;
   }
 >;
 /**
@@ -52,6 +53,7 @@ const Uoload = ({
   folder,
   multiple = false,
   maxFiles,
+  cropping = false,
   ...props
 }: Props) => {
   const { theme, systemTheme } = useTheme();
@@ -107,13 +109,16 @@ const Uoload = ({
       </Flex>
 
       <CldUploadWidget
+        uploadPreset="ml_default"
         signatureEndpoint="/api/sign-cloudinary-params"
         options={{
           resourceType: "image",
           sources: ["local", "url", "camera", "image_search", "facebook", "dropbox", "instagram"],
           googleApiKey: process.env.NEXT_PUBLIC_CLOUDINARY_GOOGLE_API_KEY,
           showAdvancedOptions: false,
-          cropping: false,
+          cropping: true,
+          croppingAspectRatio: 1,
+          showSkipCropButton: true,
           folder: `market-hub/${folder}`,
           multiple,
           maxFiles,

@@ -1,6 +1,6 @@
 import { wrapperMiddleware } from "@/lib/middleware/wrapper";
 import { formatErrors } from "@/lib/utils";
-import { signUpSchema } from "@/lib/validation-schemas";
+import { signUpSchema } from "@/lib/validation/user-schema";
 import prisma from "@/prisma/client";
 import { User } from "@prisma/client";
 import { hash } from "bcryptjs";

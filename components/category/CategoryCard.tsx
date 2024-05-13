@@ -1,15 +1,15 @@
 "use client";
 
+import { useMutationHook } from "@/hook/use-tanstack-hooks";
 import { Card, CardBody, CardFooter, CardProps } from "@nextui-org/card";
+import { useDisclosure } from "@nextui-org/react";
 import { Category } from "@prisma/client";
+import { truncate } from "lodash";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 import CardImage from "../common/CardImage";
 import CardName from "../common/CardName";
-import { useRouter } from "next/navigation";
-import { useMutationHook } from "@/hook/use-tanstack-hooks";
-import { useDisclosure } from "@nextui-org/react";
-import { toast } from "sonner";
 import Modal from "../common/Modal";
-import { truncate } from "lodash";
 
 interface Props extends CardProps {
   item: Category;
@@ -25,7 +25,6 @@ const CategoryCard = ({ item, ...props }: Props) => {
   const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure({});
 
   const handleDelete = () => {
-    console.log("Delete", encodeURI(path.slice(1).replace(/\//g, "-")));
     const promise = new Promise<Category>(async (resolve, reject) => {
       await delCategoryMutation.mutateAsync({}).then(resolve).catch(reject);
     });

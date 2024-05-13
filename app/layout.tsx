@@ -1,7 +1,7 @@
 import NavBar from "@/components/nav-bar/NavBar";
 import { Providers } from "@/components/root-layout/Providers";
 import ToastContainer from "@/components/root-layout/ToastContainer";
-import { inter, satisfy } from "@/lib/fonts";
+import { inter, satisfy, fira_code } from "@/lib/fonts";
 import "@radix-ui/themes/styles.css";
 import type { Metadata } from "next";
 import "./globals.css";
@@ -14,7 +14,11 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" suppressHydrationWarning className={`${inter.variable} ${satisfy.variable}`}>
+    <html
+      lang="en"
+      suppressHydrationWarning
+      className={`${inter.variable} ${satisfy.variable} ${fira_code.variable}`}
+    >
       <body className="min-h-svh">
         <Providers>
           <NavBar />

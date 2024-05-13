@@ -10,6 +10,7 @@ import { FaGithub, FaGoogle } from "react-icons/fa";
 import prisma from "./prisma/client";
 import slugify from "slugify";
 import { nanoid } from "nanoid";
+import { idSchema } from "./lib/validation/common-schema";
 
 if (!process.env.NEXT_PUBLIC_AUTH_GOOGLE_ID) {
   throw new Error("NEXT_PUBLIC_AUTH_GOOGLE_ID is not set");
@@ -33,7 +34,12 @@ const providers: Provider[] = [
       const user = await prisma.user.findUnique({ where: { email: email as string } });
       if (!user || !user.password) return null;
       const passwordMatch = await compare(password as string, user.password);
-      return passwordMatch ? user : null;
+      const returnUser = {
+        ...user,
+        password: undefined,
+        image: user.image?.secure_url || user.avatar || undefined,
+      };
+      return passwordMatch ? returnUser : null;
     },
   }),
   Google({
@@ -68,6 +74,26 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   providers,
   session: { strategy: "jwt" },
   // debug: process.env.NODE_ENV === "development",
+  callbacks: {
+    async jwt({ token, user, trigger, session }) {
+      if (trigger === "update") {
+        // Note, that `session` can be any arbitrary object, remember to validate it!
+        const { success, data } = idSchema("User Id").safeParse(session.id);
+        const dbUser = await prisma.user.findUnique({ where: { id: success ? data : token.sub } });
+        if (dbUser) {
+          token.id = dbUser.id;
+          token.name = dbUser.name;
+          token.email = dbUser.email;
+          token.picture = dbUser.image?.secure_url || dbUser.avatar;
+        }
+      }
+      if (user) {
+        // User is available during sign-in
+        token.id = user.id;
+      }
+      return token;
+    },
+  },
   events: {
     async createUser({ user }) {
       if (!user.email) return;

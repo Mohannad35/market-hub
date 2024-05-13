@@ -1,6 +1,6 @@
 import { wrapperMiddleware } from "@/lib/middleware/wrapper";
 import { formatErrors, getQueryObject } from "@/lib/utils";
-import { productRatesQuerySchema } from "@/lib/validation-schemas";
+import { productRatesQuerySchema } from "@/lib/validation/product-schema";
 import prisma from "@/prisma/client";
 import { ApiError } from "next/dist/server/api-utils";
 import { NextRequest, NextResponse } from "next/server";

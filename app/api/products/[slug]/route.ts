@@ -3,7 +3,7 @@ import { allowedMiddleware } from "@/lib/middleware/permissions";
 import { wrapperMiddleware } from "@/lib/middleware/wrapper";
 import { ProductWithBrandAndCategory, ProductWithBrandAndCategoryAndRates } from "@/lib/types";
 import { formatErrors, getQueryObject } from "@/lib/utils";
-import { editProductSchema, productDetailsQuerySchema } from "@/lib/validation-schemas";
+import { editProductSchema, productDetailsQuerySchema } from "@/lib/validation/product-schema";
 import prisma from "@/prisma/client";
 import { Prisma, Product, User } from "@prisma/client";
 import { DefaultArgs } from "@prisma/client/runtime/library";
@@ -59,7 +59,7 @@ const PATCH_handler = async (
   // Get the body of the request and validate it
   const body = await request.json();
   const { success, data, error } = editProductSchema.safeParse(body);
-  if (!success) return NextResponse.json(formatErrors(error), { status: 400 });
+  if (!success) throw new ApiError(400, formatErrors(error).message);
   // Create a slug for the product if the name is provided
   let newSlug = slug;
   if (data.name) {

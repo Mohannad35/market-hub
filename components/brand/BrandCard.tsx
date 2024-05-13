@@ -1,16 +1,15 @@
 "use client";
 
+import { useMutationHook } from "@/hook/use-tanstack-hooks";
 import { Card, CardBody, CardFooter, CardProps } from "@nextui-org/card";
+import { useDisclosure } from "@nextui-org/react";
 import { Brand } from "@prisma/client";
-import { useSession } from "next-auth/react";
+import { truncate } from "lodash";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 import CardImage from "../common/CardImage";
 import CardName from "../common/CardName";
-import { useMutationHook } from "@/hook/use-tanstack-hooks";
-import { useDisclosure } from "@nextui-org/react";
-import { toast } from "sonner";
-import { useRouter } from "next/navigation";
 import Modal from "../common/Modal";
-import { truncate } from "lodash";
 
 interface Props extends CardProps {
   item: Brand;
@@ -22,7 +21,6 @@ const BrandCard = ({ item, ...props }: Props) => {
   const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure({});
 
   const handleDelete = () => {
-    console.log("Delete", item.slug);
     const promise = new Promise<Brand>(async (resolve, reject) => {
       await delBrandMutation.mutateAsync({}).then(resolve).catch(reject);
     });

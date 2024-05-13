@@ -1,7 +1,7 @@
 "use client";
 
 import { validateSchema } from "@/lib/utils";
-import { positiveNumberSchema } from "@/lib/validation-schemas";
+import { positiveNumberSchema } from "@/lib/validation/common-schema";
 import { Button } from "@nextui-org/button";
 import { Input } from "@nextui-org/input";
 import { Flex } from "@radix-ui/themes";

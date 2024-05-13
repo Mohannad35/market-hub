@@ -42,6 +42,7 @@ const config: Config = {
       fontFamily: {
         inter: "var(--font-inter)",
         satisfy: "var(--font-satisfy)",
+        fira_code: "var(--font-fira-code)",
       },
       colors: {
         border: "hsl(var(--border))",

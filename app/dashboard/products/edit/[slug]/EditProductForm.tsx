@@ -11,7 +11,7 @@ import {
   integerSchema,
   numberSchema,
   stringMinMaxSchema,
-} from "@/lib/validation-schemas";
+} from "@/lib/validation/common-schema";
 import { Autocomplete, AutocompleteItem } from "@nextui-org/autocomplete";
 import { Button } from "@nextui-org/button";
 import { Input, Textarea } from "@nextui-org/input";
