@@ -1,6 +1,6 @@
 import { Navbar, NavbarBrand, NavbarContent, NavbarItem } from "@nextui-org/navbar";
 import { Heading } from "@radix-ui/themes";
-import { Store } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 import Search from "../product/Search";
 import NavBarAuth from "./NavBarAuth";
@@ -34,9 +34,16 @@ export default function NavBar() {
     >
       {/* Left side of the navbar */}
       <NavbarBrand>
-        <Link href="/" className="flex gap-2">
-          <Store size={24} className="text-accent" />
-          <Heading className="hidden !font-satisfy text-accent md:flex">MarketHub</Heading>
+        <Link href="/" className="flex items-center gap-2">
+          {/* <Logo className="h-6 w-6" /> */}
+          <Image
+            alt="Logo"
+            src={`/logo-transparent.png`}
+            width={1000}
+            height={1000}
+            className="h-10 w-10"
+          />
+          <Heading className="hidden !font-akaya_kanadaka text-accent md:flex">MarketHub</Heading>
         </Link>
       </NavbarBrand>
 

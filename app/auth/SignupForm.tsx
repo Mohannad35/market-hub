@@ -94,7 +94,12 @@ const SignupForm = ({ setTab }: { setTab: Dispatch<SetStateAction<string | numbe
       promise,
       {
         pending: "Signing up...",
-        success: "Signed up successfully",
+        success: {
+          render: () => {
+            setTimeout(() => setTab("login"), 2000);
+            return "Signed up successfully";
+          },
+        },
         error: {
           render: ({ data }: { data: Error }) => data.message || "An unexpected error occurred",
         },
@@ -131,7 +136,7 @@ const SignupForm = ({ setTab }: { setTab: Dispatch<SetStateAction<string | numbe
             size="lg"
             name="username"
             variant="bordered"
-            placeholder="jhone_doe"
+            placeholder="john_doe"
             startContent={
               <FingerprintIcon className="pointer-events-none flex-shrink-0 text-2xl text-default-400" />
             }

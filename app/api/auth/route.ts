@@ -1,4 +1,4 @@
-import { VerificationTemplate } from "@/emails/verification-template";
+import VerificationTemplate from "@/emails/verification-template";
 import WelcomeTemplate from "@/emails/welcome-template";
 import { wrapperMiddleware } from "@/lib/middleware/wrapper";
 import { formatErrors } from "@/lib/utils";
@@ -64,7 +64,9 @@ async function POST_handler(request: NextRequest): Promise<NextResponse<User>> {
     include: { verificationToken: true },
   });
   // Send verification email and welcome email
-  const welcomeEmailHtml = render(WelcomeTemplate({ name: user.name }));
+  const welcomeEmailHtml = render(
+    WelcomeTemplate({ name: user.name, baseUrl: request.nextUrl.origin })
+  );
   const verificationEmailHtml = render(
     VerificationTemplate({
       username: user.name,
@@ -74,7 +76,7 @@ async function POST_handler(request: NextRequest): Promise<NextResponse<User>> {
   );
   await sendgrid
     .send({
-      from: "mohannadragab53@gmail.com",
+      from: { email: "mohannadragab53@gmail.com", name: "Market Hub Support Team" },
       to: user.email!,
       subject: "Welcome aboard!",
       html: welcomeEmailHtml,
@@ -83,7 +85,7 @@ async function POST_handler(request: NextRequest): Promise<NextResponse<User>> {
     .catch(error => console.error(error));
   await sendgrid
     .send({
-      from: "mohannadragab53@gmail.com",
+      from: { email: "mohannadragab53@gmail.com", name: "Market Hub Support Team" },
       to: user.email!,
       subject: "Email Verification",
       html: verificationEmailHtml,

@@ -43,6 +43,7 @@ const config: Config = {
         inter: "var(--font-inter)",
         satisfy: "var(--font-satisfy)",
         fira_code: "var(--font-fira-code)",
+        akaya_kanadaka: "var(--font-akaya-kanadaka)",
       },
       colors: {
         border: "hsl(var(--border))",

@@ -1,7 +1,7 @@
 import NavBar from "@/components/nav-bar/NavBar";
 import { Providers } from "@/components/root-layout/Providers";
 import ToastContainer from "@/components/root-layout/ToastContainer";
-import { inter, satisfy, fira_code } from "@/lib/fonts";
+import { inter, satisfy, fira_code, akaya_kanadaka } from "@/lib/fonts";
 import "@radix-ui/themes/styles.css";
 import type { Metadata } from "next";
 import "./globals.css";
@@ -17,7 +17,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
     <html
       lang="en"
       suppressHydrationWarning
-      className={`${inter.variable} ${satisfy.variable} ${fira_code.variable}`}
+      className={`${inter.variable} ${satisfy.variable} ${fira_code.variable} ${akaya_kanadaka.variable}`}
     >
       <body className="min-h-svh">
         <Providers>
