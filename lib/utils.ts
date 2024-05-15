@@ -42,9 +42,9 @@ export function formatErrors(error: ZodError | Error) {
     return {
       message:
         formErrors.length > 0
-          ? formErrors.join(", ")
+          ? formErrors.join("\n")
           : Object.values(fieldErrors)
-              .map(e => e?.join(", "))
+              .map(e => e?.join("\n"))
               .join(". "),
     };
   }

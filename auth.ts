@@ -1,5 +1,8 @@
 import { PrismaAdapter } from "@auth/prisma-adapter";
+import { User } from "@prisma/client";
 import { compare } from "bcryptjs";
+import { pick } from "lodash";
+import { nanoid } from "nanoid";
 import NextAuth from "next-auth";
 import { Provider } from "next-auth/providers";
 import Credentials from "next-auth/providers/credentials";
@@ -7,10 +10,9 @@ import Github from "next-auth/providers/github";
 import Google from "next-auth/providers/google";
 import { IconType } from "react-icons";
 import { FaGithub, FaGoogle } from "react-icons/fa";
-import prisma from "./prisma/client";
 import slugify from "slugify";
-import { nanoid } from "nanoid";
 import { idSchema } from "./lib/validation/common-schema";
+import prisma from "./prisma/client";
 
 if (!process.env.NEXT_PUBLIC_AUTH_GOOGLE_ID) {
   throw new Error("NEXT_PUBLIC_AUTH_GOOGLE_ID is not set");
@@ -24,31 +26,61 @@ const providers: Provider[] = [
     // You can specify which fields should be submitted, by adding keys to the `credentials` object.
     // e.g. domain, username, password, 2FA token, etc.
     credentials: {
-      email: { label: "Email", type: "email", placeholder: "jsmith@example.com" },
+      username: { label: "Username" },
       password: { label: "Password", type: "password" },
     },
-    authorize: async (credentials, request) => {
-      const { email, password } = credentials;
-      if (!email || !password) return null;
+    async authorize(credentials, request) {
+      const username = credentials.username as string;
+      const password = credentials.password as string;
+      if (!username || !password) return null;
       // logic to verify if user exists
-      const user = await prisma.user.findUnique({ where: { email: email as string } });
+      const user = username.includes("@")
+        ? await prisma.user.findUnique({ where: { email: username } })
+        : await prisma.user.findUnique({ where: { username: username } });
       if (!user || !user.password) return null;
-      const passwordMatch = await compare(password as string, user.password);
-      const returnUser = {
-        ...user,
-        password: undefined,
+      const passwordMatch = await compare(password, user.password);
+      if (!passwordMatch) return null;
+      return {
+        ...pick(user, ["id", "name", "email", "role", "username"]),
         image: user.image?.secure_url || user.avatar || undefined,
       };
-      return passwordMatch ? returnUser : null;
     },
   }),
   Google({
     clientId: process.env.NEXT_PUBLIC_AUTH_GOOGLE_ID,
     clientSecret: process.env.NEXT_PUBLIC_AUTH_GOOGLE_SECRET,
+    async profile(profile, tokens) {
+      // Create a username for the user
+      let username = slugify(profile.name, { lower: true, strict: true, replacement: "_" });
+      while (await prisma.user.findUnique({ where: { username } }))
+        username = `${username}_${nanoid(6)}`;
+      return {
+        id: profile.sub,
+        name: profile.name,
+        username: profile.email,
+        email: profile.email,
+        avatar: profile.picture,
+        role: profile.role ?? "user",
+      };
+    },
   }),
   Github({
     clientId: process.env.NEXT_PUBLIC_AUTH_GITHUB_ID,
     clientSecret: process.env.NEXT_PUBLIC_AUTH_GITHUB_SECRET,
+    async profile(profile, tokens) {
+      // Create a username for the user
+      let username = slugify(profile.name!, { lower: true, strict: true, replacement: "_" });
+      while (await prisma.user.findUnique({ where: { username } }))
+        username = `${username}_${nanoid(6)}`;
+      return {
+        id: profile.node_id,
+        name: profile.name,
+        username: profile.email,
+        email: profile.email,
+        avatar: profile.avatar_url,
+        role: profile.role ?? "user",
+      };
+    },
   }),
 ];
 
@@ -75,7 +107,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   session: { strategy: "jwt" },
   // debug: process.env.NODE_ENV === "development",
   callbacks: {
-    async jwt({ token, user, trigger, session }) {
+    async jwt({ token, user, trigger, session, account, profile }) {
       if (trigger === "update") {
         // Note, that `session` can be any arbitrary object, remember to validate it!
         const { success, data } = idSchema("User Id").safeParse(session.id);
@@ -89,18 +121,15 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       }
       if (user) {
         // User is available during sign-in
-        token.id = user.id;
+        const { id, name, email, role, username, image, avatar } = user as User;
+        token.id = id;
+        token.name = name;
+        token.email = email;
+        token.role = role;
+        token.username = username;
+        token.picture = image?.secure_url || avatar;
       }
       return token;
-    },
-  },
-  events: {
-    async createUser({ user }) {
-      if (!user.email) return;
-      // Create a slug for the user
-      let slug = slugify(user.name ?? "", { lower: true, strict: true, trim: true });
-      while (await prisma.user.findFirst({ where: { slug } })) slug = `${slug}-${nanoid(6)}`;
-      await prisma.user.update({ where: { email: user.email }, data: { slug } });
     },
   },
 });

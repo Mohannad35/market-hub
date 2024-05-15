@@ -58,6 +58,11 @@ const Profile = () => {
       <Flex justify="between">
         <ProfileImage src={image ? image.secure_url : avatar ?? undefined} name={name} />
 
+        <Button variant="faded" color="default" size="sm" onClick={() => console.log(da)}>
+          <Text size="4" weight="medium">
+            Debug
+          </Text>
+        </Button>
         <Button
           variant="faded"
           color="default"

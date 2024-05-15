@@ -3,6 +3,7 @@ import {
   dateSchema,
   enumSchema,
   imageSchema,
+  regexSchema,
   stringMinMaxSchema,
   stringSchema,
 } from "./common-schema";
@@ -47,20 +48,14 @@ export const passwordSchema = stringSchema("Password").superRefine(
         message: "password must contain at least 1 special character",
       });
     }
+    if (password.length < 8) {
+      checkPassComplexity.addIssue({
+        code: "custom",
+        message: "password must contain at least 8 characters",
+      });
+    }
   }
 );
-
-// regexSchema(
-//   // Regex to check if password contains at least 3 of uppercase letter, lowercase letter, number, and special character.
-//   /(?=.{8,})((?=.*\d)(?=.*[a-z])(?=.*[A-Z])|(?=.*\d)(?=.*[a-zA-Z])(?=.*[\W_])|(?=.*[a-z])(?=.*[A-Z])(?=.*[\W_])).*/g,
-// (?=.{8,})(
-//   (?=.*\d)(?=.*[a-z])(?=.*[A-Z])|
-//   (?=.*\d)(?=.*[a-zA-Z])(?=.*[\W_])|
-//   (?=.*[a-z])(?=.*[A-Z])(?=.*[\W_])
-// ).*
-//   "Password",
-//   "Password must contain at least 8 characters, 1 uppercase letter, 1 lowercase letter, 1 number, and 1 special character"
-// ),
 
 const phoneNumberSchema = object({
   number: stringMinMaxSchema("Phone Number", 8, 25),
@@ -68,10 +63,17 @@ const phoneNumberSchema = object({
   nationalNumber: stringMinMaxSchema("Phone Number", 8, 15),
   countryCallingCode: stringMinMaxSchema("Phone Number", 2, 100),
 });
+
+export const usernameSchema = regexSchema(
+  /^[a-zA-Z0-9\.!~_-]{3,100}$/g,
+  "Username may not contain non-url-safe chars"
+);
+
 export const signUpSchema = object({
   name: stringMinMaxSchema("Name", 2, 256),
   email: stringSchema("Email").email("Invalid email"),
   password: passwordSchema,
+  username: usernameSchema,
   address: stringMinMaxSchema("Address", 2, 10_000).nullish(),
   businessAddress: stringMinMaxSchema("Business Address", 2, 10_000).nullish(),
   websiteAddress: stringMinMaxSchema("Website Address", 2, 10_000).nullish(),
@@ -84,3 +86,14 @@ export const signUpSchema = object({
 export const editProfileSchema = signUpSchema
   .partial()
   .refine(data => Object.keys(data).length > 0, "At least one field is required");
+
+export const emailOrUsernameSchema = stringSchema("Email or Username").refine(value => {
+  if (value.includes("@"))
+    return stringSchema("Email").email("Invalid email").safeParse(value).success;
+  else return stringMinMaxSchema("Username", 2, 256).safeParse(value).success;
+}, "Invalid email or username");
+
+export const signInSchema = object({
+  email: emailOrUsernameSchema,
+  password: passwordSchema,
+});

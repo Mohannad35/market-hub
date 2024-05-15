@@ -4,9 +4,9 @@ import { Tab, Tabs } from "@nextui-org/tabs";
 import { Flex } from "@radix-ui/themes";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
-import { toast } from "react-toastify";
 import Signin from "./SignIn";
 import Signup from "./Signup";
+import { toast } from "sonner";
 
 const AuthTabs = () => {
   const router = useRouter();
@@ -15,19 +15,29 @@ const AuthTabs = () => {
 
   useEffect(() => {
     const params = new URLSearchParams(searchParams.toString());
-    switch (searchParams.get("error")) {
+    const error = searchParams.get("error");
+    switch (error) {
       case "OAuthAccountNotLinked":
         toast.error(
           "Another account already exists with the same e-mail address. Please sign in with that account."
         );
         params.delete("error");
+        params.delete("code");
         router.replace("?" + params.toString());
+        break;
+      default:
+        if (error) {
+          toast.error(error);
+          params.delete("error");
+          params.delete("code");
+          router.replace("?" + params.toString());
+        }
         break;
     }
   });
 
   return (
-    <Flex direction="column" width={{ initial: "100%", xs: "30rem" }}>
+    <Flex direction="column" width={{ initial: "100%", xs: "40rem" }}>
       <Tabs
         defaultSelectedKey={"login"}
         size="lg"

@@ -109,7 +109,7 @@ const Uoload = ({
       </Flex>
 
       <CldUploadWidget
-        uploadPreset="ml_default"
+        uploadPreset={process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET}
         signatureEndpoint="/api/sign-cloudinary-params"
         options={{
           resourceType: "image",

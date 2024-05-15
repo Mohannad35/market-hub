@@ -6,73 +6,95 @@ import { Dropdown, DropdownItem, DropdownMenu, DropdownTrigger } from "@nextui-o
 import { Skeleton } from "@nextui-org/skeleton";
 import { Text } from "@radix-ui/themes";
 import { CircleUserRoundIcon, LayoutDashboardIcon, LogOutIcon, SettingsIcon } from "lucide-react";
-import { signIn, useSession } from "next-auth/react";
+import { signIn, signOut, useSession } from "next-auth/react";
 import Image from "next/image";
+import Modal from "../common/Modal";
+import { useDisclosure } from "@nextui-org/react";
+import { useState } from "react";
 
 const NavBarAuth = () => {
   const { status, data: session } = useSession();
+  const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure({});
+  const [loading, setLoading] = useState(false);
 
   if (status === "loading") return <Skeleton className="h-[2.5rem] w-[5rem] rounded-medium" />;
   else if (status === "authenticated")
     return (
-      <Dropdown className="w-fit min-w-0 font-inter">
-        <DropdownTrigger>
-          <Avatar
-            showFallback
-            isBordered
-            size="sm"
-            radius="lg"
-            ImgComponent={Image}
-            imgProps={{ width: 48, height: 48 }}
-            src={session.user?.image || undefined}
-            alt="User avatar image"
-            className="cursor-pointer"
-          />
-        </DropdownTrigger>
-        <DropdownMenu
-          hideSelectedIcon
-          selectionMode="single"
-          disabledKeys={["info"]}
-          variant="flat"
-        >
-          <DropdownItem key="info">
-            <Text as="p" className="font-semibold">
-              Signed in as
-            </Text>
-            <Text className="font-semibold">{session.user?.email}</Text>
-          </DropdownItem>
-          <DropdownItem
-            key="profile"
-            href="/dashboard/settings/profile"
-            startContent={<CircleUserRoundIcon size={20} />}
+      <div className="w-fit min-w-0">
+        <Dropdown className="w-fit min-w-0 font-inter">
+          <DropdownTrigger>
+            <Avatar
+              showFallback
+              isBordered
+              size="sm"
+              radius="lg"
+              ImgComponent={Image}
+              imgProps={{ width: 48, height: 48 }}
+              src={session.user?.image || undefined}
+              alt="User avatar image"
+              className="cursor-pointer"
+            />
+          </DropdownTrigger>
+          <DropdownMenu
+            hideSelectedIcon
+            selectionMode="single"
+            disabledKeys={["info"]}
+            variant="flat"
           >
-            Profile
-          </DropdownItem>
-          <DropdownItem
-            key="dashboard"
-            href="/dashboard"
-            startContent={<LayoutDashboardIcon size={20} />}
-          >
-            Dashboard
-          </DropdownItem>
-          <DropdownItem
-            key="settings"
-            href="/dashboard/settings"
-            showDivider
-            startContent={<SettingsIcon size={20} />}
-          >
-            Settings
-          </DropdownItem>
-          <DropdownItem
-            key="signout"
-            color="danger"
-            href="/api/auth/signout?callbackUrl=%2F"
-            startContent={<LogOutIcon size={20} />}
-          >
-            Sign out
-          </DropdownItem>
-        </DropdownMenu>
-      </Dropdown>
+            <DropdownItem key="info">
+              <Text as="p" className="font-semibold">
+                Signed in as
+              </Text>
+              <Text className="font-semibold">{session.user?.email}</Text>
+            </DropdownItem>
+            <DropdownItem
+              key="profile"
+              href="/dashboard/settings/profile"
+              startContent={<CircleUserRoundIcon size={20} />}
+            >
+              Profile
+            </DropdownItem>
+            <DropdownItem
+              key="dashboard"
+              href="/dashboard"
+              startContent={<LayoutDashboardIcon size={20} />}
+            >
+              Dashboard
+            </DropdownItem>
+            <DropdownItem
+              key="settings"
+              href="/dashboard/settings"
+              showDivider
+              startContent={<SettingsIcon size={20} />}
+            >
+              Settings
+            </DropdownItem>
+            <DropdownItem
+              key="signout"
+              color="danger"
+              startContent={<LogOutIcon size={20} />}
+              // href="/api/auth/signout?callbackUrl=%2F"
+              onPress={() => onOpen()}
+            >
+              Sign out
+            </DropdownItem>
+          </DropdownMenu>
+        </Dropdown>
+        <Modal
+          title="Sign out"
+          content="Are you sure you want to sign out?"
+          action="Sign out"
+          onAction={async () => {
+            setLoading(true);
+            await signOut({ callbackUrl: "/" });
+            onClose();
+            setLoading(false);
+          }}
+          isOpen={isOpen}
+          onOpenChange={onOpenChange}
+          isLoading={loading}
+        />
+      </div>
     );
   else if (status === "unauthenticated")
     return (
