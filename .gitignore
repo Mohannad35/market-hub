@@ -75,6 +75,6 @@ sketch
 .ionide
 
 # react emails
-/.react-email/
+.react-email
 
 # End of https://www.toptal.com/developers/gitignore/api/visualstudiocode,nextjs,react

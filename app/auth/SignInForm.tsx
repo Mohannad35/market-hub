@@ -11,42 +11,48 @@ import { Button } from "@nextui-org/button";
 import { Input } from "@nextui-org/input";
 import { Text } from "@radix-ui/themes";
 import { EyeIcon, EyeOffIcon } from "lucide-react";
+import { nanoid } from "nanoid";
 import { signIn } from "next-auth/react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
+import { useSessionStorage } from "react-use";
 import { toast } from "sonner";
 
 const SigninForm = () => {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const [callbackUrl, setCallbackUrl] = useState("/");
+  const [callbackUrl, setCallbackUrl] = useSessionStorage("callbackUrl", "/");
   const [isVisible, setIsVisible] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const toggleVisibility = () => setIsVisible(!isVisible);
 
   useEffect(() => {
     const query = new URLSearchParams(searchParams.toString());
-    setCallbackUrl(query.get("callbackUrl") ?? query.get("redirect") ?? "/");
+    const callBackUrl = query.get("callbackUrl") ?? query.get("redirect");
     const error = query.get("error");
     const code = query.get("code");
-    switch (code) {
-      case "credentials":
-        toast.error("Invalid email or password", { id: "credentials" });
-        break;
-      default:
-        if (error) toast.error(error, { id: "error" });
-        break;
+    if (callBackUrl) {
+      setCallbackUrl(callBackUrl);
+      query.delete("callbackUrl");
     }
-    query.delete("error");
-    query.delete("code");
-    query.delete("callbackUrl");
-    router.push(pathname + `${query.size > 0 ? "?" + query.toString() : ""}`);
-  }, [pathname, router, searchParams]);
+    if (error || code) {
+      switch (code) {
+        case "credentials":
+          toast.error("Invalid email or password", { id: "credentials" });
+          break;
+        default:
+          if (error) toast.error(error, { id: "error" });
+          break;
+      }
+      query.delete("error");
+      query.delete("code");
+    }
+    router.replace(pathname + `${query.size > 0 ? "?" + query.toString() : ""}`);
+  }, [pathname, router, searchParams, setCallbackUrl]);
 
   const handleSubmitSignIn = async (formData: FormData) => {
     setIsLoading(true);
-    const callbackUrl = searchParams.get("callbackUrl") ?? searchParams.get("redirect") ?? "/";
     const data = getFormDataObject<{ username: string; password: string }>(formData);
     const { username, password } = data;
     // await signIn("credentials", { username: data.email, password: data.password, callbackUrl });
@@ -58,13 +64,17 @@ const SigninForm = () => {
     toast.promise(promise, {
       loading: "Signing in...",
       success: data => {
-        setTimeout(() => router.replace(callbackUrl), 2000);
+        setTimeout(() => {
+          router.replace(callbackUrl);
+          setCallbackUrl("/");
+        }, 2000);
         return "Signed in successfully";
       },
       error: err => {
         if (err === "CredentialsSignin") return "Invalid email or password";
         else return err || "An unexpected error occurred";
       },
+      id: "signin-toast" + nanoid(4),
     });
     setIsLoading(false);
   };

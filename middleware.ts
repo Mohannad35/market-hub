@@ -2,16 +2,32 @@ import { auth } from "@/auth";
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
-const protectedRoutes = ["/dashboard", "/products/new", "/products/:slug/edit"];
+const protectedRoutes = [/^\/dashboard\/?.*/];
 
 export async function middleware(request: NextRequest) {
-  const { origin, pathname } = request.nextUrl;
-  if (protectedRoutes.some(route => pathname.startsWith(route))) {
+  const { pathname } = request.nextUrl;
+
+  if (protectedRoutes.some(route => pathname.match(route))) {
     const session = await auth();
     if (!session) {
-      const callbackUrl = encodeURIComponent(`${origin}${pathname}`.replace(/_next.*/g, ""));
-      const authUrl = `${origin}/api/auth/signin?callbackUrl=${callbackUrl}`;
-      return NextResponse.redirect(authUrl);
+      const callbackUrl = encodeURIComponent(`${pathname}`.replace(/_next.*/g, ""));
+      const authUrl = `/auth?callbackUrl=${callbackUrl}`;
+      return NextResponse.redirect(new URL(authUrl, request.url));
     }
   }
 }
+
+export const config = {
+  matcher: [
+    /*
+     * Match all request paths except for the ones starting with:
+     * - api (API routes)
+     * - _next/static (static files)
+     * - _next/image (image optimization files)
+     * - favicon.ico (favicon file)
+     * - *.svg (SVG files)
+     * - *.png (PNG files)
+     */
+    "/((?!api|_next/static|_next/image|favicon.ico|.*.svg|.*.png).*)",
+  ],
+};

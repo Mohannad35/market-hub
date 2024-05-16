@@ -41,6 +41,7 @@ import {
   LockIcon,
   MailIcon,
 } from "lucide-react";
+import { nanoid } from "nanoid";
 import { Dispatch, SetStateAction, useState } from "react";
 import { toast } from "react-toastify";
 
@@ -104,7 +105,7 @@ const SignupForm = ({ setTab }: { setTab: Dispatch<SetStateAction<string | numbe
           render: ({ data }: { data: Error }) => data.message || "An unexpected error occurred",
         },
       },
-      { toastId: "signup-toast" }
+      { toastId: "signup-toast" + nanoid(4) }
     );
   };
 

@@ -37,18 +37,15 @@ async function POST_handler(request: NextRequest): Promise<NextResponse<User>> {
   const { email, password, username, phoneNumber, gender } = data;
   // Check if email already exists
   if (await prisma.user.findUnique({ where: { email } }))
-    throw new ApiError(400, "Email already exists.");
+    throw new ApiError(400, "Email already exists");
   // Check if username already exists
   if (await prisma.user.findUnique({ where: { username } }))
-    throw new ApiError(400, "Username not available.");
+    throw new ApiError(400, "Username not available");
   // Check if the phone number already exists
   if (phoneNumber && (await prisma.user.findFirst({ where: { phoneNumber } })))
-    throw new ApiError(400, "Phone number already exists.");
+    throw new ApiError(400, "Phone number already exists");
   // Hash the password, Create the user, and return it
   const pwHash = await hash(password, 10);
-
-  // Create verification token
-  const emailVerificationToken = randomBytes(16).toString("hex");
   const user = await prisma.user.create({
     data: {
       ...data,
@@ -56,43 +53,45 @@ async function POST_handler(request: NextRequest): Promise<NextResponse<User>> {
       gender: gender as Gender,
       verificationToken: {
         create: {
-          token: emailVerificationToken,
+          token: randomBytes(16).toString("hex"),
           expires: now(getLocalTimeZone()).add({ days: 2 }).toDate(),
         },
       },
     },
     include: { verificationToken: true },
   });
-  // Send verification email and welcome email
-  const welcomeEmailHtml = render(
-    WelcomeTemplate({ name: user.name, baseUrl: request.nextUrl.origin })
-  );
-  const verificationEmailHtml = render(
-    VerificationTemplate({
-      username: user.name,
-      emailVerificationToken: user.verificationToken!.token,
-      baseUrl: request.nextUrl.origin,
-    })
-  );
-  await sendgrid
-    .send({
-      from: { email: "mohannadragab53@gmail.com", name: "Market Hub Support Team" },
-      to: user.email!,
-      subject: "Welcome aboard!",
-      html: welcomeEmailHtml,
-    })
-    .then(() => console.log("Email sent"))
-    .catch(error => console.error(error));
-  await sendgrid
-    .send({
-      from: { email: "mohannadragab53@gmail.com", name: "Market Hub Support Team" },
-      to: user.email!,
-      subject: "Email Verification",
-      html: verificationEmailHtml,
-    })
-    .then(() => console.log("Email sent"))
-    .catch(error => console.error(error));
-
+  // Send emails if SENDGRID_API_KEY is set
+  if (process.env.SENDGRID_API_KEY) {
+    // Send verification email and welcome email
+    const welcomeEmailHtml = render(
+      WelcomeTemplate({ name: user.name, baseUrl: request.nextUrl.origin })
+    );
+    const verificationEmailHtml = render(
+      VerificationTemplate({
+        username: user.name,
+        emailVerificationToken: user.verificationToken!.token,
+        baseUrl: request.nextUrl.origin,
+      })
+    );
+    await sendgrid
+      .send({
+        from: { email: "mohannadragab53@gmail.com", name: "Market Hub Support Team" },
+        to: user.email!,
+        subject: "Welcome aboard!",
+        html: welcomeEmailHtml,
+      })
+      .then(() => console.log("Email sent"))
+      .catch(error => console.error(error));
+    await sendgrid
+      .send({
+        from: { email: "mohannadragab53@gmail.com", name: "Market Hub Support Team" },
+        to: user.email!,
+        subject: "Email Verification",
+        html: verificationEmailHtml,
+      })
+      .then(() => console.log("Email sent"))
+      .catch(error => console.error(error));
+  }
   return NextResponse.json(user, { status: 201 });
 }
 
