@@ -4,6 +4,7 @@ import { wrapperMiddleware } from "@/lib/middleware/wrapper";
 import { CategoryWithProducts } from "@/lib/types";
 import { formatErrors, getQueryObject } from "@/lib/utils";
 import { categoryQuerySchema, editCategorySchema } from "@/lib/validation/category-schema";
+import { logger } from "@/logger";
 import prisma from "@/prisma/client";
 import { Category, User } from "@prisma/client";
 import { startCase, uniq } from "lodash";
@@ -93,9 +94,8 @@ const DELETE_handler = async (
   // Delete the category
   const deletedCategory = await prisma.category.delete({ where: { path } });
   if (deletedCategory.image) {
-    console.log("Deleting image:", deletedCategory.image.public_id);
     const { result } = await cloudinary.uploader.destroy(deletedCategory.image.public_id);
-    console.log(deletedCategory.image.public_id, result);
+    logger.info("Deleting image with publicId:", deletedCategory.image.public_id, result);
   }
   return NextResponse.json(deletedCategory);
 };

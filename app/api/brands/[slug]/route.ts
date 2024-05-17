@@ -4,6 +4,7 @@ import { wrapperMiddleware } from "@/lib/middleware/wrapper";
 import { BrandWithProducts } from "@/lib/types";
 import { formatErrors, getQueryObject } from "@/lib/utils";
 import { brandQuerySchema, editBrandSchema } from "@/lib/validation/brand-schema";
+import { logger } from "@/logger";
 import prisma from "@/prisma/client";
 import { Brand } from "@prisma/client";
 import { ApiError } from "next/dist/server/api-utils";
@@ -64,9 +65,8 @@ const DELETE_handler = async (
   const deletedBrand = await prisma.brand.delete({ where: { slug } });
   // Delete the image from cloudinary
   if (deletedBrand.image) {
-    console.log("Deleting image:", deletedBrand.image.public_id);
     const { result } = await cloudinary.uploader.destroy(deletedBrand.image.public_id);
-    console.log(deletedBrand.image.public_id, result);
+    logger.info("Deleting image with publicId:", deletedBrand.image.public_id, result);
   }
   return NextResponse.json(deletedBrand);
 };

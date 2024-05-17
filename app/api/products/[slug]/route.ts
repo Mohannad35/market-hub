@@ -4,6 +4,7 @@ import { wrapperMiddleware } from "@/lib/middleware/wrapper";
 import { ProductWithBrandAndCategory, ProductWithBrandAndCategoryAndRates } from "@/lib/types";
 import { formatErrors, getQueryObject } from "@/lib/utils";
 import { editProductSchema, productDetailsQuerySchema } from "@/lib/validation/product-schema";
+import { logger } from "@/logger";
 import prisma from "@/prisma/client";
 import { Prisma, Product, User } from "@prisma/client";
 import { DefaultArgs } from "@prisma/client/runtime/library";
@@ -86,9 +87,8 @@ const DELETE_handler = async (
   // Check if the user is the vendor of the product or an admin
   if (!user.isAdmin && !(product.vendorId === user.id)) throw new ApiError(403, "Unauthorized");
   for (const { public_id } of product.image) {
-    console.log("Deleting image:", public_id);
     const { result } = await cloudinary.uploader.destroy(public_id, { invalidate: true });
-    console.log(public_id, result);
+    logger.info("Deleting image with publicId:", public_id, result);
   }
   // Delete the product
   const deletedProduct = await prisma.product.delete({ where: { slug } });

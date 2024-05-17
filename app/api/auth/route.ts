@@ -3,6 +3,7 @@ import WelcomeTemplate from "@/emails/welcome-template";
 import { wrapperMiddleware } from "@/lib/middleware/wrapper";
 import { formatErrors } from "@/lib/utils";
 import { signUpSchema } from "@/lib/validation/user-schema";
+import { logger } from "@/logger";
 import prisma from "@/prisma/client";
 import { getLocalTimeZone, now } from "@internationalized/date";
 import { Gender, User } from "@prisma/client";
@@ -14,7 +15,7 @@ import { ApiError } from "next/dist/server/api-utils";
 import { NextRequest, NextResponse } from "next/server";
 
 if (!process.env.SENDGRID_API_KEY)
-  console.warn("SENDGRID_API_KEY is missing. Emails will not be sent.");
+  logger.warn("SENDGRID_API_KEY is missing. Emails will not be sent.");
 else sendgrid.setApiKey(process.env.SENDGRID_API_KEY);
 
 /**
@@ -80,8 +81,8 @@ async function POST_handler(request: NextRequest): Promise<NextResponse<User>> {
         subject: "Welcome aboard!",
         html: welcomeEmailHtml,
       })
-      .then(() => console.log("Email sent"))
-      .catch(error => console.error(error));
+      .then(() => logger.info("Email sent"))
+      .catch(logger.error);
     await sendgrid
       .send({
         from: { email: "mohannadragab53@gmail.com", name: "Market Hub Support Team" },
@@ -89,8 +90,8 @@ async function POST_handler(request: NextRequest): Promise<NextResponse<User>> {
         subject: "Email Verification",
         html: verificationEmailHtml,
       })
-      .then(() => console.log("Email sent"))
-      .catch(error => console.error(error));
+      .then(() => logger.info("Email sent"))
+      .catch(logger.error);
   }
   return NextResponse.json(user, { status: 201 });
 }

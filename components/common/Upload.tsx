@@ -1,6 +1,7 @@
 "use client";
 
 import { Modify } from "@/lib/types";
+import { loggerTail } from "@/logger";
 import { Button } from "@nextui-org/button";
 import { Card, CardFooter } from "@nextui-org/react";
 import { Flex, Text } from "@radix-ui/themes";
@@ -174,7 +175,7 @@ const Uoload = ({
         }}
         onAbort={onAbort}
         onError={async (error, widget) => {
-          console.error("Upload error:", error);
+          loggerTail.error("Upload error:", error);
           onAbort();
         }}
         {...props}

@@ -1,3 +1,4 @@
+import { logger } from "@/logger";
 import { ApiError } from "next/dist/server/api-utils";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -19,14 +20,14 @@ export const wrapperMiddleware =
         return NextResponse.json({ message: error.message }, { status: error.statusCode });
       } else if (error instanceof Error) {
         /// Log server errors using winston or your preferred logger
-        console.log(error);
+        logger.error(error);
         return NextResponse.json(
           { message: error.message || "Server died for some reason" },
           { status: 500 }
         );
       } else {
         /// Log server errors using winston or your preferred logger
-        console.log(error);
+        logger.error(error);
         return NextResponse.json({ message: "Server died for some reason" }, { status: 500 });
       }
     }

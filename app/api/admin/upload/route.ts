@@ -3,6 +3,7 @@ import { authMiddleware } from "@/lib/middleware/auth";
 import { wrapperMiddleware } from "@/lib/middleware/wrapper";
 import { formatErrors } from "@/lib/utils";
 import { adminUploadSchema } from "@/lib/validation/common-schema";
+import { logger } from "@/logger";
 import { ApiError } from "next/dist/server/api-utils";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -13,9 +14,8 @@ async function DELETE_handler(request: NextRequest) {
   if (!success) throw new ApiError(400, formatErrors(error).message);
   const { publicId } = data;
   publicId.forEach(async id => {
-    console.log("Deleting image with publicId:", id);
     const { result } = await cloudinary.uploader.destroy(id, { invalidate: true });
-    console.log(id, result);
+    logger.info("Deleting image with publicId:", id, result);
   });
   return NextResponse.json({}, { status: 202 });
 }
