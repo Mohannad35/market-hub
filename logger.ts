@@ -1,10 +1,9 @@
-import { createLogger, format, transports } from "winston";
 import { Logtail } from "@logtail/node";
 import { LogtailTransport } from "@logtail/winston";
+import { createLogger, format, transports } from "winston";
 import "winston-daily-rotate-file";
 
-const { combine, timestamp, label, printf, errors, splat, json, colorize, simple, metadata } =
-  format;
+const { combine, timestamp, printf, errors, splat, json, colorize, simple, metadata } = format;
 
 const dailyInfoLogger = new transports.DailyRotateFile({
   level: "info",
