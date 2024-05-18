@@ -6,27 +6,26 @@ import { Modify } from "@/lib/types";
 import { getFormDataObject, validateSchema } from "@/lib/utils";
 import {
   dateSchema,
-  regexSchema,
   stringMinMaxSchema,
   stringSchema,
-  urlSchema,
+  urlSchema
 } from "@/lib/validation/common-schema";
 import { passwordSchema, usernameSchema } from "@/lib/validation/user-schema";
 import { DateValue, getLocalTimeZone, today } from "@internationalized/date";
 import { Button } from "@nextui-org/button";
 import { Input } from "@nextui-org/input";
 import {
+  Accordion,
+  AccordionItem,
   Autocomplete,
   AutocompleteItem,
   Avatar,
   DatePicker,
   Select,
-  Tooltip,
-  Textarea,
   SelectItem,
   Selection,
-  Accordion,
-  AccordionItem,
+  Textarea,
+  Tooltip,
 } from "@nextui-org/react";
 import { Gender, Phone, User } from "@prisma/client";
 import { Text } from "@radix-ui/themes";
@@ -190,14 +189,8 @@ const SignupForm = ({ setTab }: { setTab: Dispatch<SetStateAction<string | numbe
               const result = validateSchema(value, passwordSchema);
               return result === true ? true : result.split("\n");
             }}
-            errorMessage={valid =>
-              valid.isInvalid && (
-                <div>
-                  {valid.validationErrors.map((error, index) => (
-                    <div key={index}>{error}</div>
-                  ))}
-                </div>
-              )
+            errorMessage={({ isInvalid, validationErrors }) =>
+              isInvalid && validationErrors.map((error, index) => <p key={index}>{error}</p>)
             }
           />
         </div>

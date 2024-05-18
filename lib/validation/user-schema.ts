@@ -1,4 +1,4 @@
-import { object } from "zod";
+import { infer, object, z } from "zod";
 import {
   dateSchema,
   enumSchema,
@@ -95,5 +95,16 @@ export const emailOrUsernameSchema = stringSchema("Email or Username").refine(va
 
 export const signInSchema = object({
   email: emailOrUsernameSchema,
-  password: passwordSchema,
+  password: stringSchema("Password"),
 });
+
+export const changePasswordSchema = object({
+  oldPassword: stringSchema("Old Password"),
+  newPassword: passwordSchema,
+  confirmPassword: passwordSchema,
+}).refine(({ newPassword, confirmPassword }) => newPassword === confirmPassword, {
+  message: "Passwords do not match",
+  path: ["confirmPassword"],
+});
+
+export type ChangePasswordFormValues = z.infer<typeof changePasswordSchema>;

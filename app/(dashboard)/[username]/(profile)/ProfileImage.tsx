@@ -1,6 +1,6 @@
-import { Avatar, AvatarIcon, Button, Card, CardBody, Image } from "@nextui-org/react";
-import { Flex } from "@radix-ui/themes";
-import { Trash2Icon } from "lucide-react";
+"use client";
+
+import { Image } from "@nextui-org/react";
 import { getCldImageUrl } from "next-cloudinary";
 import NextImage from "next/image";
 
@@ -10,7 +10,6 @@ interface Props {
 }
 const ProfileImage = ({ src, name }: Props) => {
   return (
-    // <Flex width="16rem" height="16rem" justify="center" align="center">
     <Image
       removeWrapper
       radius="none"
@@ -22,7 +21,6 @@ const ProfileImage = ({ src, name }: Props) => {
       src={src || getCldImageUrl({ src: "my-next-app/gcka5o2orshvf2mgm7vm", width: 200 })}
       fallbackSrc={getCldImageUrl({ src: "my-next-app/gcka5o2orshvf2mgm7vm", width: 200 })}
     />
-    // </Flex>
   );
 };
 

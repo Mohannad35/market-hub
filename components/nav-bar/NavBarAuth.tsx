@@ -2,7 +2,13 @@
 
 import { Avatar } from "@nextui-org/avatar";
 import { Button } from "@nextui-org/button";
-import { Dropdown, DropdownItem, DropdownMenu, DropdownTrigger } from "@nextui-org/dropdown";
+import {
+  Dropdown,
+  DropdownItem,
+  DropdownMenu,
+  DropdownTrigger,
+  DropdownSection,
+} from "@nextui-org/dropdown";
 import { Skeleton } from "@nextui-org/skeleton";
 import { Text } from "@radix-ui/themes";
 import { CircleUserRoundIcon, LayoutDashboardIcon, LogOutIcon, SettingsIcon } from "lucide-react";
@@ -11,6 +17,8 @@ import Image from "next/image";
 import Modal from "../common/Modal";
 import { useDisclosure } from "@nextui-org/react";
 import { useState } from "react";
+import { listItems } from "@/lib/navigation-data";
+import { Icon as Iconify } from "@iconify/react";
 
 const NavBarAuth = () => {
   const { status, data: session } = useSession();
@@ -42,38 +50,28 @@ const NavBarAuth = () => {
             variant="flat"
           >
             <DropdownItem key="info">
-              <Text as="p" className="font-semibold">
+              <Text className="font-semibold">
                 Signed in as
+                <br />
+                {session.user?.email}
               </Text>
-              <Text className="font-semibold">{session.user?.email}</Text>
             </DropdownItem>
-            <DropdownItem
-              key="profile"
-              href="/dashboard/settings/profile"
-              startContent={<CircleUserRoundIcon size={20} />}
-            >
-              Profile
-            </DropdownItem>
-            <DropdownItem
-              key="dashboard"
-              href="/dashboard"
-              startContent={<LayoutDashboardIcon size={20} />}
-            >
-              Dashboard
-            </DropdownItem>
-            <DropdownItem
-              key="settings"
-              href="/dashboard/settings"
-              showDivider
-              startContent={<SettingsIcon size={20} />}
-            >
-              Settings
-            </DropdownItem>
+            <DropdownSection showDivider>
+              {listItems(session?.user?.username).map(({ key, label, href, icon }, i) => (
+                <DropdownItem
+                  key={key}
+                  href={href}
+                  startContent={<Iconify icon={icon} fontSize={24} />}
+                >
+                  {label}
+                </DropdownItem>
+              ))}
+            </DropdownSection>
+
             <DropdownItem
               key="signout"
               color="danger"
-              startContent={<LogOutIcon size={20} />}
-              // href="/api/auth/signout?callbackUrl=%2F"
+              startContent={<Iconify icon="uim:signout" fontSize={24} />}
               onPress={() => onOpen()}
             >
               Sign out

@@ -49,7 +49,7 @@ async function PATCH_handler(request: NextRequest) {
   }
   // Check if the user is trying to change the password
   if (data.password) {
-    data.password = await hash(data.password, 10);
+    throw new ApiError(400, "To change password, use the change password endpoint");
   }
   const token = {
     token: randomBytes(16).toString("hex"),

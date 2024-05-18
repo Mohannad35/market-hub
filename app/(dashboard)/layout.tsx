@@ -1,31 +1,38 @@
 "use client";
 
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { accordionItems, listItems } from "@/lib/navigation-data";
 import { Accordion, AccordionItem, cn, Divider, Listbox, ListboxItem } from "@nextui-org/react";
 import { Flex, Text } from "@radix-ui/themes";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ReactNode } from "react";
-import { accordionItems, listItems } from "./data";
+import { Icon as Iconify } from "@iconify/react";
+import { useSession } from "next-auth/react";
 
 const DashboardLayout = ({ children }: Readonly<{ children: ReactNode }>) => {
   const pathname = usePathname();
+  const { data, status } = useSession();
+
+  if (status === "loading") return null;
+  if (!data?.user) return null;
+  const { username } = data.user;
 
   return (
     <Flex width="100%">
       <ScrollArea className="h-[calc(100vh-81px)] w-[20rem] rounded-none border-r p-3">
         <Listbox variant="flat" selectionMode="single" hideSelectedIcon aria-label="Dashboard">
-          {listItems.map((item, i) => (
+          {listItems(username).map(({ key, label, href, icon }, i) => (
             <ListboxItem
-              key={item.href}
+              key={key}
               as={Link}
-              href={item.href}
-              startContent={<item.Icon />}
+              href={href}
+              startContent={<Iconify icon={icon} fontSize={24} />}
               className={cn({
-                "bg-default/40 text-default-foreground transition-colors": pathname === item.href,
+                "bg-default/40 text-default-foreground transition-colors": pathname === href,
               })}
             >
-              {item.label}
+              {label}
             </ListboxItem>
           ))}
         </Listbox>
@@ -34,17 +41,17 @@ const DashboardLayout = ({ children }: Readonly<{ children: ReactNode }>) => {
           showDivider={false}
           itemClasses={{ trigger: "!py-0", content: "!py-0" }}
           className="gap-2"
-          defaultSelectedKeys={accordionItems
+          defaultSelectedKeys={accordionItems(username)
             .filter(item => item.children.some(child => child.href === pathname))
             .map(item => item.key)}
         >
-          {accordionItems.map(item => (
+          {accordionItems(username).map(({ key, label, icon, children }) => (
             <AccordionItem
-              key={item.key}
-              startContent={<item.Icon />}
-              title={<Text size="4">{item.label}</Text>}
+              key={key}
+              startContent={<Iconify icon={icon} fontSize={24} />}
+              title={<Text size="4">{label}</Text>}
               classNames={{ base: "!pb-2" }}
-              textValue={item.key}
+              textValue={key}
             >
               {
                 <Listbox
@@ -53,18 +60,18 @@ const DashboardLayout = ({ children }: Readonly<{ children: ReactNode }>) => {
                   hideSelectedIcon
                   aria-label="Dashboard sub-items"
                 >
-                  {item.children.map((child, i) => (
+                  {children.map(({ href, label, icon }, i) => (
                     <ListboxItem
-                      key={child.href}
+                      key={href}
                       as={Link}
-                      href={child.href}
-                      startContent={<child.Icon />}
+                      href={href}
+                      startContent={<Iconify icon={icon} fontSize={24} />}
                       className={cn({
                         "bg-default/40 text-default-foreground transition-colors":
-                          pathname === child.href,
+                          pathname === href,
                       })}
                     >
-                      {child.label}
+                      {label}
                     </ListboxItem>
                   ))}
                 </Listbox>

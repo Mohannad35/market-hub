@@ -2,42 +2,35 @@
 
 import LoadingIndicator from "@/components/common/LoadingIndicator";
 import { getProfile } from "@/lib/query-functions/user";
-import { Button, Chip, Code, Divider, Link, user } from "@nextui-org/react";
+import { fromDate, getLocalTimeZone, toCalendarDate } from "@internationalized/date";
+import { Button, Chip, Divider, Link } from "@nextui-org/react";
 import { User } from "@prisma/client";
 import { Flex, Text } from "@radix-ui/themes";
 import { useQuery } from "@tanstack/react-query";
+import { capitalize } from "lodash";
 import { CheckIcon, XIcon } from "lucide-react";
+import moment from "moment";
+import NextLink from "next/link";
 import { FaCircleCheck, FaCircleXmark } from "react-icons/fa6";
 import ProfileImage from "./ProfileImage";
-import { capitalize } from "lodash";
-import { fromDate, getLocalTimeZone, toCalendarDate } from "@internationalized/date";
-import moment from "moment";
 import Snippet from "./Snippet";
-import NextLink from "next/link";
-import { useRouter } from "next/navigation";
-import { useEffect } from "react";
 import { useSession } from "next-auth/react";
 
-const roles = [
-  { name: "Admin", key: "isAdmin", cn: "bg-[#7469B6] shadow-[#7469B6]/50", Icon: FaCircleCheck },
-  {
-    name: "Support",
-    key: "isSupport",
-    cn: "bg-[#f5a524] shadow-[#f5a524]/50",
-    Icon: FaCircleCheck,
-  },
-  { name: "Vendor", key: "isVendor", cn: "bg-[#17c964] shadow-[#17c964]/50", Icon: FaCircleCheck },
-  { name: "Banned", key: "isBanned", cn: "bg-[#f31260] shadow-[#f31260]/50", Icon: FaCircleXmark },
-];
+const roles = {
+  admin: { name: "Admin", className: "bg-[#7469B6] shadow-[#7469B6]/50", Icon: FaCircleCheck },
+  support: { name: "Support", className: "bg-[#f5a524] shadow-[#f5a524]/50", Icon: FaCircleCheck },
+  vendor: { name: "Vendor", className: "bg-[#17c964] shadow-[#17c964]/50", Icon: FaCircleCheck },
+  user: { name: "User", className: "bg-[#17c964] shadow-[#17c964]/50", Icon: FaCircleCheck },
+};
 
-const Profile = () => {
-  const { status, data: da, update } = useSession();
-  const { data, error, isSuccess, isLoading, refetch } = useQuery<User>({
-    queryKey: ["getProfile"],
+const Profile = ({ username }: { username: string }) => {
+  const { data: session, status } = useSession();
+  const { data, error, isSuccess, isLoading } = useQuery<User>({
+    queryKey: ["getProfile", username],
     queryFn: getProfile,
   });
 
-  if (isLoading) return <LoadingIndicator />;
+  if (isLoading || status === "loading") return <LoadingIndicator />;
   else if (error) return <div className="container">Error: {error.message}</div>;
   else if (!isSuccess || !data) return <div className="container">No data</div>;
   const {
@@ -46,6 +39,7 @@ const Profile = () => {
     avatar,
     email,
     isVerified,
+    role,
     phoneNumber,
     birthday,
     gender,
@@ -53,63 +47,65 @@ const Profile = () => {
     businessAddress,
     websiteAddress,
   } = data;
+  const { name: roleName, Icon, className } = roles[role];
   return (
     <Flex direction="column" gapY="2">
       <Flex justify="between">
         <ProfileImage src={image ? image.secure_url : avatar ?? undefined} name={name} />
 
-        <Button
-          variant="faded"
-          color="default"
-          size="sm"
-          radius="lg"
-          as={NextLink}
-          href="/dashboard/settings/profile/edit"
-        >
-          <Text size="4" weight="medium">
-            Edit Profile
-          </Text>
-        </Button>
+        {status === "authenticated" && session.user.username === username && (
+          <Button
+            variant="faded"
+            color="default"
+            size="sm"
+            radius="lg"
+            as={NextLink}
+            href="/dashboard/settings/profile/edit"
+          >
+            <Text size="4" weight="medium">
+              Edit Profile
+            </Text>
+          </Button>
+        )}
       </Flex>
       <Flex direction="row" justify="between">
         <Text size="6" weight="bold">
           {name}
         </Text>
         <Flex direction="row" gapX="2">
-          {roles.map(
-            ({ name, key, cn, Icon }) =>
-              data[key as keyof typeof data] && (
-                <Chip
-                  key={key}
-                  startContent={<Icon size={18} className="text-white dark:text-black" />}
-                  variant="shadow"
-                  className={cn}
-                  classNames={{ content: "text-white dark:text-black" }}
-                >
-                  <Text size="3" weight="medium">
-                    {name}
-                  </Text>
-                </Chip>
-              )
+          {role !== "user" && (
+            <Chip
+              startContent={<Icon size={18} className="text-white dark:text-black" />}
+              variant="shadow"
+              className={className}
+              classNames={{ content: "text-white dark:text-black" }}
+            >
+              <Text size="3" weight="medium">
+                {roleName}
+              </Text>
+            </Chip>
           )}
         </Flex>
       </Flex>
 
-      <Divider className="my-2" />
-      <Flex direction="row" justify="between">
-        <Flex gap="2" align="center">
-          <Snippet className="bg-transparent" text="Email" />
-          <Snippet text={email} />
-        </Flex>
-
-        <Chip
-          startContent={isVerified ? <CheckIcon size={18} /> : <XIcon size={18} />}
-          variant="faded"
-          color={isVerified ? "success" : "danger"}
-        >
-          {isVerified ? "Verified" : "Not Verified"}
-        </Chip>
-      </Flex>
+      {email && (
+        <>
+          <Divider className="my-2" />
+          <Flex direction="row" justify="between">
+            <Flex gap="2" align="center">
+              <Snippet className="bg-transparent" text="Email" />
+              <Snippet text={email} />
+            </Flex>
+            <Chip
+              startContent={isVerified ? <CheckIcon size={18} /> : <XIcon size={18} />}
+              variant="faded"
+              color={isVerified ? "success" : "danger"}
+            >
+              {isVerified ? "Verified" : "Not Verified"}
+            </Chip>
+          </Flex>
+        </>
+      )}
 
       {phoneNumber && (
         <>
@@ -123,7 +119,7 @@ const Profile = () => {
         </>
       )}
 
-      <Divider className="my-2" />
+      {(gender || birthday) && <Divider className="my-2" />}
       <Flex direction={{ initial: "column", xs: "row" }} width="100%">
         {gender && (
           <Text size="4" weight="medium" className="w-1/2">

@@ -1,4 +1,3 @@
-import { logger } from "@/logger";
 import ButtonCounter from "./button";
 
 export default function Counter() {

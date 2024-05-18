@@ -1,7 +1,6 @@
 "use client";
 
 import { Modify } from "@/lib/types";
-import { loggerTail } from "@/logger";
 import { Button } from "@nextui-org/button";
 import { Card, CardFooter } from "@nextui-org/react";
 import { Flex, Text } from "@radix-ui/themes";
@@ -9,7 +8,7 @@ import { uniq } from "lodash";
 import { CloudUploadIcon, Trash2Icon } from "lucide-react";
 import { CldImage, CldUploadWidget, CldUploadWidgetProps } from "next-cloudinary";
 import { useTheme } from "next-themes";
-import { Dispatch, SetStateAction, useCallback, useState } from "react";
+import { Dispatch, SetStateAction, useCallback } from "react";
 import { useBeforeUnload, useUnmount } from "react-use";
 
 interface CloudinaryResult {
@@ -175,8 +174,8 @@ const Uoload = ({
         }}
         onAbort={onAbort}
         onError={async (error, widget) => {
-          loggerTail.error("Upload error:", error);
           onAbort();
+          throw new Error(error ? error.toString() : "An error occurred while uploading images");
         }}
         {...props}
       >

@@ -2,6 +2,7 @@ import { DateValue } from "@internationalized/date";
 import { type ClassValue, clsx } from "clsx";
 import { capitalize as _capitalize, update } from "lodash";
 import { ReadonlyURLSearchParams } from "next/navigation";
+import { useCallback } from "react";
 import { twMerge } from "tailwind-merge";
 import { ZodError, ZodSchema } from "zod";
 
@@ -21,13 +22,32 @@ export function capitalize(value: string): string {
     .join(" ");
 }
 
-export const validateSchema = (
-  value: DateValue | Date | string | number | null | undefined,
-  schema: ZodSchema
-): string | true => {
+export const validateSchema = (value: any, schema: ZodSchema): string | true => {
   const valid = schema.safeParse(value);
   return valid.success ? true : formatErrors(valid.error).message;
 };
+
+export const useZodValidationResolver = (validationSchema: ZodSchema) =>
+  useCallback(
+    (data: any) => {
+      const { success, data: values, error } = validationSchema.safeParse(data);
+      if (success) return { values, errors: {} };
+      return {
+        values: {},
+        errors: error.issues.reduce(
+          (allErrors, { code, message, path }) => ({
+            ...allErrors,
+            [path.join(".")]: {
+              type: code,
+              message: message + "\n" + (allErrors[path.join(".")]?.message ?? ""),
+            },
+          }),
+          {} as Record<string, { type: string; message: string }>
+        ),
+      };
+    },
+    [validationSchema]
+  );
 
 export function getFormDataObject<TData>(formData: FormData) {
   const data: { [key: string]: FormDataEntryValue } = {};

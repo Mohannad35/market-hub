@@ -60,33 +60,11 @@ const logger = createLogger({
   transports: [dailyInfoLogger, dailyErrorLogger],
 });
 
-/**
- * This logger is used to send logs to Logtail.
- * Safe to use in production.
- * Can be used in SSR and CSR.
- */
-const loggerTail = createLogger({
-  level: "info",
-  format: combine(
-    timestamp({ format: "YYYY-MM-DD HH:mm:ss" }),
-    errors({ stack: true }),
-    metadata({ fillExcept: ["message", "level", "timestamp", "label"] }),
-    splat(),
-    json({
-      replacer(this, key, value) {
-        if (this.label && key === "message") return `[${this.label}] ${value}`;
-        return value;
-      },
-    })
-  ),
-});
-
 // If we have a Logtail source token, then add a Logtail transport
 if (process.env.LOGTAIL_SOURCE_TOKEN) {
   // Create a Logtail client
   const logtail = new Logtail(process.env.LOGTAIL_SOURCE_TOKEN);
   logger.add(new LogtailTransport(logtail));
-  loggerTail.add(new LogtailTransport(logtail));
 }
 
 // If we're not in production then **ALSO** log to the `console`
@@ -106,4 +84,4 @@ if (process.env.NODE_ENV !== "production") {
   );
 }
 
-export { logger, loggerTail };
+export { logger };

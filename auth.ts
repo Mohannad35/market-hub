@@ -1,9 +1,8 @@
 import { PrismaAdapter } from "@auth/prisma-adapter";
-import { User } from "@prisma/client";
 import { compare } from "bcryptjs";
 import { pick } from "lodash";
 import { nanoid } from "nanoid";
-import NextAuth from "next-auth";
+import NextAuth, { DefaultSession, User } from "next-auth";
 import { Provider } from "next-auth/providers";
 import Credentials from "next-auth/providers/credentials";
 import Github from "next-auth/providers/github";
@@ -13,12 +12,44 @@ import { FaGithub, FaGoogle } from "react-icons/fa";
 import slugify from "slugify";
 import { idSchema } from "./lib/validation/common-schema";
 import prisma from "./prisma/client";
+import { Modify } from "./lib/types";
+import { JWT } from "next-auth/jwt";
 
 if (!process.env.NEXT_PUBLIC_AUTH_GOOGLE_ID) {
   throw new Error("NEXT_PUBLIC_AUTH_GOOGLE_ID is not set");
 }
 if (!process.env.NEXT_PUBLIC_AUTH_GOOGLE_SECRET) {
   throw new Error("NEXT_PUBLIC_AUTH_GOOGLE_SECRET is not set");
+}
+
+declare module "next-auth" {
+  /**
+   * Returned by `auth`, `useSession`, `getSession` and received as a prop on the `SessionProvider` React Context
+   */
+  interface Session {
+    user: {
+      username: string;
+      role: string;
+    } & DefaultSession["user"];
+  }
+  /**
+   * The shape of the user object returned in the OAuth providers' `profile` callback,
+   * or the second parameter of the `session` callback, when using a database.
+   */
+  interface User {
+    username: string;
+    role: string;
+  }
+}
+
+// The `JWT` interface can be found in the `next-auth/jwt` submodule
+declare module "next-auth/jwt" {
+  /** Returned by the `jwt` callback and `auth`, when using JWT sessions */
+  interface JWT {
+    id: string;
+    username: string;
+    role: string;
+  }
 }
 
 const providers: Provider[] = [
@@ -42,7 +73,7 @@ const providers: Provider[] = [
       if (!passwordMatch) return null;
       return {
         ...pick(user, ["id", "name", "email", "role", "username"]),
-        image: user.image?.secure_url || user.avatar || undefined,
+        image: user.image?.secure_url || user.avatar,
       };
     },
   }),
@@ -57,10 +88,10 @@ const providers: Provider[] = [
       return {
         id: profile.sub,
         name: profile.name,
-        username: profile.email,
         email: profile.email,
         avatar: profile.picture,
-        role: profile.role ?? "user",
+        username,
+        role: "user",
       };
     },
   }),
@@ -75,10 +106,10 @@ const providers: Provider[] = [
       return {
         id: profile.node_id,
         name: profile.name,
-        username: profile.email,
         email: profile.email,
         avatar: profile.avatar_url,
-        role: profile.role ?? "user",
+        username,
+        role: "user",
       };
     },
   }),
@@ -100,7 +131,7 @@ export const providerMap = providers.map(provider => {
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   secret: process.env.NEXT_PUBLIC_AUTH_SECRET,
-  adapter: PrismaAdapter(prisma),
+  adapter: PrismaAdapter(prisma) as import("@auth/core/adapters").Adapter,
   trustHost: true,
   pages: { signIn: "/auth", newUser: "/auth" },
   providers,
@@ -116,20 +147,42 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           token.id = dbUser.id;
           token.name = dbUser.name;
           token.email = dbUser.email;
+          token.role = dbUser.role;
+          token.username = dbUser.username;
           token.picture = dbUser.image?.secure_url || dbUser.avatar;
         }
-      }
-      if (user) {
+      } else if (trigger === "signIn") {
         // User is available during sign-in
-        const { id, name, email, role, username, image, avatar } = user as User;
-        token.id = id;
+        const { id, name, email, role, username, image } = user;
+        token.id = id!;
         token.name = name;
         token.email = email;
         token.role = role;
         token.username = username;
-        token.picture = image?.secure_url || avatar;
+        token.picture = image;
       }
+      if (user) {
+        // User is available during sign-in
+        const { id, name, email, role, username, image } = user;
+        token.id = id!;
+        token.name = name;
+        token.email = email;
+        token.role = role;
+        token.username = username;
+        token.picture = image;
+      }
+      // console.log("🚀 ~ file: auth.ts:147 ~ jwt ~ token:", token);
       return token;
+    },
+    async session({ session, token, user, newSession, trigger }) {
+      // Add properties to the session, making them available in the front-end
+      session.user.id = token.id as string;
+      session.user.name = token.name;
+      session.user.email = token.email!;
+      session.user.role = token.role;
+      session.user.username = token.username;
+      session.user.image = token.picture;
+      return session;
     },
   },
 });

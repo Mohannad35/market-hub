@@ -1,3 +1,5 @@
+"use client";
+
 import { Snippet as NextSnippet, SnippetProps } from "@nextui-org/snippet";
 
 interface Props extends SnippetProps {
