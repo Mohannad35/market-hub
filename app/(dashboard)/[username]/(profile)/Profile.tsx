@@ -134,7 +134,7 @@ const Profile = ({ username }: { username: string }) => {
             <Snippet>
               {moment(
                 toCalendarDate(fromDate(new Date(birthday), getLocalTimeZone())).toString()
-              ).format("DDD MMMM YYYY")}
+              ).format("DD MMMM YYYY")}
             </Snippet>
           </Flex>
         )}

@@ -69,21 +69,34 @@ export const usernameSchema = regexSchema(
   "Username may not contain non-url-safe chars"
 );
 
-export const signUpSchema = object({
+export type SignUpSchemaFormValues = z.infer<typeof signUpSchema>;
+const signUp = object({
   name: stringMinMaxSchema("Name", 2, 256),
   email: stringSchema("Email").email("Invalid email"),
   password: passwordSchema,
+  confirmPassword: passwordSchema,
   username: usernameSchema,
-  address: stringMinMaxSchema("Address", 2, 10_000).nullish(),
-  businessAddress: stringMinMaxSchema("Business Address", 2, 10_000).nullish(),
-  websiteAddress: stringMinMaxSchema("Website Address", 2, 10_000).nullish(),
-  image: imageSchema.nullish(),
-  gender: enumSchema("Gender", ["male", "female"]).nullish(),
-  birthday: dateSchema("Birthday", 18, 100).nullish(),
-  phoneNumber: phoneNumberSchema.nullish(),
+  address: stringMinMaxSchema("Address", 2, 10_000).optional(),
+  businessAddress: stringMinMaxSchema("Business Address", 2, 10_000).optional(),
+  websiteAddress: stringMinMaxSchema("Website Address", 2, 10_000).optional(),
+  image: imageSchema.optional(),
+  gender: enumSchema("Gender", ["male", "female"]).optional(),
+  birthday: dateSchema("Birthday", 18, 100).optional(),
+  phoneNumber: phoneNumberSchema.optional(),
 });
+export const signUpSchema = signUp.refine(
+  ({ password, confirmPassword }) => password === confirmPassword,
+  { message: "Passwords do not match", path: ["confirmPassword"] }
+);
+export const signUpModifiedSchema = signUp
+  .omit({ phoneNumber: true })
+  .extend({ phoneNumber: stringSchema("Phone Number").optional() })
+  .refine(({ password, confirmPassword }) => password === confirmPassword, {
+    message: "Passwords do not match",
+    path: ["confirmPassword"],
+  });
 
-export const editProfileSchema = signUpSchema
+export const editProfileSchema = signUp
   .partial()
   .refine(data => Object.keys(data).length > 0, "At least one field is required");
 
@@ -93,11 +106,13 @@ export const emailOrUsernameSchema = stringSchema("Email or Username").refine(va
   else return stringMinMaxSchema("Username", 2, 256).safeParse(value).success;
 }, "Invalid email or username");
 
+export type SignInSchemaFormValues = z.infer<typeof signInSchema>;
 export const signInSchema = object({
-  email: emailOrUsernameSchema,
+  username: emailOrUsernameSchema,
   password: stringSchema("Password"),
 });
 
+export type ChangePasswordFormValues = z.infer<typeof changePasswordSchema>;
 export const changePasswordSchema = object({
   oldPassword: stringSchema("Old Password"),
   newPassword: passwordSchema,
@@ -106,5 +121,3 @@ export const changePasswordSchema = object({
   message: "Passwords do not match",
   path: ["confirmPassword"],
 });
-
-export type ChangePasswordFormValues = z.infer<typeof changePasswordSchema>;

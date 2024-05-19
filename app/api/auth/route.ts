@@ -45,11 +45,14 @@ async function POST_handler(request: NextRequest): Promise<NextResponse<User>> {
   // Check if the phone number already exists
   if (phoneNumber && (await prisma.user.findFirst({ where: { phoneNumber } })))
     throw new ApiError(400, "Phone number already exists");
+  // Check if the password and confirmPassword match
+  if (password !== data.confirmPassword) throw new ApiError(400, "Passwords do not match");
   // Hash the password, Create the user, and return it
   const pwHash = await hash(password, 10);
+  const { confirmPassword, ...rest } = data;
   const user = await prisma.user.create({
     data: {
-      ...data,
+      ...rest,
       password: pwHash,
       gender: gender as Gender,
       verificationToken: {

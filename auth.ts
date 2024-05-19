@@ -117,13 +117,13 @@ const providers: Provider[] = [
 
 export const providerMap = providers.map(provider => {
   const providerData = typeof provider === "function" ? provider() : provider;
-  let icon: IconType | null = null;
+  let icon: string | null = null;
   switch (providerData.id) {
     case "google":
-      icon = FaGoogle;
+      icon = "logos:google-icon";
       break;
     case "github":
-      icon = FaGithub;
+      icon = "skill-icons:github-dark";
       break;
   }
   return { id: providerData.id, name: providerData.name, icon: icon };

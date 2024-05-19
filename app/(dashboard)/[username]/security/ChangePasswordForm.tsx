@@ -34,7 +34,6 @@ const ChangePasswordForm = () => {
   });
 
   async function onSubmit(data: ChangePasswordFormValues) {
-    console.log(data);
     const promise = new Promise<User>(async (resolve, reject) => {
       await changePassMutation.mutateAsync(data).then(resolve).catch(reject);
     });

@@ -1,12 +1,17 @@
 "use client";
 
+import { providerMap } from "@/auth";
+import DividerWithLabel from "@/components/common/DividerWithLabel";
+import { Icon as Iconify } from "@iconify/react";
+import { Button } from "@nextui-org/react";
 import { Tab, Tabs } from "@nextui-org/tabs";
 import { Flex } from "@radix-ui/themes";
+import { signIn } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
-import Signin from "./SignIn";
-import Signup from "./Signup";
 import { toast } from "sonner";
+import SigninForm from "./SignInForm";
+import SignupForm from "./SignupForm";
 
 const AuthTabs = () => {
   const router = useRouter();
@@ -49,12 +54,30 @@ const AuthTabs = () => {
         onSelectionChange={setSelectedTab}
       >
         <Tab key="login" title="Login">
-          <Signin />
+          <SigninForm setTab={setSelectedTab} />
         </Tab>
         <Tab key="sign-up" title="Sign up">
-          <Signup setTab={setSelectedTab} />
+          <Flex direction="column" gap="3">
+            <SignupForm setTab={setSelectedTab} />
+          </Flex>
         </Tab>
       </Tabs>
+
+      <DividerWithLabel label="Or continue with" />
+      <Flex direction="column" gap="3" pt="2">
+        {Object.values(providerMap).map(provider =>
+          provider.id === "credentials" ? null : (
+            <Button
+              startContent={provider.icon && <Iconify icon={provider.icon} fontSize={24} />}
+              variant="ghost"
+              key={provider.id}
+              onPress={e => signIn(provider.id)}
+            >
+              {provider.name}
+            </Button>
+          )
+        )}
+      </Flex>
     </Flex>
   );
 };

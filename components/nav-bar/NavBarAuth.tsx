@@ -1,24 +1,23 @@
 "use client";
 
+import { listItems } from "@/lib/navigation-data";
+import { Icon as Iconify } from "@iconify/react";
 import { Avatar } from "@nextui-org/avatar";
 import { Button } from "@nextui-org/button";
 import {
   Dropdown,
   DropdownItem,
   DropdownMenu,
-  DropdownTrigger,
   DropdownSection,
+  DropdownTrigger,
 } from "@nextui-org/dropdown";
+import { useDisclosure } from "@nextui-org/react";
 import { Skeleton } from "@nextui-org/skeleton";
 import { Text } from "@radix-ui/themes";
-import { CircleUserRoundIcon, LayoutDashboardIcon, LogOutIcon, SettingsIcon } from "lucide-react";
 import { signIn, signOut, useSession } from "next-auth/react";
 import Image from "next/image";
-import Modal from "../common/Modal";
-import { useDisclosure } from "@nextui-org/react";
 import { useState } from "react";
-import { listItems } from "@/lib/navigation-data";
-import { Icon as Iconify } from "@iconify/react";
+import Modal from "../common/Modal";
 
 const NavBarAuth = () => {
   const { status, data: session } = useSession();
@@ -91,6 +90,7 @@ const NavBarAuth = () => {
           isOpen={isOpen}
           onOpenChange={onOpenChange}
           isLoading={loading}
+          startContent={<Iconify icon="uim:signout" fontSize={24} />}
         />
       </div>
     );

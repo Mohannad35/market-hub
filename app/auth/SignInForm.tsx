@@ -4,28 +4,39 @@ import { EyeFilledIcon } from "@/components/icons/EyeFilledIcon";
 import { EyeSlashFilledIcon } from "@/components/icons/EyeSlashFilledIcon";
 import { LockIcon } from "@/components/icons/LockIcon";
 import { MailIcon } from "@/components/icons/MailIcon";
-import { getFormDataObject, validateSchema } from "@/lib/utils";
-import { stringMinMaxSchema, stringSchema } from "@/lib/validation/common-schema";
-import { emailOrUsernameSchema, passwordSchema } from "@/lib/validation/user-schema";
+import { Form, FormControl, FormField, FormItem } from "@/components/ui/form";
+import { getFormDataObject, useZodValidationResolver, validateSchema } from "@/lib/utils";
+import {
+  emailOrUsernameSchema,
+  signInSchema,
+  SignInSchemaFormValues,
+} from "@/lib/validation/user-schema";
+import { Icon as Iconify } from "@iconify/react";
 import { Button } from "@nextui-org/button";
 import { Input } from "@nextui-org/input";
-import { Text } from "@radix-ui/themes";
-import { EyeIcon, EyeOffIcon } from "lucide-react";
+import { Checkbox, Link } from "@nextui-org/react";
+import { Flex, Text } from "@radix-ui/themes";
 import { nanoid } from "nanoid";
 import { signIn } from "next-auth/react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
 import { useSessionStorage } from "react-use";
 import { toast } from "sonner";
 
-const SigninForm = () => {
+const SigninForm = ({ setTab }: { setTab: Dispatch<SetStateAction<string | number>> }) => {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const [callbackUrl, setCallbackUrl] = useSessionStorage("callbackUrl", "/");
   const [isVisible, setIsVisible] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+  const [loading, setLoading] = useState(false);
   const toggleVisibility = () => setIsVisible(!isVisible);
+  const form = useForm<SignInSchemaFormValues>({
+    resolver: useZodValidationResolver(signInSchema),
+    defaultValues: {},
+    mode: "onTouched",
+  });
 
   useEffect(() => {
     const query = new URLSearchParams(searchParams.toString());
@@ -51,19 +62,17 @@ const SigninForm = () => {
     router.replace(pathname + `${query.size > 0 ? "?" + query.toString() : ""}`);
   }, [pathname, router, searchParams, setCallbackUrl]);
 
-  const handleSubmitSignIn = async (formData: FormData) => {
-    setIsLoading(true);
-    const data = getFormDataObject<{ username: string; password: string }>(formData);
-    const { username, password } = data;
-    // await signIn("credentials", { username: data.email, password: data.password, callbackUrl });
+  async function onSubmit(data: SignInSchemaFormValues) {
+    setLoading(true);
     const promise = new Promise(async (resolve, reject) => {
-      await signIn("credentials", { username, password, redirect: false }).then(data =>
+      await signIn("credentials", { ...data, redirect: false }).then(data =>
         data?.error ? reject(data.error) : resolve(data)
       );
     });
     toast.promise(promise, {
       loading: "Signing in...",
       success: data => {
+        setLoading(false);
         setTimeout(() => {
           router.replace(callbackUrl);
           setCallbackUrl("/");
@@ -71,58 +80,109 @@ const SigninForm = () => {
         return "Signed in successfully";
       },
       error: err => {
+        setLoading(false);
         if (err === "CredentialsSignin") return "Invalid email or password";
         else return err || "An unexpected error occurred";
       },
       id: "signin-toast" + nanoid(4),
     });
-    setIsLoading(false);
-  };
+  }
 
   return (
-    <form className="flex flex-col gap-4" action={handleSubmitSignIn}>
-      <Input
-        isRequired
-        type="text"
-        size="lg"
-        name="username"
-        variant="bordered"
-        placeholder="Username or Email"
-        startContent={
-          <MailIcon className="pointer-events-none flex-shrink-0 text-2xl text-default-400" />
-        }
-        validate={value => validateSchema(value, emailOrUsernameSchema)}
-        errorMessage={valid => valid.validationErrors}
-      />
-
-      <Input
-        isRequired
-        type={isVisible ? "text" : "password"}
-        size="lg"
-        name="password"
-        placeholder="Password"
-        variant="bordered"
-        startContent={
-          <LockIcon className="pointer-events-none flex-shrink-0 text-2xl text-default-400" />
-        }
-        endContent={
-          <button className="focus:outline-none" type="button" onClick={toggleVisibility}>
-            {isVisible ? (
-              <EyeSlashFilledIcon className="pointer-events-none text-2xl text-default-400" />
-            ) : (
-              <EyeFilledIcon className="pointer-events-none text-2xl text-default-400" />
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)}>
+        <Flex direction="column" gap="4" align="start">
+          <FormField
+            control={form.control}
+            name="username"
+            render={({ field }) => (
+              <FormItem className="w-full">
+                <FormControl>
+                  <Input
+                    isRequired
+                    type="text"
+                    size="lg"
+                    variant="bordered"
+                    placeholder="Username or Email"
+                    startContent={
+                      <MailIcon className="pointer-events-none flex-shrink-0 text-2xl text-default-400" />
+                    }
+                    isInvalid={form.formState.errors.username ? true : false}
+                    errorMessage={form.formState.errors.username?.message
+                      ?.split("\n")
+                      .map((msg, i) => <p key={i}>{msg}</p>)}
+                    {...field}
+                  />
+                </FormControl>
+              </FormItem>
             )}
-          </button>
-        }
-        errorMessage="Required"
-      />
+          />
 
-      <Button fullWidth type="submit" color="primary" isLoading={isLoading}>
-        <Text size="3" weight="medium">
-          Login
-        </Text>
-      </Button>
-    </form>
+          <FormField
+            control={form.control}
+            name="password"
+            render={({ field }) => (
+              <FormItem className="w-full">
+                <FormControl>
+                  <Input
+                    isRequired
+                    type={isVisible ? "text" : "password"}
+                    size="lg"
+                    placeholder="Password"
+                    variant="bordered"
+                    startContent={
+                      <LockIcon className="pointer-events-none flex-shrink-0 text-2xl text-default-400" />
+                    }
+                    endContent={
+                      <button
+                        className="focus:outline-none"
+                        type="button"
+                        onClick={toggleVisibility}
+                      >
+                        {isVisible ? (
+                          <EyeSlashFilledIcon className="pointer-events-none text-2xl text-default-400" />
+                        ) : (
+                          <EyeFilledIcon className="pointer-events-none text-2xl text-default-400" />
+                        )}
+                      </button>
+                    }
+                    isInvalid={form.formState.errors.password ? true : false}
+                    errorMessage={form.formState.errors.password?.message
+                      ?.split("\n")
+                      .map((msg, i) => <p key={i}>{msg}</p>)}
+                    {...field}
+                  />
+                </FormControl>
+              </FormItem>
+            )}
+          />
+
+          <Flex justify="between" width="100%">
+            <Text>
+              Don&apos;t have an account?{" "}
+              <Text onClick={() => setTab("sign-up")} className="cursor-pointer text-primary-500">
+                Sign up
+              </Text>
+            </Text>
+            <Link color="secondary" href="#" size="sm">
+              Forgot password?
+            </Link>
+          </Flex>
+
+          <Button
+            fullWidth
+            type="submit"
+            color="primary"
+            isLoading={loading}
+            endContent={<Iconify icon="solar:login-3-bold-duotone" fontSize={24} />}
+          >
+            <Text size="3" weight="medium">
+              Login
+            </Text>
+          </Button>
+        </Flex>
+      </form>
+    </Form>
   );
 };
 

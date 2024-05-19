@@ -1,9 +1,9 @@
 import EditProfileForm from "./EditProfileForm";
 
-const EditProfilePage = () => {
+const EditProfilePage = ({ params: { username } }: { params: { username: string } }) => {
   return (
     <div className="container">
-      <EditProfileForm />
+      <EditProfileForm username={username} />
     </div>
   );
 };

@@ -56,7 +56,7 @@ type DataKey =
   | "websiteAddress";
 type TData = Partial<Pick<Modify<User, { phoneNumber: string }>, DataKey>>;
 type TBody = Partial<Pick<User, DataKey>>;
-const EditProfileForm = () => {
+const EditProfileForm = ({ username }: { username: string }) => {
   const router = useRouter();
   const { update } = useSession();
   const [resources, setResources] = useState<{ public_id: string; secure_url: string }[]>([]);
@@ -96,13 +96,13 @@ const EditProfileForm = () => {
     if (phone && !phone.isValid()) return toast.error("Invalid phone number");
     const newData = {
       ...body,
-      address: body.address,
-      businessAddress: body.businessAddress,
+      address: body.address || null,
+      businessAddress: body.businessAddress || null,
       websiteAddress: body.websiteAddress?.startsWith("http")
         ? body.websiteAddress
         : body.websiteAddress?.length ?? 0 > 0
           ? `https://${body.websiteAddress}`
-          : body.websiteAddress,
+          : body.websiteAddress || null,
       image: resources[0] || null,
       gender:
         genderValue && genderValue !== "all" ? (genderValue.values().next().value as Gender) : null,
@@ -143,7 +143,7 @@ const EditProfileForm = () => {
         setTimeout(async () => {
           refetch();
           await update({ id: result.id });
-          router.push("/dashboard/settings/profile");
+          router.push(`/${username}`);
         }, 2000);
         return "Profile updated successfully";
       },
@@ -296,7 +296,7 @@ const EditProfileForm = () => {
               <span className="text-small text-default-400">https://</span>
             </div>
           }
-          validate={value => validateSchema(value, urlSchema.nullish())}
+          validate={value => (value ? validateSchema(value, urlSchema.nullish()) : undefined)}
           errorMessage={valid => valid.validationErrors}
         />
 
