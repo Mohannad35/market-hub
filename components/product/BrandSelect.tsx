@@ -16,10 +16,10 @@ type BrandSelectProps = Modify<SelectProps, { uniqueKey: string; children?: Reac
 const BrandSelect = ({ uniqueKey, ...props }: BrandSelectProps) => {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const brandQuery = useQueryHook<{ items: Brand[]; count: number }>("/api/brands", [
-    "brands",
-    "search",
-  ]);
+  const brandQuery = useQueryHook<{ items: Brand[]; count: number }>({
+    url: "/api/brands",
+    key: ["brands", "search"],
+  });
   const [brands, setBrands] = useState<Selection>(() => {
     const brands = searchParams.get("brands");
     return brands ? new Set(brands.split(",")) : new Set();
@@ -68,7 +68,12 @@ const BrandSelect = ({ uniqueKey, ...props }: BrandSelectProps) => {
         <SelectItem key={brand.slug} textValue={brand.name}>
           <div className="flex items-center gap-2">
             {brand.image && (
-              <Avatar alt={brand.name} className="flex-shrink-0" size="sm" src={brand.image} />
+              <Avatar
+                alt={brand.name}
+                className="flex-shrink-0"
+                size="sm"
+                src={brand.image.secure_url}
+              />
             )}
             <div className="flex flex-col">
               <span className="text-small">{brand.name}</span>

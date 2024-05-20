@@ -13,26 +13,22 @@ import {
 } from "@react-email/components";
 
 // Define the properties expected by the VerificationTemplate component
-interface VerificationTemplateProps {
+interface Props {
   username: string;
   emailVerificationToken: string;
   baseUrl: string;
 }
 
 // Define the VerificationTemplate component that takes the defined properties
-const VerificationTemplate = ({
-  username,
-  emailVerificationToken,
-  baseUrl,
-}: VerificationTemplateProps) => (
+const VerificationTemplate = ({ username, emailVerificationToken, baseUrl }: Props) => (
   <Html>
     <Head />
     <Preview>Verification Email for {"Market Hub"}.</Preview>
     <Tailwind>
-      <Body className="mx-auto my-auto bg-white px-2 font-sans">
-        <Container className="mx-auto my-[40px] max-w-[465px] rounded border border-solid border-[#eaeaea] p-[20px]">
+      <Body className="bg-[#f6f9fc] p-4">
+        <Container className="rounded border border-solid border-[#f0f0f0] bg-white p-10">
           {/* Logo */}
-          <Section className="mt-[32px]">
+          <Section className="mb-[2rem]">
             <Img
               src={`${baseUrl}/logo-transparent.png`}
               width="100"
@@ -41,22 +37,22 @@ const VerificationTemplate = ({
               className="mx-auto my-0"
             />
           </Section>
-          <Text className="text-[14px] leading-[24px] text-black">
+          <Text style={text}>
             Hi <strong>{username}</strong>,<br />
             Welcome to Market Hub where you can buy whatever you want!
             <br />
             Please verify your email, with the link below:
           </Text>
-          <Section className="mb-[32px] mt-[32px] text-center">
+          <Section className="text-center">
             {/* Button that takes the user to the verification link */}
             <Button
-              className="rounded bg-[#000000] px-5 py-3 text-center text-[12px] font-semibold text-white no-underline"
+              className="rounded bg-slate-900 px-5 py-3 text-center font-sans text-[15px] text-white no-underline"
               href={`${baseUrl}/auth/verify-email?token=${emailVerificationToken}`}
             >
               Verify Email
             </Button>
           </Section>
-          <Text className="text-[14px] leading-[24px] text-black">
+          <Text style={text}>
             Thank you for choosing <strong>{"Market Hub"}</strong>.<br /> Yours truly,
             <br /> Support Team at <strong>{"Market Hub"}</strong>.
           </Text>
@@ -66,4 +62,19 @@ const VerificationTemplate = ({
   </Html>
 );
 
+VerificationTemplate.PreviewProps = {
+  username: "Alan",
+  baseUrl: "http://localhost:3001",
+  emailVerificationToken: "123456",
+} as Props;
+
 export default VerificationTemplate;
+
+const text = {
+  fontSize: "16px",
+  fontFamily:
+    "'Open Sans', 'HelveticaNeue-Light', 'Helvetica Neue Light', 'Helvetica Neue', Helvetica, Arial, 'Lucida Grande', sans-serif",
+  fontWeight: "300",
+  color: "#404040",
+  lineHeight: "26px",
+};

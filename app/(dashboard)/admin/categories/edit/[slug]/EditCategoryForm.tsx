@@ -28,10 +28,10 @@ const EditCategoryForm = ({ slug }: { slug: string }) => {
     Category,
     Partial<Pick<Category, "name" | "image" | "parent">>
   >(`/api/categories/${slug}`, ["editCategory", slug], "PATCH");
-  const categoriesQuery = useQueryHook<{ items: Category[]; count: number }>("/api/categories", [
-    "categories",
-    "editCategory",
-  ]);
+  const categoriesQuery = useQueryHook<{ items: Category[]; count: number }>({
+    url: "/api/categories",
+    key: ["categories", "editCategory"],
+  });
   const { data, error, isSuccess, isLoading, refetch } = useQuery<Category>({
     queryKey: ["getCategoryEdit", slug],
     queryFn: getCategory,

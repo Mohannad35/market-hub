@@ -8,7 +8,7 @@ import {
   stringSchema,
 } from "./common-schema";
 
-export const passwordSchema = stringSchema("Password").superRefine(
+export const password = stringSchema("Password").superRefine(
   (password: string, checkPassComplexity) => {
     const isUppercase = (ch: string) => /[A-Z]/.test(ch);
     const isLowercase = (ch: string) => /[a-z]/.test(ch);
@@ -73,8 +73,8 @@ export type SignUpSchemaFormValues = z.infer<typeof signUpSchema>;
 const signUp = object({
   name: stringMinMaxSchema("Name", 2, 256),
   email: stringSchema("Email").email("Invalid email"),
-  password: passwordSchema,
-  confirmPassword: passwordSchema,
+  password: password,
+  confirmPassword: stringSchema("Confirm Password"),
   username: usernameSchema,
   address: stringMinMaxSchema("Address", 2, 10_000).optional(),
   businessAddress: stringMinMaxSchema("Business Address", 2, 10_000).optional(),
@@ -115,9 +115,37 @@ export const signInSchema = object({
 export type ChangePasswordFormValues = z.infer<typeof changePasswordSchema>;
 export const changePasswordSchema = object({
   oldPassword: stringSchema("Old Password"),
-  newPassword: passwordSchema,
-  confirmPassword: passwordSchema,
+  newPassword: password,
+  confirmPassword: stringSchema("Confirm Password"),
 }).refine(({ newPassword, confirmPassword }) => newPassword === confirmPassword, {
   message: "Passwords do not match",
   path: ["confirmPassword"],
 });
+
+export const forgotPasswordSchema = object({
+  email: stringSchema("Email").email("Invalid email"),
+});
+
+export type VerifyEmailFormValues = z.infer<typeof verifyEmailSchema>;
+export const verifyEmailSchema = object({
+  token: stringSchema("Token"),
+});
+
+const passwordSchema = object({
+  password: password,
+  confirmPassword: stringSchema("Confirm Password"),
+});
+
+export type ResetPasswordFormValues = z.infer<typeof resetPasswordSchema>;
+export const resetPasswordSchema = passwordSchema.refine(
+  ({ password, confirmPassword }) => password === confirmPassword,
+  { message: "Passwords do not match", path: ["confirmPassword"] }
+);
+
+export type ResetPasswordTokenFormValues = z.infer<typeof resetPasswordTokenSchema>;
+export const resetPasswordTokenSchema = passwordSchema
+  .extend({ token: stringSchema("Token") })
+  .refine(({ password, confirmPassword }) => password === confirmPassword, {
+    message: "Passwords do not match",
+    path: ["confirmPassword"],
+  });

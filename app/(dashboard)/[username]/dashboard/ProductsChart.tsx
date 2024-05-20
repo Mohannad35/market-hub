@@ -5,10 +5,10 @@ import { Flex, Text } from "@radix-ui/themes";
 import { Bar, BarChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 
 const ProductsChart = () => {
-  const { data, error, isLoading } = useQueryHook<{ products: number; month: string }[]>(
-    "/api/stats/product",
-    ["stats", "product"]
-  );
+  const { data, error, isLoading } = useQueryHook<{ products: number; month: string }[]>({
+    url: "/api/stats/product",
+    key: ["stats", "product"],
+  });
 
   if (isLoading) return <></>;
   else if (error) return <div>Error: {error.message}</div>;

@@ -37,14 +37,14 @@ const EditProductForm = ({ slug }: { slug: string }) => {
     ["editProduct"],
     "PATCH"
   );
-  const brandQuery = useQueryHook<{ items: Brand[]; count: number }>("/api/brands", [
-    "brands",
-    "newProduct",
-  ]);
-  const categoriesQuery = useQueryHook<{ items: Category[]; count: number }>("/api/categories", [
-    "categories",
-    "newProduct",
-  ]);
+  const brandQuery = useQueryHook<{ items: Brand[]; count: number }>({
+    url: "/api/brands",
+    key: ["brands", "newProduct"],
+  });
+  const categoriesQuery = useQueryHook<{ items: Category[]; count: number }>({
+    url: "/api/categories",
+    key: ["categories", "newProduct"],
+  });
   const { data, error, isSuccess, isLoading, refetch } = useQuery<ProductWithBrandAndCategory>({
     queryKey: ["editProduct", slug, "brand,category"],
     queryFn: getProduct,

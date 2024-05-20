@@ -16,9 +16,10 @@ type CategorySelectProps = Modify<
 const CategorySelect = ({ uniqueKey, ...props }: CategorySelectProps) => {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const categoriesQuery = useQueryHook<{ items: Category[]; count: number }>("/api/categories", [
-    uniqueKey,
-  ]);
+  const categoriesQuery = useQueryHook<{ items: Category[]; count: number }>({
+    url: "/api/categories",
+    key: [uniqueKey],
+  });
   const [category, setCategory] = useState<string | number>(() => {
     const category = searchParams.get("category");
     return category ? category : "";

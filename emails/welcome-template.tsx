@@ -10,15 +10,20 @@ import {
   Text,
 } from "@react-email/components";
 
-const WelcomeTemplate = ({ name, baseUrl }: { name: string; baseUrl: string }) => {
+interface Props {
+  name: string;
+  baseUrl: string;
+}
+
+const WelcomeTemplate = ({ name, baseUrl }: Props) => {
   return (
     <Html>
       <Preview>Welcome aboard!</Preview>
       <Tailwind>
-        <Body className="mx-auto my-auto bg-white px-2 font-sans">
-          <Container className="mx-auto my-[40px] max-w-[465px] rounded border border-solid border-[#eaeaea] p-[20px]">
+        <Body className="bg-[#f6f9fc] p-4">
+          <Container className="rounded border border-solid border-[#f0f0f0] bg-white p-10">
             {/* Logo */}
-            <Section className="mt-[32px]">
+            <Section className="mb-[2rem]">
               <Img
                 src={`${baseUrl}/logo-transparent.png`}
                 width="100"
@@ -27,12 +32,17 @@ const WelcomeTemplate = ({ name, baseUrl }: { name: string; baseUrl: string }) =
                 className="mx-auto my-0"
               />
             </Section>
-            <Text className="text-[14px] leading-[24px] text-black">
+            <Text style={text}>
               Hello <strong>{name}</strong>,<br />
               We&lsquo;re excited to have you on board. Let&lsquo;s{" "}
               <Link href={baseUrl} className="text-blue-600 no-underline">
                 Visit our website
               </Link>
+            </Text>
+            <Text style={text}>
+              Best regards,
+              <br />
+              Support Team at <strong>{"Market Hub"}</strong>.
             </Text>
           </Container>
         </Body>
@@ -41,4 +51,18 @@ const WelcomeTemplate = ({ name, baseUrl }: { name: string; baseUrl: string }) =
   );
 };
 
+WelcomeTemplate.PreviewProps = {
+  name: "Alan",
+  baseUrl: "http://localhost:3001",
+} as Props;
+
 export default WelcomeTemplate;
+
+const text = {
+  fontSize: "16px",
+  fontFamily:
+    "'Open Sans', 'HelveticaNeue-Light', 'Helvetica Neue Light', 'Helvetica Neue', Helvetica, Arial, 'Lucida Grande', sans-serif",
+  fontWeight: "300",
+  color: "#404040",
+  lineHeight: "26px",
+};

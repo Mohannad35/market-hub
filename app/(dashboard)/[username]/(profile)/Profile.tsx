@@ -15,6 +15,12 @@ import { FaCircleCheck, FaCircleXmark } from "react-icons/fa6";
 import ProfileImage from "./ProfileImage";
 import Snippet from "./Snippet";
 import { useSession } from "next-auth/react";
+import { useMutationHook, useQueryHook } from "@/hook/use-tanstack-hooks";
+import { UserWithToken } from "@/lib/types";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
+import { nanoid } from "nanoid";
+import { usePathname } from "next/navigation";
 
 const roles = {
   admin: { name: "Admin", className: "bg-[#7469B6] shadow-[#7469B6]/50", Icon: FaCircleCheck },
@@ -24,11 +30,29 @@ const roles = {
 };
 
 const Profile = ({ username }: { username: string }) => {
+  const pathname = usePathname();
   const { data: session, status } = useSession();
   const { data, error, isSuccess, isLoading } = useQuery<User>({
     queryKey: ["getProfile", username],
     queryFn: getProfile,
   });
+  const resendVerification = useMutationHook<UserWithToken, undefined>(
+    `/api/resend-verification`,
+    ["resendVerification", username],
+    "GET"
+  );
+
+  async function handleResendVerification() {
+    const promise = new Promise<UserWithToken>((resolve, reject) =>
+      resendVerification.mutateAsync(undefined).then(resolve).catch(reject)
+    );
+    toast.promise(promise, {
+      loading: "Resending verification email...",
+      success: data => "Verification email sent successfully",
+      error: err => err || "An unexpected error occurred",
+      id: "resend-toast" + nanoid(4),
+    });
+  }
 
   if (isLoading || status === "loading") return <LoadingIndicator />;
   else if (error) return <div className="container">Error: {error.message}</div>;
@@ -60,7 +84,7 @@ const Profile = ({ username }: { username: string }) => {
             size="sm"
             radius="lg"
             as={NextLink}
-            href="/dashboard/settings/profile/edit"
+            href={`${pathname}/edit`}
           >
             <Text size="4" weight="medium">
               Edit Profile
@@ -96,13 +120,29 @@ const Profile = ({ username }: { username: string }) => {
               <Snippet className="bg-transparent" text="Email" />
               <Snippet text={email} />
             </Flex>
-            <Chip
-              startContent={isVerified ? <CheckIcon size={18} /> : <XIcon size={18} />}
-              variant="faded"
-              color={isVerified ? "success" : "danger"}
-            >
-              {isVerified ? "Verified" : "Not Verified"}
-            </Chip>
+            <Flex gap="2" justify="end" align="center">
+              {status === "authenticated" && session.user.username === username && !isVerified && (
+                <Button
+                  variant="faded"
+                  color="default"
+                  size="sm"
+                  radius="full"
+                  onClick={() => handleResendVerification()}
+                  isLoading={resendVerification.isPending}
+                >
+                  <Text size="3" weight="medium">
+                    Resend Verification
+                  </Text>
+                </Button>
+              )}
+              <Chip
+                startContent={isVerified ? <CheckIcon size={18} /> : <XIcon size={18} />}
+                variant="faded"
+                color={isVerified ? "success" : "danger"}
+              >
+                {isVerified ? "Verified" : "Not Verified"}
+              </Chip>
+            </Flex>
           </Flex>
         </>
       )}

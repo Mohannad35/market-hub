@@ -17,12 +17,14 @@ import {
  * @returns { UseQueryResult<TData, TError> }
  * object from react-query contains isLoading, isSuccess, isError, error, data, mutate, mutateAsync, reset, status...
  */
-export function useQueryHook<TData, TError = Error>(
-  url: string,
-  key: string[],
-  query?: string,
-  enabled: boolean = true
-): UseQueryResult<TData, TError> {
+type Props = { url: string; key: string[]; query?: string; enabled?: boolean; staleTime?: number };
+export function useQueryHook<TData, TError = Error>({
+  url,
+  key,
+  query,
+  enabled = true,
+  staleTime = 1000 * 60,
+}: Props): UseQueryResult<TData, TError> {
   return useQuery<TData, TError>({
     queryKey: [...key],
     queryFn: async () => {
@@ -32,7 +34,7 @@ export function useQueryHook<TData, TError = Error>(
         throw new Error((await res.json()).message || res.statusText);
       else throw new Error("A server error occurred");
     },
-    staleTime: 1000 * 60, // 1 minute
+    staleTime, // default 1 minute
     retry: 3,
     enabled,
     placeholderData: keepPreviousData,
@@ -40,7 +42,7 @@ export function useQueryHook<TData, TError = Error>(
 }
 
 type TVariablesDef = { [key: string]: string[] | FormDataEntryValue };
-type TMethod = "POST" | "PUT" | "PATCH" | "DELETE";
+type TMethod = "POST" | "PUT" | "PATCH" | "DELETE" | "GET";
 /**
  * This hook is used to add or edit data to the server
  * @param url string API endpoint
@@ -60,7 +62,7 @@ export function useMutationHook<TData, TVariables = TVariablesDef, TError = Erro
     mutationKey: [...key],
     mutationFn: async data => {
       const res = await fetch(`${url}${query ? "?" + query : ""}`, {
-        method: method,
+        method,
         body: JSON.stringify(data),
       });
       if (res.ok) return await res.json();

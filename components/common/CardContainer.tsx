@@ -22,7 +22,7 @@ const CardContainer = ({ api, uniqueKey, Card, label, ...props }: Props) => {
   const { data, isSuccess, error, isLoading, isRefetching, refetch } = useQueryHook<{
     items: {}[];
     count: number;
-  }>(api, [uniqueKey], query.toString());
+  }>({ url: api, key: [uniqueKey], query: query.toString() });
 
   useEffect(() => {
     refetch();

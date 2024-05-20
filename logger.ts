@@ -11,7 +11,8 @@ const dailyInfoLogger = new transports.DailyRotateFile({
   filename: "info-%DATE%.log",
   zippedArchive: true,
   maxSize: "20m",
-  maxFiles: "14d",
+  maxFiles: "10",
+  frequency: "7d",
 });
 dailyInfoLogger.on("rotate", (oldFilename, newFilename) => {
   // do something fun
@@ -27,7 +28,10 @@ const dailyErrorLogger = new transports.DailyRotateFile({
   filename: "error-%DATE%.log",
   zippedArchive: true,
   maxSize: "20m",
-  maxFiles: "14d",
+  maxFiles: "10",
+  frequency: "7d",
+  handleExceptions: true,
+  handleRejections: true,
 });
 dailyErrorLogger.on("rotate", (oldFilename, newFilename) => {
   // do something fun

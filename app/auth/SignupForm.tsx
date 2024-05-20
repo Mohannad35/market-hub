@@ -58,17 +58,16 @@ const SignupForm = ({ setTab }: { setTab: Dispatch<SetStateAction<string | numbe
   async function onSubmit(data: ModifiedSignUpSchemaFormValues) {
     if (!countryCode)
       return form.setError("phoneNumber", { type: "manual", message: "Select a country" });
-    const phone = parsePhoneNumber(data.phoneNumber, countryCode as CountryCode);
-    if (!phone?.isValid() || !phone?.isPossible())
+    const phone = data.phoneNumber
+      ? parsePhoneNumber(data.phoneNumber, countryCode as CountryCode)
+      : undefined;
+    if (phone && (!phone.isValid() || !phone.isPossible()))
       return form.setError("phoneNumber", { type: "manual", message: "Invalid phone number" });
     const newData = {
       ...data,
-      phoneNumber: pick(phone, [
-        "number",
-        "country",
-        "countryCallingCode",
-        "nationalNumber",
-      ]) as Phone,
+      phoneNumber:
+        phone &&
+        (pick(phone, ["number", "country", "countryCallingCode", "nationalNumber"]) as Phone),
       websiteAddress: data.websiteAddress?.startsWith("http")
         ? data.websiteAddress
         : data.websiteAddress?.length ?? 0 > 0
@@ -272,133 +271,6 @@ const SignupForm = ({ setTab }: { setTab: Dispatch<SetStateAction<string | numbe
               </FormItem>
             )}
           />
-          <FormField
-            control={form.control}
-            name="birthday"
-            render={({ field }) => (
-              <FormItem className="w-full">
-                <FormControl>
-                  <Tooltip content="Birth date" delay={1000} placement="top-start" size="lg">
-                    <div>
-                      <DatePicker
-                        variant="bordered"
-                        size="lg"
-                        selectorButtonProps={{ size: "md" }}
-                        classNames={{ selectorIcon: "text-primary-500 text-2xl" }}
-                        showMonthAndYearPickers
-                        minValue={today(getLocalTimeZone()).subtract({ years: 100 })}
-                        maxValue={today(getLocalTimeZone()).subtract({ years: 18 })}
-                        isInvalid={form.formState.errors.birthday ? true : false}
-                        errorMessage={form.formState.errors.birthday?.message
-                          ?.split("\n")
-                          .map((msg, i) => <p key={i}>{msg}</p>)}
-                        value={
-                          field.value
-                            ? toCalendarDate(fromDate(new Date(field.value), getLocalTimeZone()))
-                            : undefined
-                        }
-                        onChange={date => {
-                          field.onChange(new Date(date.toDate(getLocalTimeZone())));
-                        }}
-                        isDisabled={field.disabled}
-                        name={field.name}
-                        onBlur={field.onBlur}
-                        ref={field.ref}
-                      />
-                    </div>
-                  </Tooltip>
-                </FormControl>
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="phoneNumber"
-            render={({ field }) => (
-              <FormItem className="w-full">
-                <FormControl>
-                  <Tooltip content="Phone number" delay={1000} placement="top-start" size="lg">
-                    <div>
-                      <Input
-                        type="tel"
-                        size="lg"
-                        variant="bordered"
-                        placeholder="000-000-0000"
-                        startContent={
-                          <div className="flex items-center">
-                            <Autocomplete
-                              type="tel"
-                              defaultItems={Object.entries(
-                                pick(countries, ["US", "EG", "NG", "IN", "BR"])
-                              )}
-                              aria-label="Select Country"
-                              variant="underlined"
-                              size="sm"
-                              classNames={{ base: "w-[8rem] p-0", popoverContent: "w-[20rem]" }}
-                              isClearable={false}
-                              selectedKey={countryCode}
-                              onSelectionChange={key => setCountryCode(key as string)}
-                            >
-                              {([key, { name, phone }]) => (
-                                <AutocompleteItem
-                                  key={key}
-                                  value={name}
-                                  startContent={
-                                    <Avatar
-                                      alt={name}
-                                      className="h-6 w-6"
-                                      src={`https://flagcdn.com/${key.toLowerCase()}.svg`}
-                                    />
-                                  }
-                                >
-                                  {`(+${phone}) ${name}`}
-                                </AutocompleteItem>
-                              )}
-                            </Autocomplete>
-                          </div>
-                        }
-                        isInvalid={form.formState.errors.phoneNumber ? true : false}
-                        errorMessage={form.formState.errors.phoneNumber?.message
-                          ?.split("\n")
-                          .map((msg, i) => <p key={i}>{msg}</p>)}
-                        {...field}
-                      />
-                    </div>
-                  </Tooltip>
-                </FormControl>
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="gender"
-            render={({ field }) => (
-              <FormItem className="w-full">
-                <FormControl>
-                  <Tooltip content="Gender" delay={1000} placement="top-start" size="lg">
-                    <div>
-                      <Select
-                        variant="bordered"
-                        placeholder="gender"
-                        size="lg"
-                        items={[
-                          { label: "Male", value: "male" },
-                          { label: "Female", value: "female" },
-                        ]}
-                        selectedKeys={field.value ? [field.value] : []}
-                        onSelectionChange={keys => {
-                          if (keys === "all") return;
-                          field.onChange(keys.values().next().value);
-                        }}
-                      >
-                        {({ value, label }) => <SelectItem key={value}>{label}</SelectItem>}
-                      </Select>
-                    </div>
-                  </Tooltip>
-                </FormControl>
-              </FormItem>
-            )}
-          />
           <Accordion>
             <AccordionItem
               key="1"
@@ -408,6 +280,135 @@ const SignupForm = ({ setTab }: { setTab: Dispatch<SetStateAction<string | numbe
               classNames={{ trigger: "p-0" }}
               title={<DividerWithLabel label="Advanced Details" />}
             >
+              <FormField
+                control={form.control}
+                name="birthday"
+                render={({ field }) => (
+                  <FormItem className="w-full">
+                    <FormControl>
+                      <Tooltip content="Birth date" delay={1000} placement="top-start" size="lg">
+                        <div>
+                          <DatePicker
+                            variant="bordered"
+                            size="lg"
+                            selectorButtonProps={{ size: "md" }}
+                            classNames={{ selectorIcon: "text-primary-500 text-2xl" }}
+                            showMonthAndYearPickers
+                            minValue={today(getLocalTimeZone()).subtract({ years: 100 })}
+                            maxValue={today(getLocalTimeZone()).subtract({ years: 18 })}
+                            isInvalid={form.formState.errors.birthday ? true : false}
+                            errorMessage={form.formState.errors.birthday?.message
+                              ?.split("\n")
+                              .map((msg, i) => <p key={i}>{msg}</p>)}
+                            value={
+                              field.value
+                                ? toCalendarDate(
+                                    fromDate(new Date(field.value), getLocalTimeZone())
+                                  )
+                                : undefined
+                            }
+                            onChange={date => {
+                              field.onChange(new Date(date.toDate(getLocalTimeZone())));
+                            }}
+                            isDisabled={field.disabled}
+                            name={field.name}
+                            onBlur={field.onBlur}
+                            ref={field.ref}
+                          />
+                        </div>
+                      </Tooltip>
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="phoneNumber"
+                render={({ field }) => (
+                  <FormItem className="w-full">
+                    <FormControl>
+                      <Tooltip content="Phone number" delay={1000} placement="top-start" size="lg">
+                        <div>
+                          <Input
+                            type="tel"
+                            size="lg"
+                            variant="bordered"
+                            placeholder="000-000-0000"
+                            startContent={
+                              <div className="flex items-center">
+                                <Autocomplete
+                                  type="tel"
+                                  defaultItems={Object.entries(
+                                    pick(countries, ["US", "EG", "NG", "IN", "BR"])
+                                  )}
+                                  aria-label="Select Country"
+                                  variant="underlined"
+                                  size="sm"
+                                  classNames={{ base: "w-[8rem] p-0", popoverContent: "w-[20rem]" }}
+                                  isClearable={false}
+                                  selectedKey={countryCode}
+                                  onSelectionChange={key => setCountryCode(key as string)}
+                                >
+                                  {([key, { name, phone }]) => (
+                                    <AutocompleteItem
+                                      key={key}
+                                      value={name}
+                                      startContent={
+                                        <Avatar
+                                          alt={name}
+                                          className="h-6 w-6"
+                                          src={`https://flagcdn.com/${key.toLowerCase()}.svg`}
+                                        />
+                                      }
+                                    >
+                                      {`(+${phone}) ${name}`}
+                                    </AutocompleteItem>
+                                  )}
+                                </Autocomplete>
+                              </div>
+                            }
+                            isInvalid={form.formState.errors.phoneNumber ? true : false}
+                            errorMessage={form.formState.errors.phoneNumber?.message
+                              ?.split("\n")
+                              .map((msg, i) => <p key={i}>{msg}</p>)}
+                            {...field}
+                          />
+                        </div>
+                      </Tooltip>
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="gender"
+                render={({ field }) => (
+                  <FormItem className="w-full">
+                    <FormControl>
+                      <Tooltip content="Gender" delay={1000} placement="top-start" size="lg">
+                        <div>
+                          <Select
+                            variant="bordered"
+                            placeholder="gender"
+                            size="lg"
+                            items={[
+                              { label: "Male", value: "male" },
+                              { label: "Female", value: "female" },
+                            ]}
+                            selectedKeys={field.value ? [field.value] : []}
+                            onSelectionChange={keys => {
+                              if (keys === "all") return;
+                              field.onChange(keys.values().next().value);
+                            }}
+                          >
+                            {({ value, label }) => <SelectItem key={value}>{label}</SelectItem>}
+                          </Select>
+                        </div>
+                      </Tooltip>
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
               <FormField
                 control={form.control}
                 name="address"

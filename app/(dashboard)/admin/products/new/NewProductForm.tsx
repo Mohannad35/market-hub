@@ -29,14 +29,14 @@ const NewProductForm = () => {
   const [brandId, setBrandId] = useState<null | string>(null);
   const [categoryId, setCategoryId] = useState<null | string>(null);
   const addProductMutation = useMutationHook<Product, TBody>("/api/products", ["newProduct"]);
-  const brandQuery = useQueryHook<{ items: Brand[]; count: number }>("/api/brands", [
-    "brands",
-    "newProduct",
-  ]);
-  const categoriesQuery = useQueryHook<{ items: Category[]; count: number }>("/api/categories", [
-    "categories",
-    "newProduct",
-  ]);
+  const brandQuery = useQueryHook<{ items: Brand[]; count: number }>({
+    url: "/api/brands",
+    key: ["brands", "newProduct"],
+  });
+  const categoriesQuery = useQueryHook<{ items: Category[]; count: number }>({
+    url: "/api/categories",
+    key: ["categories", "newProduct"],
+  });
 
   const handleSubmit = async (formData: FormData) => {
     if (resources.length < 1) return toast.error("A product needs at least one image");

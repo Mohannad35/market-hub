@@ -55,15 +55,19 @@ async function POST_handler(request: NextRequest): Promise<NextResponse<User>> {
       ...rest,
       password: pwHash,
       gender: gender as Gender,
-      verificationToken: {
+      tokens: {
         create: {
+          type: "verification",
           token: randomBytes(16).toString("hex"),
           expires: now(getLocalTimeZone()).add({ days: 2 }).toDate(),
         },
       },
     },
-    include: { verificationToken: true },
+    include: { tokens: true },
   });
+  // Find verification token
+  const verificationToken = user.tokens.find(token => token.type === "verification");
+  if (!verificationToken) throw new ApiError(500, "Token not found");
   // Send emails if SENDGRID_API_KEY is set
   if (process.env.SENDGRID_API_KEY) {
     // Send verification email and welcome email
@@ -73,7 +77,7 @@ async function POST_handler(request: NextRequest): Promise<NextResponse<User>> {
     const verificationEmailHtml = render(
       VerificationTemplate({
         username: user.name,
-        emailVerificationToken: user.verificationToken!.token,
+        emailVerificationToken: verificationToken.token,
         baseUrl: request.nextUrl.origin,
       })
     );

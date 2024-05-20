@@ -23,10 +23,10 @@ const NewCategoryForm = () => {
     Category,
     Pick<Category, "name" | "image" | "parent">
   >("/api/categories", ["newCategory"]);
-  const categoriesQuery = useQueryHook<{ items: Category[]; count: number }>("/api/categories", [
-    "categories",
-    "new",
-  ]);
+  const categoriesQuery = useQueryHook<{ items: Category[]; count: number }>({
+    url: "/api/categories",
+    key: ["categories", "new"],
+  });
 
   const handleSubmit = async (formData: FormData) => {
     if (resources.length < 1) return toast.error("A category needs at least one image");

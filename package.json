@@ -8,7 +8,7 @@
     "url": "https://github.com/Mohannad35"
   },
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev -p 3001",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",

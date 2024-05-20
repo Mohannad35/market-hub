@@ -5,16 +5,12 @@ import { EyeSlashFilledIcon } from "@/components/icons/EyeSlashFilledIcon";
 import { LockIcon } from "@/components/icons/LockIcon";
 import { MailIcon } from "@/components/icons/MailIcon";
 import { Form, FormControl, FormField, FormItem } from "@/components/ui/form";
-import { getFormDataObject, useZodValidationResolver, validateSchema } from "@/lib/utils";
-import {
-  emailOrUsernameSchema,
-  signInSchema,
-  SignInSchemaFormValues,
-} from "@/lib/validation/user-schema";
+import { useZodValidationResolver } from "@/lib/utils";
+import { signInSchema, SignInSchemaFormValues } from "@/lib/validation/user-schema";
 import { Icon as Iconify } from "@iconify/react";
 import { Button } from "@nextui-org/button";
 import { Input } from "@nextui-org/input";
-import { Checkbox, Link } from "@nextui-org/react";
+import { Link } from "@nextui-org/react";
 import { Flex, Text } from "@radix-ui/themes";
 import { nanoid } from "nanoid";
 import { signIn } from "next-auth/react";
@@ -164,7 +160,7 @@ const SigninForm = ({ setTab }: { setTab: Dispatch<SetStateAction<string | numbe
                 Sign up
               </Text>
             </Text>
-            <Link color="secondary" href="#" size="sm">
+            <Link color="secondary" href="/auth/forgot-password" size="sm">
               Forgot password?
             </Link>
           </Flex>
