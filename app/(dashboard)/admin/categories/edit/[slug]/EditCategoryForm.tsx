@@ -13,13 +13,15 @@ import { Category } from "@prisma/client";
 import { Flex, Text } from "@radix-ui/themes";
 import { useQuery } from "@tanstack/react-query";
 import { isEqual, pick } from "lodash";
-import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
+import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
 type DataKey = "name" | "image" | "parent";
 const EditCategoryForm = ({ slug }: { slug: string }) => {
   const router = useRouter();
+  const pathname = usePathname();
   const [resources, setResources] = useState<{ public_id: string; secure_url: string }[]>([]);
   const [deletedRes, setDeletedRes] = useState<string[]>([]);
   const [temp, setTemp] = useState<string[]>([]);
@@ -72,7 +74,7 @@ const EditCategoryForm = ({ slug }: { slug: string }) => {
         });
         setTimeout(() => {
           refetch();
-          router.replace("/dashboard/categories");
+          router.replace(pathname.replace(/\/edit.*/, ""));
           router.refresh();
         }, 2000);
         return `${data.name} has been edited successfully`;

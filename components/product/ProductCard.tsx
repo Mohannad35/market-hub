@@ -53,7 +53,7 @@ const ProductCard = ({ item, ...props }: Props) => {
         <CardImage
           src={image[0].secure_url}
           href={`/products/${slug}`}
-          edit={`/dashboard/products/edit/${slug}`}
+          edit={`/admin/products/edit/${slug}`}
           name={name}
           handleDelete={onOpen}
         />

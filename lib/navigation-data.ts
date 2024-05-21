@@ -2,25 +2,25 @@ export const listItems = (username: string) => [
   {
     key: "dashboard",
     label: "Dashboard",
-    href: `/${username}/dashboard`,
+    href: `/user/${username}/dashboard`,
     icon: "tabler:layout-dashboard-filled",
   },
   {
     key: "profile",
     label: "Profile",
-    href: `/${username}`,
+    href: `/user/${username}`,
     icon: "solar:user-bold-duotone",
   },
   {
     key: "settings",
     label: "Settings",
-    href: `/${username}/settings`,
+    href: `/user/${username}/settings`,
     icon: "solar:settings-bold-duotone",
   },
   {
     key: "security",
     label: "Security",
-    href: `/${username}/security`,
+    href: `/user/${username}/security`,
     icon: "mdi:security-account",
   },
 ];

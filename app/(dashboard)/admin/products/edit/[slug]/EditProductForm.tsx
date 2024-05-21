@@ -19,7 +19,8 @@ import { Brand, Category, Product } from "@prisma/client";
 import { Flex, Text } from "@radix-ui/themes";
 import { useQuery } from "@tanstack/react-query";
 import { difference, pick } from "lodash";
-import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
+import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
@@ -27,6 +28,7 @@ type DataKey = "name" | "description" | "price" | "quantity" | "image" | "brandI
 type TBody = Pick<Modify<Product, { price: string; quantity: string }>, DataKey>;
 const EditProductForm = ({ slug }: { slug: string }) => {
   const router = useRouter();
+  const pathname = usePathname();
   const [resources, setResources] = useState<{ public_id: string; secure_url: string }[]>([]);
   const [deletedRes, setDeletedRes] = useState<string[]>([]);
   const [temp, setTemp] = useState<string[]>([]);
@@ -99,7 +101,8 @@ const EditProductForm = ({ slug }: { slug: string }) => {
         });
         setTimeout(() => {
           refetch();
-          if (differences.includes("name")) router.push(`/dashboard/products/edit/${data.slug}`);
+          if (differences.includes("name"))
+            router.push(pathname.replace(/\/edit.*/, `/edit/${data.slug}`));
         }, 2000);
         return `${data.name} has been edited successfully`;
       },

@@ -44,6 +44,7 @@ const config: Config = {
         satisfy: "var(--font-satisfy)",
         fira_code: "var(--font-fira-code)",
         akaya_kanadaka: "var(--font-akaya-kanadaka)",
+        dosis: "var(--font-dosis)",
       },
       colors: {
         border: "hsl(var(--border))",
@@ -98,6 +99,7 @@ const config: Config = {
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
+        "spin-slow": "spin 5s linear infinite",
       },
     },
   },

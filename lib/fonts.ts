@@ -1,4 +1,4 @@
-import { Inter, Satisfy, Fira_Code, Akaya_Kanadaka } from "next/font/google";
+import { Inter, Satisfy, Fira_Code, Akaya_Kanadaka, Dosis } from "next/font/google";
 
 export const inter = Inter({
   subsets: ["latin"],
@@ -24,4 +24,10 @@ export const akaya_kanadaka = Akaya_Kanadaka({
   variable: "--font-akaya-kanadaka",
   display: "swap",
   weight: "400",
+});
+
+export const dosis = Dosis({
+  subsets: ["latin"],
+  variable: "--font-dosis",
+  display: "swap",
 });

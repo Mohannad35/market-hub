@@ -12,13 +12,16 @@ import { Brand } from "@prisma/client";
 import { Flex, Text } from "@radix-ui/themes";
 import { useQuery } from "@tanstack/react-query";
 import { isEqual, pick } from "lodash";
-import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
+import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
 type DataKey = "name" | "image";
 const EditBrandForm = ({ slug }: { slug: string }) => {
   const router = useRouter();
+  const pathname = usePathname();
+  const { data: session, status } = useSession();
   const [resources, setResources] = useState<{ public_id: string; secure_url: string }[]>([]);
   const [deletedRes, setDeletedRes] = useState<string[]>([]);
   const [temp, setTemp] = useState<string[]>([]);
@@ -35,7 +38,7 @@ const EditBrandForm = ({ slug }: { slug: string }) => {
     if (data && data.image) setResources([data.image]);
   }, [data]);
 
-  if (isLoading) return <LoadingIndicator />;
+  if (isLoading || status === "loading") return <LoadingIndicator />;
   if (error) return <Text>Error: {error.message}</Text>;
   if (!isSuccess || !data) return <Text>Brand not found</Text>;
 
@@ -64,7 +67,7 @@ const EditBrandForm = ({ slug }: { slug: string }) => {
         });
         setTimeout(() => {
           refetch();
-          router.replace("/dashboard/brands");
+          router.replace(pathname.replace(/\/edit.*/, ""));
           router.refresh();
         }, 2000);
         return `${data.name} has been edited successfully`;

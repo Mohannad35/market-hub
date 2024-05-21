@@ -50,7 +50,7 @@ const CategoryCard = ({ item, ...props }: Props) => {
         <CardImage
           src={image?.secure_url}
           href={`/products?${new URLSearchParams({ category: item.path })}`}
-          edit={`/dashboard/categories/edit/${encodeURI(path.slice(1).replace(/\//g, "-"))}`}
+          edit={`/admin/categories/edit/${encodeURI(path.slice(1).replace(/\//g, "-"))}`}
           name={name}
           handleDelete={onOpen}
         />

@@ -1,5 +1,6 @@
 "use client";
 
+import LoadingIndicator from "@/components/common/LoadingIndicator";
 import Upload from "@/components/common/Upload";
 import { useMutationHook } from "@/hook/use-tanstack-hooks";
 import { getFormDataObject, validateSchema } from "@/lib/utils";
@@ -8,12 +9,14 @@ import { Button } from "@nextui-org/button";
 import { Input } from "@nextui-org/input";
 import { Brand } from "@prisma/client";
 import { Flex, Text } from "@radix-ui/themes";
-import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
+import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "react-toastify";
 
 const NewBrandForm = () => {
   const router = useRouter();
+  const pathname = usePathname();
   const [resources, setResources] = useState<{ public_id: string; secure_url: string }[]>([]);
   const [deletedRes, setDeletedRes] = useState<string[]>([]);
   const [temp, setTemp] = useState<string[]>([]);
@@ -39,7 +42,7 @@ const NewBrandForm = () => {
             body: JSON.stringify({ publicId: deletedRes }),
           });
           setTimeout(() => {
-            router.push("/dashboard/brands");
+            router.push(pathname.replace(/\/new.*/, ""));
             router.refresh();
           }, 2000);
           return `${data.name} has been added`;

@@ -20,7 +20,7 @@ import { UserWithToken } from "@/lib/types";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { nanoid } from "nanoid";
-import { usePathname } from "next/navigation";
+import { notFound, usePathname } from "next/navigation";
 
 const roles = {
   admin: { name: "Admin", className: "bg-[#7469B6] shadow-[#7469B6]/50", Icon: FaCircleCheck },
@@ -55,8 +55,10 @@ const Profile = ({ username }: { username: string }) => {
   }
 
   if (isLoading || status === "loading") return <LoadingIndicator />;
-  else if (error) return <div className="container">Error: {error.message}</div>;
-  else if (!isSuccess || !data) return <div className="container">No data</div>;
+  else if (error) {
+    if (error.message === "Not Found") notFound();
+    return <div className="container">Error: {error.message}</div>;
+  } else if (!isSuccess || !data) return <div className="container">No data</div>;
   const {
     name,
     image,

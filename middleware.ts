@@ -2,7 +2,12 @@ import { auth } from "@/auth";
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
-const protectedRoutes = [/^\/dashboard\/?.*/];
+const protectedRoutes = [
+  /^\/admin\/?.*/,
+  /^\/user\/.*\/dashboard\/?.*/,
+  /^\/user\/.*\/security\/?.*/,
+  /^\/user\/.*\/settings\/?.*/,
+];
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;

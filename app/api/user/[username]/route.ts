@@ -12,7 +12,7 @@ async function GET_handler(
 ): Promise<NextResponse<Partial<User> | null>> {
   const session = await auth();
   const user = await prisma.user.findUnique({ where: { username } });
-  if (!user) throw new ApiError(404, "User not found");
+  if (!user) throw new ApiError(404, "Not Found");
   if (session?.user.role === "admin" || session?.user.username === user.username)
     return NextResponse.json(user);
   return NextResponse.json(
