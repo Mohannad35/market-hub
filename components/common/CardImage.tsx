@@ -3,6 +3,7 @@
 import { Button } from "@nextui-org/button";
 import { Card, CardBody, CardFooter } from "@nextui-org/card";
 import { Image } from "@nextui-org/image";
+import { cn } from "@nextui-org/react";
 import { Flex } from "@radix-ui/themes";
 import { EditIcon, Trash2Icon } from "lucide-react";
 import { useSession } from "next-auth/react";
@@ -15,26 +16,29 @@ interface Props {
   href: string;
   edit: string;
   name: string;
+  width?: string;
+  height?: string;
   handleDelete: () => void;
 }
-const CardImage = ({ src, href, edit, name, handleDelete }: Props) => {
+const CardImage = ({ src, href, edit, name, handleDelete, width, height }: Props) => {
   const { data, status } = useSession();
+  const className = `h-[${height || "16rem"}] w-[${width || "16rem"}]`;
 
   return (
-    <Card radius="none" shadow="none" className="h-[16rem] w-[16rem] border-none bg-transparent">
+    <Card radius="none" shadow="none" className={cn("border-none bg-transparent", className)}>
       <CardBody
         as={NextLink}
         href={href}
         className="items-center justify-center overflow-x-clip overflow-y-visible p-0"
       >
-        <Flex width="16rem" height="16rem" justify="center" align="center">
+        <Flex width={width || "16rem"} height={height || "16rem"} justify="center" align="center">
           <Image
             isZoomed
             removeWrapper
             radius="none"
             width={480}
             height={480}
-            className="h-[16rem] w-[16rem] object-contain"
+            className={cn("object-contain", className)}
             as={NextImage}
             alt={name}
             src={src || undefined}
@@ -47,7 +51,7 @@ const CardImage = ({ src, href, edit, name, handleDelete }: Props) => {
           />
         </Flex>
       </CardBody>
-      {status === "authenticated" && (
+      {status === "authenticated" && data.user.role === "admin" && (
         <>
           <Button
             isIconOnly

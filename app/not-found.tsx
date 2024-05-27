@@ -1,3 +1,5 @@
+"use client";
+
 import { Button } from "@nextui-org/react";
 import { Flex, Heading, Text } from "@radix-ui/themes";
 import Image from "next/image";
@@ -6,14 +8,20 @@ import { ParticlesContainer } from "./ParticlesContainer";
 
 export default function NotFound() {
   return (
-    <Flex width="100%" justify="center" align="center" className="font-dosis">
+    <Flex
+      width="100%"
+      justify="center"
+      height="100%"
+      className="relative min-h-[calc(100vh-70px)] font-dosis"
+    >
       <ParticlesContainer />
       <Flex
         direction="column"
         width="384px"
         align="center"
         position="relative"
-        className="z-10 text-center"
+        className="text-center"
+        pt="20px"
       >
         <Text className="text-8xl" weight="bold">
           404

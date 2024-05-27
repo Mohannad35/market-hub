@@ -71,7 +71,7 @@ export function formatErrors(error: ZodError | Error) {
   return { message: error.message };
 }
 
-export function getQueryObject(searchParams: URLSearchParams | ReadonlyURLSearchParams) {
+export function getQueryObject<TData>(searchParams: URLSearchParams | ReadonlyURLSearchParams) {
   const queryArr: { [key: string]: string | string[] } = {};
   searchParams.forEach((value, key) =>
     update(queryArr, key, v => {
@@ -80,5 +80,5 @@ export function getQueryObject(searchParams: URLSearchParams | ReadonlyURLSearch
       else if (Array.isArray(v)) return [...v, value];
     })
   );
-  return queryArr;
+  return queryArr as TData;
 }

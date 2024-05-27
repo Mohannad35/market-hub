@@ -3,10 +3,12 @@
 import { type Container, type ISourceOptions } from "@tsparticles/engine";
 import { loadStarsPreset } from "@tsparticles/preset-stars";
 import Particles, { initParticlesEngine } from "@tsparticles/react";
+import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
 
 export function ParticlesContainer(props: unknown) {
   const [init, setInit] = useState(false);
+  const { theme, systemTheme } = useTheme();
 
   // this should be run only once per application lifetime
   useEffect(() => {
@@ -31,6 +33,18 @@ export function ParticlesContainer(props: unknown) {
 
   const options: ISourceOptions = {
     preset: "stars",
+    fullScreen: false,
+    backgroundMask: {
+      enable:
+        theme === "system"
+          ? systemTheme === "dark"
+            ? false
+            : true
+          : theme === "dark"
+            ? false
+            : true,
+      cover: { color: { value: "#fff" }, opacity: 1 },
+    },
   };
 
   if (init) {
@@ -38,6 +52,7 @@ export function ParticlesContainer(props: unknown) {
       <Particles
         id="tsparticles"
         options={options}
+        className="pointer-events-none absolute left-0 top-0 z-0 h-full w-full"
         // particlesLoaded={particlesLoaded}
       />
     );

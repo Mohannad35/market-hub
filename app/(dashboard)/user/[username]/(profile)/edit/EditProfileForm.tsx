@@ -9,7 +9,7 @@ import { getProfile } from "@/lib/query-functions/user";
 import { Modify } from "@/lib/types";
 import { getFormDataObject, validateSchema } from "@/lib/utils";
 import {
-  dateSchema,
+  birthDateSchema,
   stringMinMaxSchema,
   stringSchema,
   urlSchema,
@@ -206,7 +206,7 @@ const EditProfileForm = ({ username }: { username: string }) => {
             validate={value =>
               validateSchema(
                 value ? value.toDate(getLocalTimeZone()) : undefined,
-                dateSchema("Birthday", 18, 100)
+                birthDateSchema("Birthday", 18, 100)
               )
             }
             value={birthday}

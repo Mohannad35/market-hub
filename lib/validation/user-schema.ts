@@ -1,8 +1,9 @@
 import { infer, object, z } from "zod";
 import {
-  dateSchema,
+  birthDateSchema,
   enumSchema,
   imageSchema,
+  phoneNumberSchema,
   regexSchema,
   stringMinMaxSchema,
   stringSchema,
@@ -57,13 +58,6 @@ export const password = stringSchema("Password").superRefine(
   }
 );
 
-const phoneNumberSchema = object({
-  number: stringMinMaxSchema("Phone Number", 8, 25),
-  country: stringMinMaxSchema("Country", 2, 256),
-  nationalNumber: stringMinMaxSchema("Phone Number", 8, 15),
-  countryCallingCode: stringMinMaxSchema("Phone Number", 2, 100),
-});
-
 export const usernameSchema = regexSchema(
   /^[a-zA-Z0-9\.!~_-]{3,100}$/g,
   "Username may not contain non-url-safe chars"
@@ -81,7 +75,7 @@ const signUp = object({
   websiteAddress: stringMinMaxSchema("Website Address", 2, 10_000).optional(),
   image: imageSchema.optional(),
   gender: enumSchema("Gender", ["male", "female"]).optional(),
-  birthday: dateSchema("Birthday", 18, 100).optional(),
+  birthday: birthDateSchema("Birthday", 18, 100).optional(),
   phoneNumber: phoneNumberSchema.optional(),
 });
 export const signUpSchema = signUp.refine(

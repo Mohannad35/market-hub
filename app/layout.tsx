@@ -19,9 +19,9 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
       suppressHydrationWarning
       className={`${inter.variable} ${satisfy.variable} ${fira_code.variable} ${akaya_kanadaka.variable} ${dosis.variable}`}
     >
-      <body className="min-h-svh">
+      <body className="min-h-screen">
         <Providers>
-          <NavBar />
+          <NavBar height="70px" />
           <main className="font-inter">{children}</main>
           <ToastContainer />
         </Providers>

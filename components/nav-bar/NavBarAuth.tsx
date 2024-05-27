@@ -27,20 +27,21 @@ const NavBarAuth = () => {
   if (status === "loading") return <Skeleton className="h-[2.5rem] w-[5rem] rounded-medium" />;
   else if (status === "authenticated")
     return (
-      <div className="w-fit min-w-0">
-        <Dropdown className="w-fit min-w-0 font-inter">
+      <div>
+        <Dropdown className=" font-inter">
           <DropdownTrigger>
-            <Avatar
-              showFallback
-              isBordered
-              size="sm"
-              radius="lg"
-              ImgComponent={Image}
-              imgProps={{ width: 48, height: 48 }}
-              src={session.user?.image || undefined}
-              alt="User avatar image"
-              className="cursor-pointer"
-            />
+            <Button isIconOnly variant="light" radius="full">
+              <Avatar
+                showFallback
+                isBordered
+                size="sm"
+                radius="full"
+                ImgComponent={Image}
+                imgProps={{ width: 48, height: 48 }}
+                src={session.user?.image || undefined}
+                alt="User avatar image"
+              />
+            </Button>
           </DropdownTrigger>
           <DropdownMenu
             hideSelectedIcon

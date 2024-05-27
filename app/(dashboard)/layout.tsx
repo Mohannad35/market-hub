@@ -20,7 +20,7 @@ const DashboardLayout = ({ children }: Readonly<{ children: ReactNode }>) => {
 
   return (
     <Flex width="100%">
-      <ScrollArea className="h-[calc(100vh-81px)] w-[20rem] rounded-none border-r p-3">
+      <ScrollArea className="h-[calc(100vh-70px)] w-[20rem] rounded-none border-r p-3">
         <Listbox variant="flat" selectionMode="single" hideSelectedIcon aria-label="Dashboard">
           {listItems(username).map(({ key, label, href, icon }, i) => (
             <ListboxItem
@@ -80,7 +80,7 @@ const DashboardLayout = ({ children }: Readonly<{ children: ReactNode }>) => {
           ))}
         </Accordion>
       </ScrollArea>
-      <ScrollArea className="h-[calc(100vh-81px)] w-full rounded-none pt-4">{children}</ScrollArea>
+      <ScrollArea className="h-[calc(100vh-70px)] w-full rounded-none pt-4">{children}</ScrollArea>
     </Flex>
   );
 };

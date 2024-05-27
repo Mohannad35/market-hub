@@ -1,17 +1,19 @@
-import { Navbar, NavbarBrand, NavbarContent, NavbarItem } from "@nextui-org/navbar";
+import { Navbar, NavbarBrand, NavbarContent, NavbarItem, NavbarProps } from "@nextui-org/navbar";
 import { Heading } from "@radix-ui/themes";
 import Image from "next/image";
 import Link from "next/link";
 import Search from "../product/Search";
 import NavBarAuth from "./NavBarAuth";
 import { ThemeToggle } from "./ThemeModeToggle";
+import NavCart from "./NavCart";
 
-export default function NavBar() {
+export default function NavBar({ ...props }: NavbarProps) {
   return (
     <Navbar
+      {...props}
       isBordered
       maxWidth="full"
-      className="font-inter"
+      className="border-none font-inter"
       classNames={{
         item: [
           "flex",
@@ -53,10 +55,11 @@ export default function NavBar() {
       </NavbarContent>
 
       {/* Right side of the navbar */}
-      <NavbarContent justify="end">
+      <NavbarContent justify="end" className="gap-2">
         <NavbarItem className="hidden 2xs:flex">
           <NavBarAuth />
         </NavbarItem>
+        <NavCart />
         <ThemeToggle />
       </NavbarContent>
     </Navbar>

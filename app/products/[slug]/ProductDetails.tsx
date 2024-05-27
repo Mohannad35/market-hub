@@ -65,7 +65,7 @@ const ProductDetails = ({ slug }: { slug: string }) => {
               align="start"
               className="max-[767px]:w-full"
             >
-              <AddToCartButton />
+              <AddToCartButton product={data} />
               <BuyNowButton />
             </Flex>
           </Flex>

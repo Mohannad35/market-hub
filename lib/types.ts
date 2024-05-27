@@ -1,9 +1,31 @@
-import { Brand, Category, Product, Rate, User, VerificationToken } from "@prisma/client";
+import {
+  Brand,
+  Cart,
+  CartItem,
+  Category,
+  Product,
+  Rate,
+  User,
+  Token,
+  Coupon,
+} from "@prisma/client";
 
 export type Modify<T, R> = Omit<T, keyof R> & R;
 
+export interface CouponWithUser extends Coupon {
+  user: User;
+}
+
+export interface CartItemWithProduct extends CartItem {
+  product: Product;
+}
+
+export interface CartWithItems extends Cart {
+  cartItems: CartItemWithProduct[];
+}
+
 export interface UserWithToken extends User {
-  verificationToken: VerificationToken;
+  tokens: Token[];
 }
 
 export interface CategoryWithProducts extends Category {

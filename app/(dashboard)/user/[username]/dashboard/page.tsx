@@ -3,7 +3,7 @@ import ProductsChart from "./ProductsChart";
 
 export default function ProductDetailsPage() {
   return (
-    <Flex width="100%">
+    <Flex direction="column" width="100%" gap="2" align="start" justify="start">
       <ProductsChart />
     </Flex>
   );

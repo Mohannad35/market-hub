@@ -18,13 +18,6 @@ type Image {
   secure_url String
 }
 
-type Item {
-  quantity   Int
-  priceAfter Float
-  product    String @db.ObjectId
-}
-
-// Pick<PhoneNumber, "number" | "country" | "nationalNumber" | "countryCallingCode"> | null
 type Phone {
   number             String
   country            String
@@ -42,6 +35,11 @@ enum Role {
 enum CouponType {
   admin
   vendor
+}
+
+enum CartStatus {
+  active
+  ordered
 }
 
 enum Status {
@@ -161,30 +159,26 @@ model Coupon {
   type        CouponType @default(vendor)
   value       Float
   minAmount   Float      @default(0)
-  maxAmount   Float
+  maxAmount   Float?
   startDate   DateTime   @default(now())
   endDate     DateTime
   isActive    Boolean    @default(true)
   cartsId     String[]   @db.ObjectId
-  carts       Cart[]     @relation(fields: [cartsId], references: [id])
   userId      String     @db.ObjectId
   user        User       @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  order       Order[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
 model Cart {
-  id         String     @id @default(auto()) @map("_id") @db.ObjectId
-  userId     String     @unique @db.ObjectId
-  user       User       @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  couponsId  String[]   @db.ObjectId
-  coupons    Coupon[]   @relation(fields: [couponsId], references: [id])
-  bill       Float
-  billBefore Float
-  items      Item[]
-  cartItems  CartItem[]
-  order      Order?
+  id        String     @id @default(auto()) @map("_id") @db.ObjectId
+  userId    String?    @db.ObjectId
+  user      User?      @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  cartItems CartItem[]
+  order     Order?
+  status    CartStatus @default(active)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -195,8 +189,8 @@ model CartItem {
   quantity   Int
   priceAfter Float
   cartId     String  @db.ObjectId
-  productId  String  @db.ObjectId
   cart       Cart    @relation(fields: [cartId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  productId  String  @db.ObjectId
   product    Product @relation(fields: [productId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
   createdAt DateTime @default(now())
@@ -212,7 +206,7 @@ model List {
   userId      String    @db.ObjectId
   user        User      @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   productsId  String[]  @db.ObjectId
-  Products    Product[] @relation(fields: [productsId], references: [id])
+  products    Product[] @relation(fields: [productsId], references: [id])
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -221,17 +215,21 @@ model List {
 }
 
 model Order {
-  id      String @id @default(auto()) @map("_id") @db.ObjectId
-  code    String @unique
-  userId  String @db.ObjectId
-  user    User   @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  cartId  String @unique @db.ObjectId
-  cart    Cart   @relation(fields: [cartId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  address String
-  phone   String
-  email   String
-  status  Status @default(pending)
-  payment String
+  id       String  @id @default(auto()) @map("_id") @db.ObjectId
+  code     String  @unique
+  userId   String  @db.ObjectId
+  user     User    @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  cartId   String  @unique @db.ObjectId
+  cart     Cart    @relation(fields: [cartId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  address  String
+  phone    Phone
+  email    String
+  payment  String
+  bill     Float
+  discount Float   @default(0)
+  status   Status  @default(pending)
+  couponId String? @db.ObjectId
+  coupon   Coupon? @relation(fields: [couponId], references: [id], onDelete: SetNull, onUpdate: Cascade)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

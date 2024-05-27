@@ -13,6 +13,7 @@ import { toast } from "sonner";
 import CardImage from "../common/CardImage";
 import CardName from "../common/CardName";
 import Modal from "../common/Modal";
+import AddToCartButton from "@/app/products/[slug]/AddToCartButton";
 
 interface Props extends CardProps {
   item: Product;
@@ -58,7 +59,7 @@ const ProductCard = ({ item, ...props }: Props) => {
           handleDelete={onOpen}
         />
       </CardBody>
-      <CardFooter className="justify-between p-2 text-small">
+      <CardFooter className="text-small">
         <Flex width="260px" gap="2" direction="column" justify="start" align="start">
           <CardName href={`/products/${slug}`} name={name} />
 
@@ -68,9 +69,7 @@ const ProductCard = ({ item, ...props }: Props) => {
             <Text weight="medium" className="text-muted-foreground">
               {price} EGP
             </Text>
-            <Button color="primary" variant="solid" size="sm" radius="lg">
-              Add to Cart
-            </Button>
+            <AddToCartButton product={item} />
           </Flex>
         </Flex>
       </CardFooter>

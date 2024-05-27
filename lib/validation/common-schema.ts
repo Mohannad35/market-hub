@@ -13,7 +13,7 @@ export const stringMinMaxSchema = (label: string, min: number, max: number) =>
     .max(max, `${label} must contain at most ${max} character(s)`);
 
 export const regexSchema = (regex: RegExp, label: string) =>
-  stringSchema(label).regex(regex, `Invalid ${label || "sortBy"}`);
+  stringSchema(label).regex(regex, `Invalid ${label}`);
 
 export const idSchema = (label?: string) =>
   stringSchema(label || "Id").regex(/^[a-f\d]{24}$/i, `Invalid ${label || "Id"}`);
@@ -39,7 +39,16 @@ export const imageSchema = object({
   secure_url: stringSchema("Secure URL").url("Invalid Secure URL"),
 });
 
-export const dateSchema = (label: string, min: number, max: number) =>
+export const dateSchema = (label: string, min: Date, max: Date) =>
+  coerce
+    .date({
+      required_error: `${label} is required`,
+      invalid_type_error: `${label} must be a date`,
+    })
+    .min(min, `Minimum ${label} is ${min.toDateString()}`)
+    .max(max, `Maximum ${label} is ${max.toDateString()}`);
+
+export const birthDateSchema = (label: string, min: number, max: number) =>
   coerce
     .date({
       required_error: `${label} is required`,
@@ -77,3 +86,10 @@ export const urlSchema = regexSchema(
   /[(http(s)?):\/\/(www\.)?a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/i,
   "URL"
 );
+
+export const phoneNumberSchema = object({
+  number: stringMinMaxSchema("Phone Number", 8, 25),
+  country: stringMinMaxSchema("Country", 2, 256),
+  nationalNumber: stringMinMaxSchema("Phone Number", 8, 15),
+  countryCallingCode: stringMinMaxSchema("Phone Number", 2, 100),
+});
