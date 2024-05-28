@@ -26,7 +26,7 @@ async function GET_handler(request: NextRequest): Promise<NextResponse<User | nu
 
 async function PATCH_handler(request: NextRequest) {
   const { id } = JSON.parse(request.cookies.get("user")!.value!) as User;
-  const user = await prisma.user.findFirst({ where: { id }, include: { verificationToken: true } });
+  const user = await prisma.user.findFirst({ where: { id }, include: { tokens: true } });
   if (!user) throw new ApiError(404, "User not found");
   // Get the body of the request and validate it
   const body = await request.json();
@@ -62,12 +62,19 @@ async function PATCH_handler(request: NextRequest) {
       ...data,
       gender: data.gender ? (data.gender as Gender) : undefined,
       isVerified: data.email ? false : undefined,
-      verificationToken: data.email
-        ? { upsert: { where: { userId: user.id }, create: token, update: token } }
-        : undefined,
+      tokens: {
+        upsert: {
+          where: { userId_type: { userId: user.id, type: "verification" } },
+          create: { ...token, type: "verification" },
+          update: { ...token },
+        },
+      },
     },
-    include: { verificationToken: true },
+    include: { tokens: true },
   });
+  // Find verification token
+  const verificationToken = user.tokens.find(token => token.type === "verification");
+  if (!verificationToken) throw new ApiError(500, "Token not found");
   // Send verification email if the email was changed
   if (data.email) {
     // Send emails if SENDGRID_API_KEY is set
@@ -76,7 +83,7 @@ async function PATCH_handler(request: NextRequest) {
       const verificationEmailHtml = render(
         VerificationTemplate({
           username: updatedUser.name,
-          emailVerificationToken: updatedUser.verificationToken!.token,
+          emailVerificationToken: verificationToken.token,
           baseUrl: request.nextUrl.origin,
         })
       );

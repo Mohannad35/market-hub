@@ -144,7 +144,7 @@ const Checkout = () => {
   };
 
   return (
-    <form action={handleSubmit} className="w-full">
+    <form action={handleSubmit} className="w-full pt-4">
       <Flex width="100%" justify="between" gap="4">
         <Flex width="100%" direction="column">
           <Card radius="none" shadow="none" fullWidth className="gap-2 bg-card p-4">

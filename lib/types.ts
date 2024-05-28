@@ -8,9 +8,16 @@ import {
   User,
   Token,
   Coupon,
+  Order,
 } from "@prisma/client";
 
 export type Modify<T, R> = Omit<T, keyof R> & R;
+
+export interface OrderIncluded extends Order {
+  user: User;
+  cart: CartWithItems;
+  coupon: Coupon;
+}
 
 export interface CouponWithUser extends Coupon {
   user: User;

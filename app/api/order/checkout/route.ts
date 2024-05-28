@@ -8,9 +8,11 @@ import prisma from "@/prisma/client";
 import { Coupon, User } from "@prisma/client";
 import { render } from "@react-email/render";
 import sendgrid from "@sendgrid/mail";
-import { nanoid } from "nanoid";
+import moment from "moment";
+import { customAlphabet } from "nanoid";
 import { ApiError } from "next/dist/server/api-utils";
 import { NextRequest, NextResponse } from "next/server";
+const nanoid = customAlphabet("0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ", 10);
 
 if (!process.env.SENDGRID_API_KEY)
   logger.warn("SENDGRID_API_KEY is missing. Emails will not be sent.");
@@ -46,23 +48,27 @@ async function POST_handler(request: NextRequest) {
     for (const cartItem of cart.cartItems) {
       const itemPrice = cartItem.product.price;
       const isActive =
+        coupon.isActive &&
         new Date(coupon.startDate) < new Date() &&
         new Date(coupon.endDate) > new Date() &&
-        coupon.isActive;
-      if (isActive)
-        if (coupon.type === "admin" || coupon.userId === cartItem.product.vendorId) {
-          const discountValue = coupon.maxAmount
-            ? Math.min(itemPrice * (coupon.value / 100), coupon.maxAmount)
-            : itemPrice * (coupon.value / 100);
-          discount += discountValue * cartItem.quantity;
-        }
+        (coupon.type === "admin" || coupon.userId === cartItem.product.vendorId);
+      if (isActive) {
+        const discountValue = coupon.maxAmount
+          ? Math.min(itemPrice * (coupon.value / 100), coupon.maxAmount)
+          : itemPrice * (coupon.value / 100);
+        discount += discountValue * cartItem.quantity;
+        await prisma.cartItem.update({
+          where: { id: cartItem.id },
+          data: { priceAfter: itemPrice - discountValue },
+        });
+      }
       total += itemPrice * cartItem.quantity;
     }
   }
   // Create the order
   const order = await prisma.order.create({
     data: {
-      code: `#${nanoid(10)}`,
+      code: `#${parseInt(moment().format("X"), 10).toString(16).toUpperCase()}-${nanoid(8).toUpperCase()}`,
       address,
       email,
       payment,

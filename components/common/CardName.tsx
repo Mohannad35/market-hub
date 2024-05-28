@@ -1,14 +1,19 @@
 "use client";
 
 import { Link, Tooltip } from "@nextui-org/react";
-import { Text } from "@radix-ui/themes";
+import { Text, type TextProps } from "@radix-ui/themes";
 import NextLink from "next/link";
 
-const CardName = ({ href, name }: { href: string; name: string }) => {
+type CardNameProps = TextProps & {
+  href: string;
+  name: string;
+};
+
+const CardName = ({ href, name, ...props }: CardNameProps) => {
   return (
     <Link href={href} as={NextLink} color="foreground">
       <Tooltip content={name} radius="sm" delay={1000}>
-        <Text size="5" weight="medium" className="line-clamp-2 text-start">
+        <Text size="4" weight="medium" className="line-clamp-2 text-start" {...props}>
           {name}
         </Text>
       </Tooltip>

@@ -14,14 +14,12 @@ async function GET_handler(request: NextRequest) {
   const session = await auth();
   if (session?.user?.email) {
     const user = await prisma.user.findUnique({ where: { email: session.user.email } });
-    console.log("🚀 ~ file: route.ts:17 ~ GET_handler ~ user:", user);
     if (!user || !user.activeCartId) return NextResponse.json(null);
     // Get the cart
     const cart = await prisma.cart.findUnique({
       where: { id: user.activeCartId },
       include: { cartItems: { include: { product: true } } },
     });
-    console.log("🚀 ~ file: route.ts:23 ~ GET_handler ~ cart:", cart);
     return NextResponse.json(cart);
   } else if (query.cartId) {
     const cart = await prisma.cart.findUnique({

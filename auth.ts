@@ -1,19 +1,15 @@
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import { compare } from "bcryptjs";
-import { pick } from "lodash";
 import { nanoid } from "nanoid";
-import NextAuth, { DefaultSession, User } from "next-auth";
+import NextAuth, { DefaultSession } from "next-auth";
+import { JWT } from "next-auth/jwt";
 import { Provider } from "next-auth/providers";
 import Credentials from "next-auth/providers/credentials";
 import Github from "next-auth/providers/github";
 import Google from "next-auth/providers/google";
-import { IconType } from "react-icons";
-import { FaGithub, FaGoogle } from "react-icons/fa";
 import slugify from "slugify";
 import { idSchema } from "./lib/validation/common-schema";
 import prisma from "./prisma/client";
-import { Modify } from "./lib/types";
-import { JWT } from "next-auth/jwt";
 
 if (!process.env.NEXT_PUBLIC_AUTH_GOOGLE_ID) {
   throw new Error("NEXT_PUBLIC_AUTH_GOOGLE_ID is not set");
@@ -72,7 +68,11 @@ const providers: Provider[] = [
       const passwordMatch = await compare(password, user.password);
       if (!passwordMatch) return null;
       return {
-        ...pick(user, ["id", "name", "email", "role", "username"]),
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        username: user.username,
         image: user.image?.secure_url || user.avatar,
       };
     },

@@ -39,7 +39,7 @@ const CouponDetails = ({ code }: { code: string }) => {
   if (!isSuccess || !coupon) return <Text size="6">Coupon not found</Text>;
 
   return (
-    <Table hideHeader aria-label="Example static collection table" className="font-fira_code">
+    <Table hideHeader aria-label="" className="font-fira_code">
       <TableHeader>
         <TableColumn>PROPERTY</TableColumn>
         <TableColumn>VALUE</TableColumn>

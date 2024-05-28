@@ -79,7 +79,7 @@ const ProductRates = ({ slug }: { slug: string }) => {
                   <Text>Reviewed in Egypt on {new Date(rate.createdAt).toDateString()}</Text>
                 }
                 avatarProps={{
-                  src: rate.user.image || undefined,
+                  src: rate.user.image?.secure_url || undefined,
                   showFallback: true,
                   fallback: <AvatarIcon />,
                   size: "sm",
