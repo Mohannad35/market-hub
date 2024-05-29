@@ -5,43 +5,6 @@ import "winston-daily-rotate-file";
 
 const { combine, timestamp, printf, errors, splat, json, colorize, simple, metadata } = format;
 
-const dailyInfoLogger = new transports.DailyRotateFile({
-  level: "info",
-  dirname: "logs/info",
-  filename: "info-%DATE%.log",
-  zippedArchive: true,
-  maxSize: "20m",
-  maxFiles: "10",
-  frequency: "7d",
-});
-dailyInfoLogger.on("rotate", (oldFilename, newFilename) => {
-  // do something fun
-  console.log("info logger rotated", oldFilename, newFilename);
-});
-dailyInfoLogger.on("archive", zipFilename => {
-  // do something fun
-  console.log("info logger archived", zipFilename);
-});
-const dailyErrorLogger = new transports.DailyRotateFile({
-  level: "error",
-  dirname: "logs/error",
-  filename: "error-%DATE%.log",
-  zippedArchive: true,
-  maxSize: "20m",
-  maxFiles: "10",
-  frequency: "7d",
-  handleExceptions: true,
-  handleRejections: true,
-});
-dailyErrorLogger.on("rotate", (oldFilename, newFilename) => {
-  // do something fun
-  console.log("error logger rotated", oldFilename, newFilename);
-});
-dailyErrorLogger.on("archive", zipFilename => {
-  // do something fun
-  console.log("error logger archived", zipFilename);
-});
-
 /**
  * This logger is used to send logs to the local file system.
  * Safe to use in production.
@@ -61,7 +24,6 @@ const logger = createLogger({
       },
     })
   ),
-  transports: [dailyInfoLogger, dailyErrorLogger],
 });
 
 // If we have a Logtail source token, then add a Logtail transport

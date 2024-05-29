@@ -3,36 +3,11 @@ import { withSentryConfig } from "@sentry/nextjs";
 const nextConfig = {
   images: {
     remotePatterns: [
-      {
-        protocol: "https",
-        hostname: "lh3.googleusercontent.com",
-        port: "",
-        pathname: "/**",
-      },
-      {
-        protocol: "https",
-        hostname: "avatars.githubusercontent.com",
-        port: "",
-        pathname: "/**",
-      },
-      {
-        protocol: "https",
-        hostname: "res.cloudinary.com",
-        port: "",
-        pathname: "/**",
-      },
-      {
-        protocol: "https",
-        hostname: "picsum.photos",
-        port: "",
-        pathname: "/**",
-      },
-      {
-        protocol: "https",
-        hostname: "source.unsplash.com",
-        port: "",
-        pathname: "/**",
-      },
+      { protocol: "https", port: "", pathname: "/**", hostname: "lh3.googleusercontent.com" },
+      { protocol: "https", port: "", pathname: "/**", hostname: "avatars.githubusercontent.com" },
+      { protocol: "https", port: "", pathname: "/**", hostname: "res.cloudinary.com" },
+      { protocol: "https", port: "", pathname: "/**", hostname: "picsum.photos" },
+      { protocol: "https", port: "", pathname: "/**", hostname: "source.unsplash.com" },
     ],
   },
 };

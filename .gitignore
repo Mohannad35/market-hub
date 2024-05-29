@@ -80,4 +80,7 @@ sketch
 # Sentry Config File
 .env.sentry-build-plugin
 
+# Million Lint
+.million
+
 # End of https://www.toptal.com/developers/gitignore/api/visualstudiocode,nextjs,react

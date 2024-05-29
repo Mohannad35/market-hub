@@ -1,29 +1,26 @@
 "use client";
 
+import DropdownColumns from "@/components/data-table/dropdown-columns";
+import SelectRowsPerPage from "@/components/data-table/select-rows-per-page";
+import { OrderIncluded } from "@/lib/types";
 import { Input } from "@nextui-org/input";
 import { Selection } from "@nextui-org/table";
 import { Box, Flex, Text } from "@radix-ui/themes";
 import { Search } from "lucide-react";
 import { ChangeEvent, Dispatch, SetStateAction } from "react";
-import ControlButtons from "./control-buttons";
-import { Coupon } from "@prisma/client";
-import DropdownColumns from "@/components/data-table/dropdown-columns";
-import SelectRowsPerPage from "@/components/data-table/select-rows-per-page";
-import { columns } from "./data";
+import ControlButtons from "./order-table-control-buttons";
+import { columns } from "./order-table-data";
 
 const TopContent = (props: TopContentProps) => {
   const {
-    coupons,
-    status,
+    orders,
     filterValue,
     rowsPerPage,
     visibleColumns,
     isLoadingRefresh,
-    isLoadingNew,
     setFilterValue,
     onSearchChange,
     onClickRefresh,
-    onPressNew,
     onRowsPerPageChange,
     setVisibleColumns,
   } = props;
@@ -58,13 +55,7 @@ const TopContent = (props: TopContentProps) => {
 
         <Flex direction={{ initial: "column", sm: "row" }} gap={"12px"}>
           <Flex direction={{ initial: "column", xs: "row" }} gap={"12px"}>
-            <ControlButtons
-              isLoadingNew={isLoadingNew}
-              isLoadingRefresh={isLoadingRefresh}
-              onClickRefresh={onClickRefresh}
-              onPressNew={onPressNew}
-              status={status}
-            />
+            <ControlButtons isLoadingRefresh={isLoadingRefresh} onClickRefresh={onClickRefresh} />
           </Flex>
 
           <Flex direction={{ initial: "column", xs: "row" }} gap={"12px"} justify={"end"}>
@@ -80,7 +71,7 @@ const TopContent = (props: TopContentProps) => {
       <Flex justify="between" align="center">
         <Box>
           <Text size="2" className="text-muted-foreground">
-            {"Found " + coupons.length + " of " + coupons.length + " issues"}
+            {"Found " + orders.length + " of " + orders.length + " issues"}
           </Text>
         </Box>
         <SelectRowsPerPage onRowsPerPageChange={onRowsPerPageChange} rowsPerPage={rowsPerPage} />
@@ -92,17 +83,14 @@ const TopContent = (props: TopContentProps) => {
 export default TopContent;
 
 interface TopContentProps {
-  coupons: Coupon[];
-  status: "authenticated" | "loading" | "unauthenticated";
+  orders: OrderIncluded[];
   filterValue: string | undefined;
   rowsPerPage: number;
   visibleColumns: Selection;
   isLoadingRefresh: boolean;
-  isLoadingNew: boolean;
   setFilterValue: Dispatch<SetStateAction<string | undefined>>;
   onSearchChange: (value?: string) => void;
   onClickRefresh: () => Promise<void>;
-  onPressNew: () => void;
   onRowsPerPageChange: (e: ChangeEvent<HTMLSelectElement>) => void;
   setVisibleColumns: Dispatch<SetStateAction<Selection>>;
 }

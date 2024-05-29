@@ -6,9 +6,8 @@ import { Selection } from "@nextui-org/table";
 import { capitalize } from "lodash";
 import { ChevronDownIcon } from "lucide-react";
 import { Dispatch, SetStateAction } from "react";
-import { columns } from "./data";
 
-const DropdownColumns = ({ visibleColumns, setVisibleColumns }: DropdownColumnsProps) => {
+const DropdownColumns = ({ visibleColumns, setVisibleColumns, columns }: DropdownColumnsProps) => {
   return (
     <Dropdown>
       <DropdownTrigger className="hidden sm:flex">
@@ -46,4 +45,5 @@ export default DropdownColumns;
 interface DropdownColumnsProps {
   visibleColumns: Selection;
   setVisibleColumns: Dispatch<SetStateAction<Selection>>;
+  columns: { name: string; value: string; sortable: boolean; align: string }[];
 }

@@ -70,6 +70,7 @@ export const columns = [
   {
     name: "",
     value: "actions",
+    sortable: false,
     align: "end",
   },
 ];

@@ -16,13 +16,22 @@ import { Skeleton } from "@nextui-org/skeleton";
 import { Text } from "@radix-ui/themes";
 import { signIn, signOut, useSession } from "next-auth/react";
 import Image from "next/image";
-import { useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import Modal from "../common/Modal";
 
 const NavBarAuth = () => {
   const { status, data: session } = useSession();
   const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure({});
   const [loading, setLoading] = useState(false);
+
+  const onSignOut = useCallback(async () => {
+    setLoading(true);
+    await signOut({ callbackUrl: "/" });
+    onClose();
+    setLoading(false);
+  }, [onClose]);
+
+  const signOutIcon = useMemo(() => <Iconify icon="uim:signout" fontSize={24} />, []);
 
   if (status === "loading") return <Skeleton className="h-[2.5rem] w-[5rem] rounded-medium" />;
   else if (status === "authenticated")
@@ -71,7 +80,7 @@ const NavBarAuth = () => {
             <DropdownItem
               key="signout"
               color="danger"
-              startContent={<Iconify icon="uim:signout" fontSize={24} />}
+              startContent={signOutIcon}
               onPress={() => onOpen()}
             >
               Sign out
@@ -82,16 +91,11 @@ const NavBarAuth = () => {
           title="Sign out"
           content="Are you sure you want to sign out?"
           action="Sign out"
-          onAction={async () => {
-            setLoading(true);
-            await signOut({ callbackUrl: "/" });
-            onClose();
-            setLoading(false);
-          }}
+          onAction={onSignOut}
           isOpen={isOpen}
           onOpenChange={onOpenChange}
           isLoading={loading}
-          startContent={<Iconify icon="uim:signout" fontSize={24} />}
+          startContent={signOutIcon}
         />
       </div>
     );
