@@ -1,4 +1,4 @@
-import { QueryKey } from "@tanstack/react-code";
+import { QueryKey } from "@tanstack/react-query";
 import { processResponse } from "./process";
 
 export async function getUserOrders({ queryKey }: { queryKey: QueryKey }) {
