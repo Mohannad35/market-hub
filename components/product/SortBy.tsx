@@ -5,10 +5,17 @@ import { Select, SelectItem } from "@nextui-org/select";
 import { Selection } from "@nextui-org/table";
 import { ArrowUpDownIcon } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
+import { useMemo } from "react";
 
 const SortBy = ({ sortOpts }: { sortOpts: { label: string; value: string }[] }) => {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const sort = useMemo(() => {
+    [(searchParams.get("sortBy") || "createdAt") + (searchParams.get("direction") || "-desc")];
+    const sortBy = searchParams.get("sortBy") || "createdAt";
+    const direction = searchParams.get("direction") || "desc";
+    return [`${sortBy}-${direction}`];
+  }, [searchParams]);
 
   const onSelectionChange = (keys: Selection) => {
     if (keys === "all") return;
@@ -26,7 +33,7 @@ const SortBy = ({ sortOpts }: { sortOpts: { label: string; value: string }[] }) 
         ],
         query
       );
-    router.push(`${query ? "?" + query.toString() : ""}`);
+    router.replace("?".concat(query.toString()));
   };
 
   return (
@@ -34,10 +41,8 @@ const SortBy = ({ sortOpts }: { sortOpts: { label: string; value: string }[] }) 
       title="Sort by"
       aria-label="Sort by"
       variant="bordered"
-      defaultSelectedKeys={[
-        (searchParams.get("sortBy") || "createdAt") + (searchParams.get("direction") || "-desc"),
-      ]}
-      className="max-w-xs"
+      defaultSelectedKeys={sort}
+      className="h-min max-w-[200px]"
       startContent={<ArrowUpDownIcon />}
       disallowEmptySelection
       onSelectionChange={onSelectionChange}

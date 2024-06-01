@@ -2,8 +2,9 @@ import { QueryKey } from "@tanstack/react-query";
 import { processResponse } from "./process";
 
 export async function getRate({ queryKey }: { queryKey: QueryKey }) {
-  const [_key, productId] = queryKey;
-  const res = await fetch(`/api/rate?productId=${productId}`);
+  const [_key, productId, productSlug] = queryKey;
+  const query = productSlug ? `productSlug=${productSlug}` : `productId=${productId}`;
+  const res = await fetch(`/api/rate?${query}`);
   return processResponse(res);
 }
 

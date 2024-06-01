@@ -49,6 +49,7 @@ const CategoryCard = ({ item, ...props }: Props) => {
       <CardBody className="p-0">
         <CardImage
           src={image?.secure_url}
+          height="16rem"
           href={`/products?${new URLSearchParams({ category: item.path })}`}
           edit={`/admin/categories/edit/${encodeURI(path.slice(1).replace(/\//g, "-"))}`}
           name={name}

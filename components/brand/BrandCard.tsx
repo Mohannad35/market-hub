@@ -45,6 +45,7 @@ const BrandCard = ({ item, ...props }: Props) => {
       <CardBody className="p-0">
         <CardImage
           src={image?.secure_url}
+          height="16rem"
           href={`/products?brands=${item.slug}`}
           edit={`/admin/brands/edit/${slug}`}
           name={name}

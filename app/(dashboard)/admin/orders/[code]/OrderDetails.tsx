@@ -8,6 +8,7 @@ import { OrderIncluded } from "@/lib/types";
 import { Card, CardBody, Divider } from "@nextui-org/react";
 import { Flex, Text } from "@radix-ui/themes";
 import { useQuery } from "@tanstack/react-query";
+import { capitalize } from "lodash";
 import { notFound } from "next/navigation";
 
 const OrderDetails = ({ code }: { code: string }) => {
@@ -26,20 +27,20 @@ const OrderDetails = ({ code }: { code: string }) => {
   const { cart, address, bill, coupon, discount, email, payment, phone, status } = data;
   return (
     <Card key={code}>
-      <CardBody className="gap-4">
+      <CardBody className="gap-4 p-4">
         <Flex width="100%" justify="between">
           <Text size="6" weight="medium">
-            {code}
+            #{code}
           </Text>
           <Text size="5" weight="medium">
-            {status}
+            {capitalize(status)}
           </Text>
         </Flex>
         <Flex width="100%" justify="between">
-          <Text size="3" weight="medium">
+          <Text size="4" weight="medium">
             Contact: {email}
           </Text>
-          <Text size="3" weight="medium">
+          <Text size="4" weight="medium">
             {phone.number}
           </Text>
         </Flex>
@@ -52,20 +53,25 @@ const OrderDetails = ({ code }: { code: string }) => {
           Payment: {payment === "cod" ? "Cash on delivery" : "Card"}
         </Text>
         <Flex width="100%" justify="between">
-          <Text size="3" weight="medium">
-            Bill: {bill}
+          <Text size="4" weight="medium">
+            Bill: <span className="font-fira_code">{bill} EGP</span>
           </Text>
-          <Text size="3" weight="medium">
-            {discount > 0 ? `Discount: ${discount} (-${coupon.value}%)` : ""}
+          <Text size="4" weight="medium">
+            {discount > 0 && "Discount: "}
+            {discount > 0 && (
+              <span className="font-fira_code">
+                {discount} (-{coupon.value}%)
+              </span>
+            )}
           </Text>
         </Flex>
 
+        <Divider />
         <Text size="4" weight="medium">
-          Your Order
+          Order
         </Text>
         {cart.cartItems.map(({ id, product, quantity, priceAfter }) => (
           <Flex key={id} width="100%" gap="4" direction="column">
-            <Divider />
             <Flex width="100%" gap="2">
               <Flex width="16rem">
                 <CardImage

@@ -32,7 +32,7 @@ export const OrderPlacedTemplate = ({ username, name, baseUrl, order, items }: P
   <Html>
     <Head />
     <Preview>
-      {"Market Hub"} Order {order.code} Placed.
+      {"Market Hub"} Order #{order.code} Placed.
     </Preview>
     <Tailwind>
       <Body className="bg-[#f6f9fc] p-4">
@@ -47,7 +47,7 @@ export const OrderPlacedTemplate = ({ username, name, baseUrl, order, items }: P
               className="mx-auto mb-[1rem] mt-0"
             />
             <Text style={text} className="mt-0 text-center text-3xl font-bold">
-              Order {order.code} Placed.
+              Order #{order.code} Placed.
             </Text>
           </Section>
 
@@ -100,7 +100,7 @@ export const OrderPlacedTemplate = ({ username, name, baseUrl, order, items }: P
                 <Column style={{ width: "170px" }}>
                   <Text style={text}>Order Code</Text>
                   <Text style={text} className="font-semibold">
-                    {order.code}
+                    #{order.code}
                   </Text>
                 </Column>
                 <Column>

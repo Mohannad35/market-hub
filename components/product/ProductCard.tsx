@@ -49,7 +49,7 @@ const ProductCard = ({ item, ...props }: Props) => {
   };
 
   return (
-    <Card radius="none" shadow="none" className="max-h-[30rem] w-[16rem] bg-card" {...props}>
+    <Card radius="none" shadow="none" className="w-[16rem] bg-card" {...props}>
       <CardBody className="p-0">
         <CardImage
           src={image[0].secure_url}
@@ -61,9 +61,9 @@ const ProductCard = ({ item, ...props }: Props) => {
       </CardBody>
       <CardFooter className="text-small">
         <Flex width="260px" gap="2" direction="column" justify="start" align="start">
-          <CardName href={`/products/${slug}`} name={name} />
+          <CardName href={`/products/${slug}`} name={name} size="3" />
 
-          <Rating rating={rating} ratingCount={ratingCount} />
+          <Rating readOnly size="small" defaultValue={rating} ratingCount={ratingCount} />
 
           <Flex width="100%" direction="row" justify="between" align="center">
             <Text weight="medium" className="text-muted-foreground">

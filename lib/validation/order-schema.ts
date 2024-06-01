@@ -16,7 +16,7 @@ export const orderQuerySchema = object({
     .nullish()
     .transform(value => (value === "" ? undefined : value === null ? undefined : value)),
   sortBy: regexSchema(
-    /^(code|value|name|description|endDate|startDate|minAmount|maxAmount|createdAt)$/,
+    /^(code|user|address|phone|email|payment|bill|discount|status|coupon|createdAt)$/,
     "Sort By"
   ).default("createdAt"),
   direction: regexSchema(/^(asc|desc|ascending|descending)$/g, "Direction")

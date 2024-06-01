@@ -9,6 +9,19 @@ import {
   stringSchema,
 } from "./common-schema";
 
+export const usersQuerySchema = object({
+  search: stringSchema("Search")
+    .nullish()
+    .transform(value => (value === "" ? undefined : value === null ? undefined : value)),
+  sortBy: regexSchema(
+    /^(user|verified|role|username|gender|phone|birthday|address|businessAddress|websiteAddress|banned|createdAt)$/,
+    "Sort By"
+  ).default("createdAt"),
+  direction: regexSchema(/^(asc|desc|ascending|descending)$/g, "Direction")
+    .default("desc")
+    .transform(value => value.replace(/ending$/, "")),
+}).strict();
+
 export const password = stringSchema("Password").superRefine(
   (password: string, checkPassComplexity) => {
     const isUppercase = (ch: string) => /[A-Z]/.test(ch);

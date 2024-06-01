@@ -3,7 +3,7 @@ import { wrapperMiddleware } from "@/lib/middleware/wrapper";
 import { formatErrors, getQueryObject } from "@/lib/utils";
 import { productRatesQuerySchema } from "@/lib/validation/product-schema";
 import prisma from "@/prisma/client";
-import { User } from "@prisma/client";
+import { Product, User } from "@prisma/client";
 import { ApiError } from "next/dist/server/api-utils";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -12,10 +12,14 @@ const GET_handler = async (request: NextRequest) => {
   const query = getQueryObject(request.nextUrl.searchParams);
   const { success, data, error } = productRatesQuerySchema.safeParse(query);
   if (!success) throw new ApiError(400, formatErrors(error).message);
-  const { productId } = data;
+  const { productId, productSlug } = data;
+  const product = productId
+    ? await prisma.product.findUnique({ where: { id: productId } })
+    : await prisma.product.findUnique({ where: { slug: productSlug } });
+  if (!product) throw new ApiError(404, "Product not found");
   // Get the rating for the product
-  const rate = await prisma.rate.findFirst({
-    where: { productId, userId: user.id },
+  const rate = await prisma.rate.findUnique({
+    where: { productId_userId: { productId: product.id, userId: user.id } },
     include: { user: true },
   });
   return NextResponse.json(rate);

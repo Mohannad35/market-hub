@@ -1,7 +1,6 @@
-import CardContainer from "@/components/common/CardContainer";
-import BrandSelect from "@/components/product/BrandSelect";
+import BrandPopover from "@/components/product/BrandPopover";
 import CategorySelect from "@/components/product/CategorySelect";
-import ProductCard from "@/components/product/ProductCard";
+import ProductContainer from "@/components/product/ProductContainer";
 import Search from "@/components/product/Search";
 import SortBy from "@/components/product/SortBy";
 import { Flex } from "@radix-ui/themes";
@@ -20,20 +19,10 @@ const sortOpts = [
 const DashboardProductsPage = () => {
   return (
     <Flex direction="column" width="100%" gapY="4" className="container">
-      <Search queryName="q" api="" />
-      <Flex direction="row" width="100%" justify="between" align="start" gapX="4">
-        <SortBy sortOpts={sortOpts} />
-        <CategorySelect uniqueKey="dashboardCategories" />
-        <BrandSelect uniqueKey="dashboardBrands" />
-      </Flex>
+      <Search queryName="q" />
 
       <Flex width="100%" direction="column" gap="5" justify="start">
-        <CardContainer
-          label="products"
-          api="/api/products"
-          uniqueKey="dashboardProducts"
-          Card={ProductCard}
-        />
+        <ProductContainer api="/api/products" uniqueKey={["dashboardProducts"]} />
       </Flex>
     </Flex>
   );

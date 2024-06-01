@@ -25,13 +25,13 @@ const CardImage = ({ src, href, edit, name, handleDelete, width, height }: Props
   const className = `h-[${height || "16rem"}] w-[${width || "16rem"}]`;
 
   return (
-    <Card radius="none" shadow="none" className={cn("border-none bg-transparent", className)}>
+    <Card radius="none" shadow="none" className={cn("border-none bg-transparent")}>
       <CardBody
         as={NextLink}
         href={href}
         className="items-center justify-center overflow-x-clip overflow-y-visible p-0"
       >
-        <Flex width={width || "16rem"} height={height || "16rem"} justify="center" align="center">
+        <Flex width={width || "100%"} height={height || "100%"} justify="center" align="center">
           <Image
             isZoomed
             removeWrapper

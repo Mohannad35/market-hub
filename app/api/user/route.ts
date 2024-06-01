@@ -101,5 +101,9 @@ async function PATCH_handler(request: NextRequest) {
   return NextResponse.json(updatedUser);
 }
 
+// Delete User
+
+// Ban User
+
 export const GET = wrapperMiddleware(authMiddleware, GET_handler);
 export const PATCH = wrapperMiddleware(authMiddleware, PATCH_handler);

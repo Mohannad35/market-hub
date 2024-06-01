@@ -29,20 +29,24 @@ const CategorySelect = ({ uniqueKey, ...props }: CategorySelectProps) => {
     let query = new URLSearchParams(searchParams.toString());
     if (!category || category === "") query = deleteQueryString(["category"], query);
     else query = createQueryString([{ name: "category", value: category.toString() }], query);
-    router.push(`${query ? "?" + query.toString() : ""}`);
+    router.replace("?".concat(query.toString()));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [category]);
 
-  if (categoriesQuery.isLoading) return <Skeleton className="h-12 max-w-xs rounded-xl" />;
+  if (categoriesQuery.isLoading) return <Skeleton className="h-12 max-w-[200px] rounded-xl" />;
   else if (categoriesQuery.error) return <p>Error: {categoriesQuery.error?.message}</p>;
   else if (!categoriesQuery.isSuccess || !categoriesQuery.data) return <p>No data found</p>;
   return (
     <Autocomplete
-      label="Category"
+      aria-label="Category"
       variant="bordered"
       defaultItems={categoriesQuery.data.items}
-      placeholder="Filter with..."
-      className="max-w-xs"
+      placeholder="Category"
+      classNames={{
+        base: "max-w-[200px]",
+        popoverContent: "w-[320px]",
+        listboxWrapper: "w-[320px]",
+      }}
       selectedKey={category}
       onSelectionChange={setCategory}
       {...props}

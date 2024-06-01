@@ -7,7 +7,7 @@ import { SearchIcon } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
 
-type SearchProps = Modify<InputProps, { api: string; queryName: string }>;
+type SearchProps = Modify<InputProps, { api?: string; queryName: string }>;
 const Search = ({ api, queryName, ...props }: SearchProps) => {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -17,7 +17,8 @@ const Search = ({ api, queryName, ...props }: SearchProps) => {
     let query = new URLSearchParams(searchParams.toString());
     if (search === "") query = deleteQueryString([queryName], query);
     else query = createQueryString([{ name: queryName, value: search }], query);
-    router.push(`${api}${query ? "?" + query.toString() : ""}`);
+    if (typeof api === "string") router.push(api + "?".concat(query.toString()));
+    else router.replace("?".concat(query.toString()));
   };
 
   return (

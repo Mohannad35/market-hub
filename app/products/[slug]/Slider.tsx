@@ -34,7 +34,7 @@ export function Slider({ items }: { items: { public_id: string; secure_url: stri
   }, [emblaMainApi, onSelect]);
 
   return (
-    <Flex direction="row" gap="0.5rem" minWidth="600px">
+    <Flex direction="row" gap="0.5rem">
       <Carousel
         setApi={setEmblaThumbsApi}
         opts={{ align: "start", containScroll: "keepSnaps", dragFree: true }}
@@ -64,7 +64,7 @@ export function Slider({ items }: { items: { public_id: string; secure_url: stri
       </Carousel>
 
       <Flex direction={"column"} gap="1rem">
-        <Carousel setApi={setEmblaMainApi} className="w-full max-w-md">
+        <Carousel setApi={setEmblaMainApi} className="w-full">
           <CarouselContent>
             {items.map((item, index) => (
               <CarouselItem key={index}>
@@ -74,7 +74,7 @@ export function Slider({ items }: { items: { public_id: string; secure_url: stri
                   height={720}
                   shadow="none"
                   radius="none"
-                  className="max-h-[30rem] object-contain"
+                  className="object-contain"
                   src={item.secure_url}
                   alt=""
                 />

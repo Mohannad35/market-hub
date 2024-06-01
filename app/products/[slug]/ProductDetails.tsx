@@ -33,11 +33,13 @@ const ProductDetails = ({ slug }: { slug: string }) => {
       <CategoriesBreadcrumbs path={path} />
 
       <Flex width="100%" direction={{ initial: "column", lg: "row" }} gap="1rem">
-        <Slider items={image} />
+        <Flex direction="column" width={{ initial: "100%", lg: "50%" }}>
+          <Slider items={image} />
+        </Flex>
 
-        <Flex direction="column" gap="1rem" width="100%">
+        <Flex direction="column" gap="1rem" width={{ initial: "100%", lg: "50%" }}>
           <Heading>{name}</Heading>
-          <Rating rating={rating} ratingCount={ratingCount} />
+          <Rating readOnly defaultValue={rating} ratingCount={ratingCount} />
 
           <Flex align="start" className="text-muted-foreground">
             <Text size="2">EGP</Text>

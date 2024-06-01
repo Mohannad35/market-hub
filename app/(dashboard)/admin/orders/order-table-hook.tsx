@@ -142,7 +142,7 @@ const DataTableHook = (
             <Flex>
               <Link href={`/admin/orders/${order.code}`} color="primary" underline="hover">
                 <Text truncate weight="medium" wrap="nowrap" className="max-w-[300px]">
-                  {code}
+                  #{code}
                 </Text>
               </Link>
             </Flex>
@@ -361,7 +361,7 @@ const DataTableHook = (
 
   const handleSortChange = (descriptor: SortDescriptor) => {
     const { column, direction } = descriptor;
-    const valid = orderQuerySchema.safeParse({ column, direction });
+    const valid = orderQuerySchema.safeParse({ sortBy: column, direction });
     if (!valid.success) return;
     if (column && direction) {
       const params = new URLSearchParams(searchParams.toString());

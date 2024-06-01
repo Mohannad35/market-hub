@@ -68,7 +68,7 @@ async function POST_handler(request: NextRequest) {
   // Create the order
   const order = await prisma.order.create({
     data: {
-      code: `#${parseInt(moment().format("X"), 10).toString(16).toUpperCase()}-${nanoid(8).toUpperCase()}`,
+      code: `${parseInt(moment().format("X"), 10).toString(16).toUpperCase()}-${nanoid(8).toUpperCase()}`,
       address,
       email,
       payment,
