@@ -5,16 +5,15 @@ import { Selection } from "@nextui-org/table";
 import { Box, Flex, Text } from "@radix-ui/themes";
 import { Search } from "lucide-react";
 import { ChangeEvent, Dispatch, SetStateAction } from "react";
-import ControlButtons from "./control-buttons";
+import ControlButtons from "./coupon-table-control-buttons";
 import { Coupon } from "@prisma/client";
 import DropdownColumns from "@/components/data-table/dropdown-columns";
 import SelectRowsPerPage from "@/components/data-table/select-rows-per-page";
-import { columns } from "./data";
+import { columns } from "./coupon-table-data";
 
 const TopContent = (props: TopContentProps) => {
   const {
     coupons,
-    status,
     filterValue,
     rowsPerPage,
     visibleColumns,
@@ -63,7 +62,6 @@ const TopContent = (props: TopContentProps) => {
               isLoadingRefresh={isLoadingRefresh}
               onClickRefresh={onClickRefresh}
               onPressNew={onPressNew}
-              status={status}
             />
           </Flex>
 
@@ -93,7 +91,6 @@ export default TopContent;
 
 interface TopContentProps {
   coupons: Coupon[];
-  status: "authenticated" | "loading" | "unauthenticated";
   filterValue: string | undefined;
   rowsPerPage: number;
   visibleColumns: Selection;

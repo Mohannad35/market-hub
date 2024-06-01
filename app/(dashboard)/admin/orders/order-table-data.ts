@@ -1,4 +1,7 @@
+import { Colors } from "@/lib/types";
 import { Status } from "@prisma/client";
+
+export const INITIAL_VISIBLE_COLUMNS = ["code", "user", "bill", "status", "actions"];
 
 export const columns = [
   { name: "CODE", value: "code", sortable: true, align: "start" },
@@ -15,16 +18,15 @@ export const columns = [
   { name: "", value: "actions", sortable: false, align: "end" },
 ];
 
-export interface TypeOption {
-  value: Status;
+export interface StatusOption {
   icon: string;
-  color: "primary" | "secondary" | "success" | "danger" | "default" | "warning";
+  color: Colors;
 }
 
-export const statusOptions: TypeOption[] = [
-  { value: "pending", icon: "eos-icons:admin", color: "secondary" },
-  { value: "processing", icon: "wpf:administrator", color: "danger" },
-  { value: "shipped", icon: "wpf:administrator", color: "danger" },
-  { value: "delivered", icon: "wpf:administrator", color: "danger" },
-  { value: "canceled", icon: "wpf:administrator", color: "danger" },
-];
+export const statusOptions: { [key in Status]: StatusOption } = {
+  pending: { icon: "solar:clock-circle-bold-duotone", color: "primary" },
+  processing: { icon: "streamline:production-belt-solid", color: "secondary" },
+  shipped: { icon: "flat-color-icons:shipped", color: "success" },
+  delivered: { icon: "hugeicons:package-delivered", color: "success" },
+  canceled: { icon: "pajamas:canceled-circle", color: "danger" },
+};

@@ -5,7 +5,7 @@ import { Text } from "@radix-ui/themes";
 import { PlusCircleIcon, RefreshCw } from "lucide-react";
 
 const ControlButtons = (props: ControlButtonsProps) => {
-  const { status, isLoadingRefresh, isLoadingNew, onClickRefresh, onPressNew } = props;
+  const { isLoadingRefresh, isLoadingNew, onClickRefresh, onPressNew } = props;
 
   return (
     <>
@@ -22,21 +22,17 @@ const ControlButtons = (props: ControlButtonsProps) => {
         <Text className="sr-only">Refresh table data</Text>
       </Button>
 
-      {status === "authenticated" && (
-        <>
-          <Button
-            color="default"
-            variant="ghost"
-            startContent={<PlusCircleIcon size={20} />}
-            isLoading={isLoadingNew}
-            onPress={onPressNew}
-            className="max-w-40"
-            size="md"
-          >
-            New Coupon
-          </Button>
-        </>
-      )}
+      <Button
+        color="default"
+        variant="ghost"
+        startContent={<PlusCircleIcon size={20} />}
+        isLoading={isLoadingNew}
+        onPress={onPressNew}
+        className="max-w-40"
+        size="md"
+      >
+        New Coupon
+      </Button>
     </>
   );
 };
@@ -44,7 +40,6 @@ const ControlButtons = (props: ControlButtonsProps) => {
 export default ControlButtons;
 
 interface ControlButtonsProps {
-  status: "authenticated" | "loading" | "unauthenticated";
   isLoadingRefresh: boolean;
   isLoadingNew: boolean;
   onClickRefresh: () => Promise<void>;

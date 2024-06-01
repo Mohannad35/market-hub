@@ -1,4 +1,14 @@
+import { Colors } from "@/lib/types";
 import { Role } from "@prisma/client";
+
+export const INITIAL_VISIBLE_COLUMNS = [
+  "user",
+  "role",
+  "username",
+  "verified",
+  "createdAt",
+  "actions",
+];
 
 export const columns = [
   { name: "USER", value: "user", sortable: true, align: "start" },
@@ -18,7 +28,7 @@ export const columns = [
 
 export interface RoleOption {
   icon: string;
-  color: "primary" | "secondary" | "success" | "danger" | "default" | "warning";
+  color: Colors;
 }
 
 export const roleOptions: { [key in Role]: RoleOption } = {

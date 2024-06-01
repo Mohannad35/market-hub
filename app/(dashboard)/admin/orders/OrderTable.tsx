@@ -57,7 +57,21 @@ export default function OrderTable() {
         bottomContentPlacement="outside"
         topContentPlacement="outside"
         checkboxesProps={{ color: "primary" }}
-        classNames={{ wrapper: "max-h-[640px] max-w-[calc(100vw-20rem)]" }}
+        classNames={{
+          wrapper:
+            "!max-h-[640px] !max-w-[calc(100vw-20rem)] bg-transparent p-0 rounded-none border-none shadow-none",
+          loadingWrapper: "backdrop-blur-sm bg-background/30 z-10",
+          th: ["bg-transparent", "text-default-500", "border-b", "border-divider"],
+          thead: ["[&>tr]:first:rounded-none [&>tr]:first:shadow-none"],
+          td: [
+            // changing the rows border radius
+            "group-data-[first=true]:first:before:rounded-none",
+            "group-data-[first=true]:last:before:rounded-none",
+            "group-data-[middle=true]:before:rounded-none",
+            "group-data-[last=true]:first:before:rounded-none",
+            "group-data-[last=true]:last:before:rounded-none",
+          ],
+        }}
         aria-label="Order Table"
         selectedKeys={selectedKeys}
         sortDescriptor={sortDescriptor}
@@ -106,16 +120,14 @@ export default function OrderTable() {
           loadingContent={loadingContent}
           emptyContent={"No orders found"}
         >
-          {item => {
-            return (
-              <TableRow key={item.id}>
-                {columnKey => {
-                  const { content, textValue } = renderCell(item, columnKey);
-                  return <TableCell textValue={textValue}>{content}</TableCell>;
-                }}
-              </TableRow>
-            );
-          }}
+          {item => (
+            <TableRow key={item.id}>
+              {columnKey => {
+                const { content, textValue } = renderCell(item, columnKey);
+                return <TableCell textValue={textValue}>{content}</TableCell>;
+              }}
+            </TableRow>
+          )}
         </TableBody>
       </Table>
 
@@ -140,12 +152,11 @@ export default function OrderTable() {
 }
 
 const useOrders = (searchParams: ReadonlyURLSearchParams) => {
-  const search = new URLSearchParams(searchParams);
-  search.set("admin", "true");
-  const query = search.toString();
+  const query = new URLSearchParams(searchParams);
+  query.set("admin", "true");
   return useQuery<OrderIncluded[]>({
     queryKey: ["orders"],
-    queryFn: () => fetch(`/api/order${query ? `?${query}` : ""}`).then(res => res.json()),
+    queryFn: () => fetch("/api/order?".concat(query.toString())).then(res => res.json()),
     staleTime: 1000 * 60, // 1 minute
     retry: 3,
   });

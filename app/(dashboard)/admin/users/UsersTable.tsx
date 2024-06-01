@@ -59,8 +59,6 @@ export default function UsersTable() {
   return (
     <>
       <Table
-        // isCompact
-        // removeWrapper
         isHeaderSticky
         showSelectionCheckboxes
         selectionMode="multiple"
@@ -75,12 +73,9 @@ export default function UsersTable() {
           thead: ["[&>tr]:first:rounded-none [&>tr]:first:shadow-none"],
           td: [
             // changing the rows border radius
-            // first
             "group-data-[first=true]:first:before:rounded-none",
             "group-data-[first=true]:last:before:rounded-none",
-            // middle
             "group-data-[middle=true]:before:rounded-none",
-            // last
             "group-data-[last=true]:first:before:rounded-none",
             "group-data-[last=true]:last:before:rounded-none",
           ],
@@ -195,10 +190,9 @@ export default function UsersTable() {
 }
 
 const useUsers = (searchParams: ReadonlyURLSearchParams) => {
-  const query = searchParams.toString();
   return useQuery<User[]>({
     queryKey: ["users"],
-    queryFn: () => fetch(`/api/users${query ? `?${query}` : ""}`).then(res => res.json()),
+    queryFn: () => fetch("/api/users?".concat(searchParams.toString())).then(res => res.json()),
     staleTime: 1000 * 60, // 1 minute
     retry: 3,
   });

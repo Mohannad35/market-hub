@@ -1,6 +1,6 @@
 "use client";
 
-import { Skeleton } from "@/components/ui/skeleton";
+import LoadingIndicator from "@/components/common/LoadingIndicator";
 import { useMutationHook } from "@/hook/use-tanstack-hooks";
 import { usersQuerySchema } from "@/lib/validation/user-schema";
 import { Icon as Iconify } from "@iconify/react";
@@ -9,15 +9,15 @@ import {
   Dropdown,
   DropdownItem,
   DropdownMenu,
-  DropdownTrigger,
   DropdownSection,
+  DropdownTrigger,
 } from "@nextui-org/dropdown";
-import { Chip, cn, Link, User as NextUser } from "@nextui-org/react";
+import { Chip, Link, User as NextUser } from "@nextui-org/react";
 import { AvatarIcon } from "@nextui-org/shared-icons";
 import { Selection, SortDescriptor } from "@nextui-org/table";
 import { useDisclosure } from "@nextui-org/use-disclosure";
 import { User } from "@prisma/client";
-import { Flex, Text } from "@radix-ui/themes";
+import { Text } from "@radix-ui/themes";
 import { QueryObserverResult, RefetchOptions } from "@tanstack/react-query";
 import { capitalize } from "lodash";
 import moment from "moment";
@@ -25,11 +25,7 @@ import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
 import { ChangeEvent, Key, useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
-import { columns, roleOptions } from "./users-table-data";
-import LoadingIndicator from "@/components/common/LoadingIndicator";
-
-const INITIAL_VISIBLE_COLUMNS = ["user", "role", "username", "verified", "createdAt", "actions"];
-type Color = "danger" | "default" | "success" | "primary" | "secondary" | "warning" | undefined;
+import { columns, INITIAL_VISIBLE_COLUMNS, roleOptions } from "./users-table-data";
 
 const DataTableHook = (
   refetch: (options?: RefetchOptions) => Promise<QueryObserverResult<User[], Error>>
@@ -222,7 +218,7 @@ const DataTableHook = (
       case "birthday":
         return {
           content: (
-            <Text weight="medium" wrap="nowrap">
+            <Text weight="medium" wrap="nowrap" className="font-fira_code">
               {birthday ? <span>{moment(birthday).format("MMM, DD YYYY")}</span> : "N/A"}
             </Text>
           ),
@@ -300,7 +296,6 @@ const DataTableHook = (
           content: (
             <div className="flex justify-end">
               <Dropdown
-                showArrow
                 classNames={{
                   base: "before:bg-default-200", // change arrow background
                   content:

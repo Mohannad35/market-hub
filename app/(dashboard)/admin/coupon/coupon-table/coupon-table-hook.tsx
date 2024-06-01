@@ -1,37 +1,39 @@
 "use client";
 
-import { Skeleton } from "@/components/ui/skeleton";
+import LoadingIndicator from "@/components/common/LoadingIndicator";
+import { useMutationHook } from "@/hook/use-tanstack-hooks";
 import { CouponWithUser } from "@/lib/types";
 import { couponQuerySchema } from "@/lib/validation/coupon-schema";
+import { Icon as Iconify } from "@iconify/react";
 import { Button } from "@nextui-org/button";
-import { Dropdown, DropdownItem, DropdownMenu, DropdownTrigger } from "@nextui-org/dropdown";
+import {
+  Dropdown,
+  DropdownItem,
+  DropdownMenu,
+  DropdownSection,
+  DropdownTrigger,
+} from "@nextui-org/dropdown";
 import { Link } from "@nextui-org/link";
-import { User } from "@nextui-org/react";
+import { Chip, User } from "@nextui-org/react";
+import { AvatarIcon } from "@nextui-org/shared-icons";
 import { Selection, SortDescriptor } from "@nextui-org/table";
 import { useDisclosure } from "@nextui-org/use-disclosure";
 import { Coupon } from "@prisma/client";
-import { Flex, Text } from "@radix-ui/themes";
+import { Text } from "@radix-ui/themes";
 import { QueryObserverResult, RefetchOptions } from "@tanstack/react-query";
-import { capitalize, difference } from "lodash";
-import { useSession } from "next-auth/react";
-import { useTheme } from "next-themes";
-import { useRouter, useSearchParams } from "next/navigation";
-import { ChangeEvent, Key, useCallback, useEffect, useRef, useState } from "react";
-import { HiDotsHorizontal } from "react-icons/hi";
-import { columns } from "./data";
-import { useMutationHook } from "@/hook/use-tanstack-hooks";
-import { toast } from "sonner";
+import { capitalize } from "lodash";
 import moment from "moment";
-
-const INITIAL_VISIBLE_COLUMNS = ["code", "value", "startDate", "endDate", "type", "actions"];
+import Image from "next/image";
+import { useRouter, useSearchParams } from "next/navigation";
+import { ChangeEvent, Key, useCallback, useEffect, useState } from "react";
+import { toast } from "sonner";
+import { columns, INITIAL_VISIBLE_COLUMNS, typeOptions } from "./coupon-table-data";
 
 const DataTableHook = (
   refetch: (options?: RefetchOptions) => Promise<QueryObserverResult<Coupon[], Error>>
 ) => {
   const router = useRouter();
-  const { status } = useSession();
   const searchParams = useSearchParams();
-  const { theme, systemTheme } = useTheme();
   const [coupon, setCoupon] = useState<Coupon | undefined>(undefined);
   const [selectedKeys, setSelectedKeys] = useState<Selection>(new Set([]));
   const [isLoadingNew, setIsLoadingNew] = useState(false);
@@ -58,17 +60,6 @@ const DataTableHook = (
       direction: ["asc", "ascending"].includes(direction!) ? "ascending" : "descending",
     };
   });
-  const [actions, setActions] = useState(() => {
-    if (status === "authenticated") {
-      return [
-        { key: "view", label: "View" },
-        { key: "edit", label: "Edit" },
-        { key: "delete", label: "Delete" },
-      ];
-    }
-    return [{ key: "view", label: "View" }];
-  });
-  // const toastId = useRef<Id | null>(null);
   const {
     isOpen: isOpenDelete,
     onOpen: onOpenDelete,
@@ -90,16 +81,6 @@ const DataTableHook = (
   useEffect(() => {
     onClickRefresh();
   }, [onClickRefresh, searchParams]);
-
-  useEffect(() => {
-    if (status === "authenticated")
-      setActions([
-        { key: "view", label: "View" },
-        { key: "edit", label: "Edit" },
-        { key: "delete", label: "Delete" },
-      ]);
-    else setActions([{ key: "view", label: "View" }]);
-  }, [status]);
 
   const onAction = (key: Key, coupon: Coupon) => {
     switch (key) {
@@ -140,105 +121,100 @@ const DataTableHook = (
       case "code":
         return {
           content: (
-            <Flex>
-              <Link href={`/coupon/${coupon.code}`} color="primary" underline="hover">
-                <Text truncate weight="medium" wrap="nowrap" className="max-w-[300px]">
-                  {code}
-                </Text>
-              </Link>
-            </Flex>
+            <Link href={`/coupon/${coupon.code}`} color="primary" underline="hover">
+              <Text truncate weight="medium" wrap="nowrap" className="max-w-[300px]">
+                {code}
+              </Text>
+            </Link>
           ),
           textValue: String(code),
         };
       case "value":
         return {
           content: (
-            <Flex>
-              <Text weight="medium" wrap="nowrap">
-                {value.toString()}
-              </Text>
-            </Flex>
+            <Text weight="medium" wrap="nowrap" className="font-fira_code">
+              {value.toString()}
+            </Text>
           ),
           textValue: String(value),
         };
       case "type":
         return {
           content: (
-            <Flex>
-              <Text weight="medium" wrap="nowrap">
+            <Text weight="medium" wrap="nowrap">
+              <Chip
+                variant="flat"
+                color={typeOptions[type].color}
+                className="font-fira_code font-medium"
+                startContent={<Iconify icon={typeOptions[type].icon} fontSize={22} />}
+              >
                 {capitalize(type)}
-              </Text>
-            </Flex>
+              </Chip>
+            </Text>
           ),
-          textValue: String(value),
+          textValue: String(capitalize(type)),
         };
       case "user":
         return {
           content: (
-            <Flex>
-              <User
-                name={user.name}
-                // className="flex-nowrap whitespace-nowrap text-nowrap"
-                avatarProps={{
-                  radius: "full",
-                  size: "sm",
-                  src: user.image?.secure_url || user.avatar || undefined,
-                }}
-                classNames={{ name: "flex-nowrap text-nowrap whitespace-nowrap" }}
-                description={capitalize(user.role)}
-              />
-            </Flex>
+            <User
+              name={user.name}
+              avatarProps={{
+                size: "sm",
+                radius: "full",
+                showFallback: true,
+                fallback: <AvatarIcon fontSize={24} />,
+                ImgComponent: Image,
+                imgProps: { width: 48, height: 48 },
+                alt: `${user.name} avatar image`,
+                src: user.image?.secure_url || user.avatar || undefined,
+              }}
+              classNames={{ name: "flex-nowrap text-nowrap whitespace-nowrap" }}
+              description={capitalize(user.role)}
+            />
           ),
-          textValue: String(value),
+          textValue: String(user.name),
         };
       case "minAmount":
         return {
           content: (
-            <Flex>
-              <Text weight="medium" wrap="nowrap">
-                {minAmount.toString()}
-              </Text>
-            </Flex>
+            <Text weight="medium" wrap="nowrap" className="font-fira_code">
+              {minAmount.toString()}
+            </Text>
           ),
           textValue: String(minAmount),
         };
       case "maxAmount":
         return {
           content: (
-            <Flex>
-              <Text weight="medium" wrap="nowrap">
-                {maxAmount ? maxAmount.toString() : "N/A"}
-              </Text>
-            </Flex>
+            <Text weight="medium" wrap="nowrap" className="font-fira_code">
+              {maxAmount ? maxAmount.toString() : "N/A"}
+            </Text>
           ),
           textValue: String(maxAmount),
         };
       case "name":
         return {
           content: (
-            <Flex>
-              <Text truncate wrap="nowrap" className="max-w-[300px]">
-                {name ? name : "N/A"}
-              </Text>
-            </Flex>
+            <Text truncate wrap="nowrap" className="max-w-[300px]">
+              {name ? name : "N/A"}
+            </Text>
           ),
           textValue: String(name),
         };
       case "description":
         return {
           content: (
-            <Flex>
-              <Text truncate wrap="nowrap" className="max-w-[400px]">
-                {description ? description : "N/A"}
-              </Text>
-            </Flex>
+            <Text truncate wrap="nowrap" className="max-w-[400px]">
+              {description ? description : "N/A"}
+            </Text>
           ),
           textValue: String(description),
         };
       case "startDate":
         return {
           content: (
-            <Text weight="medium" wrap="nowrap">
+            <Text weight="medium" wrap="nowrap" className="font-fira_code">
               <span>{moment(startDate).format("MMM, DD YYYY")}</span>
             </Text>
           ),
@@ -247,7 +223,7 @@ const DataTableHook = (
       case "endDate":
         return {
           content: (
-            <Text weight="medium" wrap="nowrap">
+            <Text weight="medium" wrap="nowrap" className="font-fira_code">
               <span>{moment(endDate).format("MMM, DD YYYY")}</span>
             </Text>
           ),
@@ -256,7 +232,7 @@ const DataTableHook = (
       case "createdAt":
         return {
           content: (
-            <Text weight="medium" wrap="nowrap">
+            <Text weight="medium" wrap="nowrap" className="font-fira_code">
               <span>{moment(createdAt).format("MMM, DD YYYY")}</span>
             </Text>
           ),
@@ -266,22 +242,53 @@ const DataTableHook = (
         return {
           content: (
             <div className="flex justify-end">
-              <Dropdown className="">
+              <Dropdown
+                classNames={{
+                  base: "before:bg-default-200", // change arrow background
+                  content:
+                    "p-1 border border-default-200 bg-gradient-to-br from-white to-default-200 dark:from-default-50 dark:to-black font-fira_code",
+                }}
+              >
                 <DropdownTrigger>
                   <Button isIconOnly radius="full" size="sm" variant="light">
-                    <HiDotsHorizontal size={20} className="text-muted-foreground" />
+                    <Iconify icon="solar:menu-dots-bold-duotone" fontSize={22} />
                   </Button>
                 </DropdownTrigger>
-                <DropdownMenu items={actions} onAction={key => onAction(key, coupon)}>
-                  {({ key, label }) => (
+                <DropdownMenu onAction={key => onAction(key, coupon)} variant="faded">
+                  <DropdownSection title="Actions" classNames={{ heading: "text-base" }}>
                     <DropdownItem
-                      key={key}
-                      color={key === "delete" ? "danger" : "default"}
-                      className={key === "delete" ? "text-danger" : ""}
+                      key="view"
+                      color="default"
+                      description="View the coupon"
+                      startContent={<Iconify icon="mdi:coupon" fontSize={32} />}
+                      classNames={{ title: "text-base font-medium", description: "font-medium" }}
                     >
-                      {label}
+                      View
                     </DropdownItem>
-                  )}
+                    <DropdownItem
+                      key="edit"
+                      color="default"
+                      description="Edit the coupon"
+                      startContent={
+                        <Iconify icon="solar:pen-new-square-bold-duotone" fontSize={32} />
+                      }
+                      classNames={{ title: "text-base font-medium", description: "font-medium" }}
+                    >
+                      Edit
+                    </DropdownItem>
+                    <DropdownItem
+                      key="delete"
+                      color="danger"
+                      description="Permanently delete the order"
+                      startContent={
+                        <Iconify icon="solar:trash-bin-trash-bold-duotone" fontSize={32} />
+                      }
+                      classNames={{ title: "text-base font-medium", description: "font-medium" }}
+                      className="text-danger"
+                    >
+                      Delete
+                    </DropdownItem>
+                  </DropdownSection>
                 </DropdownMenu>
               </Dropdown>
             </div>
@@ -323,25 +330,7 @@ const DataTableHook = (
       ? columns
       : columns.filter(column => Array.from(visibleColumns).includes(column.value));
 
-  const loadingContent = (
-    <Flex direction={"column"} width={"100%"} height={"100%"}>
-      <Flex
-        direction={"column"}
-        width={"100%"}
-        justify={"between"}
-        mt={"65px"}
-        px={"20px"}
-        pt={"10px"}
-        pb={"20px"}
-        gap={"28px"}
-        className="z-10 bg-neutral-900"
-      >
-        {[...new Array(rowsPerPage)].map((_, index) => (
-          <Skeleton key={index} className="h-[20px] w-full rounded-lg" />
-        ))}
-      </Flex>
-    </Flex>
-  );
+  const loadingContent = <LoadingIndicator />;
 
   const handleDelete = async () => {
     if (!coupon) return;
@@ -382,7 +371,6 @@ const DataTableHook = (
   return {
     page,
     coupon,
-    status,
     filterValue,
     sortDescriptor,
     rowsPerPage,

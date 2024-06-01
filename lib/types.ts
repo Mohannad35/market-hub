@@ -11,6 +11,15 @@ import {
   Order,
 } from "@prisma/client";
 
+export type Colors =
+  | "danger"
+  | "default"
+  | "success"
+  | "primary"
+  | "secondary"
+  | "warning"
+  | undefined;
+
 export type Modify<T, R> = Omit<T, keyof R> & R;
 
 export interface OrderIncluded extends Order {
