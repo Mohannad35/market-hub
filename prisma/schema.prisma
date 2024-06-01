@@ -58,6 +58,7 @@ model User {
   tokens          Token[]
   role            Role      @default(user)
   isBanned        Boolean   @default(false)
+  banReason       String?
   isVerified      Boolean   @default(false)
   gender          Gender?
   accounts        Account[]
@@ -66,6 +67,7 @@ model User {
   coupons         Coupon[]
   activeCartId    String?   @db.ObjectId
   carts           Cart[]
+  wishlist        String?   @db.ObjectId
   lists           List[]
   orders          Order[]
   rates           Rate[]

@@ -85,9 +85,7 @@ const CartDetails = () => {
                 <CardImage
                   src={product.image[0].secure_url}
                   href={`/products/${product.slug}`}
-                  edit={`/admin/products/edit/${product.slug}`}
                   name={product.name}
-                  handleDelete={() => {}}
                 />
               </Flex>
               <Flex width="100%" direction="column" justify="between">

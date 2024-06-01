@@ -1,14 +1,13 @@
 "use client";
 
-import CardContainer from "@/components/common/CardContainer";
 import LoadingIndicator from "@/components/common/LoadingIndicator";
-import ProductCard from "@/components/product/ProductCard";
 import { useQueryHook } from "@/hook/use-tanstack-hooks";
 import { Product } from "@prisma/client";
 import { Flex, Text } from "@radix-ui/themes";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useMemo } from "react";
 import AppliedFilters from "./AppliedFilters";
+import ProductCardContainer from "./ProductCardContainer";
 import ProductFilter from "./ProductFilter";
 
 const ProductContainer = ({ api, uniqueKey }: { api: string; uniqueKey: string[] }) => {
@@ -40,7 +39,14 @@ const ProductContainer = ({ api, uniqueKey }: { api: string; uniqueKey: string[]
       {searchParams.size > 0 && <AppliedFilters />}
 
       <Flex width="100%" direction="column" justify="start" align="start">
-        <CardContainer label="products" items={data.items} count={data.count} Card={ProductCard} />
+        <ProductCardContainer
+          label="products"
+          items={data.items}
+          count={data.count}
+          showDelete={true}
+          showEdit={true}
+          showFav={true}
+        />
       </Flex>
     </Flex>
   );

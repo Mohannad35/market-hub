@@ -9,6 +9,7 @@ import {
   Token,
   Coupon,
   Order,
+  List,
 } from "@prisma/client";
 
 export type Colors =
@@ -34,6 +35,10 @@ export interface CouponWithUser extends Coupon {
 
 export interface CartItemWithProduct extends CartItem {
   product: Product;
+}
+
+export interface ListWithProducts extends List {
+  products: Product[];
 }
 
 export interface CartWithItems extends Cart {

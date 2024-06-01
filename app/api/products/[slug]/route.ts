@@ -1,5 +1,5 @@
 import cloudinary from "@/lib/cloudinary";
-import { allowedMiddleware } from "@/lib/middleware/permissions";
+import { allowedMiddleware, isAllowed } from "@/lib/middleware/permissions";
 import { wrapperMiddleware } from "@/lib/middleware/wrapper";
 import { ProductWithBrandAndCategory, ProductWithBrandAndCategoryAndRates } from "@/lib/types";
 import { formatErrors, getQueryObject } from "@/lib/utils";
@@ -56,7 +56,8 @@ const PATCH_handler = async (
   const product = await prisma.product.findUnique({ where: { slug } });
   if (!product) throw new ApiError(404, "Product not found");
   // Check if the user is the vendor of the product or an admin
-  if (!user.isAdmin && !(product.vendorId === user.id)) throw new ApiError(403, "Unauthorized");
+  if (!isAllowed("admin", user) && !(product.vendorId === user.id))
+    throw new ApiError(403, "Unauthorized");
   // Get the body of the request and validate it
   const body = await request.json();
   const { success, data, error } = editProductSchema.safeParse(body);
@@ -85,7 +86,8 @@ const DELETE_handler = async (
   const product = await prisma.product.findUnique({ where: { slug } });
   if (!product) throw new ApiError(404, "Product not found");
   // Check if the user is the vendor of the product or an admin
-  if (!user.isAdmin && !(product.vendorId === user.id)) throw new ApiError(403, "Unauthorized");
+  if (!isAllowed("admin", user) && !(product.vendorId === user.id))
+    throw new ApiError(403, "Unauthorized");
   for (const { public_id } of product.image) {
     const { result } = await cloudinary.uploader.destroy(public_id, { invalidate: true });
     logger.info("Deleting image with publicId:", public_id, result);
@@ -96,11 +98,5 @@ const DELETE_handler = async (
 };
 
 export const GET = wrapperMiddleware(GET_handler);
-export const PATCH = wrapperMiddleware(
-  allowedMiddleware({ isAdmin: true, isVendor: true }),
-  PATCH_handler
-);
-export const DELETE = wrapperMiddleware(
-  allowedMiddleware({ isAdmin: true, isVendor: true }),
-  DELETE_handler
-);
+export const PATCH = wrapperMiddleware(allowedMiddleware("vendor"), PATCH_handler);
+export const DELETE = wrapperMiddleware(allowedMiddleware("vendor"), DELETE_handler);

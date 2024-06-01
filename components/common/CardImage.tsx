@@ -1,5 +1,6 @@
 "use client";
 
+import { Icon as Iconify } from "@iconify/react/dist/iconify.js";
 import { Button } from "@nextui-org/button";
 import { Card, CardBody, CardFooter } from "@nextui-org/card";
 import { Image } from "@nextui-org/image";
@@ -14,14 +15,31 @@ import NextLink from "next/link";
 interface Props {
   src?: string | null;
   href: string;
-  edit: string;
+  edit?: string;
   name: string;
   width?: string;
   height?: string;
-  handleDelete: () => void;
+  showEdit?: boolean;
+  showDelete?: boolean;
+  showFav?: boolean;
+  isFav?: boolean;
+  handleDelete?: () => void;
+  handleFav?: () => void;
 }
-const CardImage = ({ src, href, edit, name, handleDelete, width, height }: Props) => {
-  const { data, status } = useSession();
+const CardImage = ({
+  src,
+  href,
+  edit,
+  name,
+  handleDelete,
+  width,
+  height,
+  showDelete,
+  showEdit,
+  showFav,
+  isFav,
+  handleFav,
+}: Props) => {
   const className = `h-[${height || "16rem"}] w-[${width || "16rem"}]`;
 
   return (
@@ -51,31 +69,46 @@ const CardImage = ({ src, href, edit, name, handleDelete, width, height }: Props
           />
         </Flex>
       </CardBody>
-      {status === "authenticated" && data.user.role === "admin" && (
-        <>
-          <Button
-            isIconOnly
-            variant="faded"
-            size="sm"
-            radius="lg"
-            className="absolute bottom-1 left-1 z-50"
-            as={NextLink}
-            href={edit}
-          >
-            <EditIcon size={20} />
-          </Button>
-          <Button
-            isIconOnly
-            variant="faded"
-            color="danger"
-            size="sm"
-            className="absolute bottom-1 right-1 z-50"
-            radius="lg"
-            onPress={() => handleDelete()}
-          >
-            <Trash2Icon size={20} />
-          </Button>
-        </>
+
+      {showFav && (
+        <Button
+          isIconOnly
+          variant="faded"
+          size="sm"
+          radius="full"
+          className="absolute right-1 top-1 z-50"
+          onPress={() => handleFav && handleFav()}
+        >
+          <Iconify icon="solar:star-bold" color={isFav ? "#f5a524" : ""} fontSize={20} />
+        </Button>
+      )}
+
+      {showEdit && (
+        <Button
+          isIconOnly
+          variant="faded"
+          size="sm"
+          radius="lg"
+          className="absolute bottom-1 left-1 z-50"
+          as={NextLink}
+          href={edit}
+        >
+          <EditIcon size={20} />
+        </Button>
+      )}
+
+      {showDelete && (
+        <Button
+          isIconOnly
+          variant="faded"
+          color="danger"
+          size="sm"
+          className="absolute bottom-1 right-1 z-50"
+          radius="lg"
+          onPress={() => handleDelete && handleDelete()}
+        >
+          <Trash2Icon size={20} />
+        </Button>
       )}
     </Card>
   );

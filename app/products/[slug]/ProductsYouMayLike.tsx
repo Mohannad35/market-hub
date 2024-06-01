@@ -37,7 +37,7 @@ const ProductsYouMayLike = ({ slug }: { slug: string }) => {
       </Text>
       <Flex width="100%" direction="row" gap="3" justify="start" align="start">
         {products.map((product, index) => (
-          <ProductCard key={index} item={product} />
+          <ProductCard key={index} item={product} showDelete={false} showEdit={false} showFav />
         ))}
       </Flex>
     </>

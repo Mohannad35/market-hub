@@ -101,5 +101,5 @@ const DELETE_handler = async (
 };
 
 export const GET = wrapperMiddleware(GET_handler);
-export const PATCH = wrapperMiddleware(allowedMiddleware({ isAdmin: true }), PATCH_handler);
-export const DELETE = wrapperMiddleware(allowedMiddleware({ isAdmin: true }), DELETE_handler);
+export const PATCH = wrapperMiddleware(allowedMiddleware("admin"), PATCH_handler);
+export const DELETE = wrapperMiddleware(allowedMiddleware("admin"), DELETE_handler);

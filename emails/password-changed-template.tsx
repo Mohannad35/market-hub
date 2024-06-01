@@ -18,10 +18,7 @@ interface Props {
   username: string;
   baseUrl: string;
 }
-// const regular = "text-justify text-base font-sans text-black";
-// const muted = "text-justify text-base text-[#666666]";
-// const mutedSm = "text-justify text-[12px] leading-[22px] text-[#666666]";
-// Define the PasswordChangedTemplate component that takes the defined properties
+
 const PasswordChangedTemplate = ({ username, baseUrl }: Props) => (
   <Html>
     <Head />

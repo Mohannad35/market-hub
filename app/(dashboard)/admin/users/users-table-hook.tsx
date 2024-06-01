@@ -2,7 +2,12 @@
 
 import LoadingIndicator from "@/components/common/LoadingIndicator";
 import { useMutationHook } from "@/hook/use-tanstack-hooks";
-import { usersQuerySchema } from "@/lib/validation/user-schema";
+import {
+  BanUserFormValues,
+  DeleteUserFormValues,
+  UnBanUserFormValues,
+  usersQuerySchema,
+} from "@/lib/validation/user-schema";
 import { Icon as Iconify } from "@iconify/react";
 import { Button } from "@nextui-org/button";
 import {
@@ -34,6 +39,7 @@ const DataTableHook = (
   const searchParams = useSearchParams();
   const [delUser, setDelUser] = useState<User | undefined>(undefined);
   const [banUser, setBanUser] = useState<User | undefined>(undefined);
+  const [unBanUser, setUnBanUser] = useState<User | undefined>(undefined);
   const [selectedKeys, setSelectedKeys] = useState<Selection>(new Set([]));
   const [isLoadingRefresh, setIsLoadingRefresh] = useState(false);
   const [visibleColumns, setVisibleColumns] = useState<Selection>(new Set(INITIAL_VISIBLE_COLUMNS));
@@ -70,15 +76,26 @@ const DataTableHook = (
     onOpenChange: onOpenChangeBan,
     onClose: onCloseBan,
   } = useDisclosure();
-  const delUserMutation = useMutationHook<User, { username: string }>(
+  const {
+    isOpen: isOpenUnBan,
+    onOpen: onOpenUnBan,
+    onOpenChange: onOpenChangeUnBan,
+    onClose: onCloseUnBan,
+  } = useDisclosure();
+  const delUserMutation = useMutationHook<User, DeleteUserFormValues>(
     `/api/user`,
     ["delUser"],
     "DELETE"
   );
-  const banUserMutation = useMutationHook<User, { username: string; reason: string }>(
+  const banUserMutation = useMutationHook<User, BanUserFormValues>(
     `/api/user/ban`,
     ["banUser"],
     "DELETE"
+  );
+  const unBanUserMutation = useMutationHook<User, UnBanUserFormValues>(
+    `/api/user/ban`,
+    ["banUser"],
+    "POST"
   );
 
   const onClickRefresh = useCallback(async () => {
@@ -96,6 +113,10 @@ const DataTableHook = (
       case "ban":
         setBanUser(user);
         onOpenBan();
+        break;
+      case "unBan":
+        setUnBanUser(user);
+        onOpenUnBan();
         break;
       case "delete":
         setDelUser(user);
@@ -309,16 +330,33 @@ const DataTableHook = (
                 </DropdownTrigger>
                 <DropdownMenu onAction={key => onAction(key, user)} variant="faded">
                   <DropdownSection title="Actions" classNames={{ heading: "text-base" }}>
-                    <DropdownItem
-                      key="ban"
-                      color="danger"
-                      description="Ban the user"
-                      startContent={<Iconify icon="solar:user-block-bold-duotone" fontSize={32} />}
-                      classNames={{ title: "text-base font-medium", description: "font-medium" }}
-                      className="text-danger"
-                    >
-                      Ban
-                    </DropdownItem>
+                    {user.isBanned ? (
+                      <DropdownItem
+                        key="unBan"
+                        color="danger"
+                        description="Un ban the user"
+                        startContent={
+                          <Iconify icon="solar:user-check-bold-duotone" fontSize={32} />
+                        }
+                        classNames={{ title: "text-base font-medium", description: "font-medium" }}
+                        className="text-danger"
+                      >
+                        Un Ban
+                      </DropdownItem>
+                    ) : (
+                      <DropdownItem
+                        key="ban"
+                        color="danger"
+                        description="Ban the user"
+                        startContent={
+                          <Iconify icon="solar:user-block-bold-duotone" fontSize={32} />
+                        }
+                        classNames={{ title: "text-base font-medium", description: "font-medium" }}
+                        className="text-danger"
+                      >
+                        Ban
+                      </DropdownItem>
+                    )}
                     <DropdownItem
                       key="delete"
                       color="danger"
@@ -368,11 +406,14 @@ const DataTableHook = (
 
   const loadingContent = <LoadingIndicator />;
 
-  const handleDelete = async () => {
+  const handleDelete = async (reason: string, uponRequest: boolean) => {
     if (!delUser) return;
     onCloseDelete();
     const promise = new Promise<User>(async (resolve, reject) =>
-      delUserMutation.mutateAsync({ username: delUser.username }).then(resolve).catch(reject)
+      delUserMutation
+        .mutateAsync({ username: delUser.username, reason, uponRequest })
+        .then(resolve)
+        .catch(reject)
     );
     toast.promise(promise, {
       loading: "Deleting user...",
@@ -407,6 +448,24 @@ const DataTableHook = (
     });
   };
 
+  const handleUnBan = async () => {
+    if (!unBanUser) return;
+    onCloseUnBan();
+    const promise = new Promise<User>(async (resolve, reject) =>
+      unBanUserMutation.mutateAsync({ username: unBanUser.username }).then(resolve).catch(reject)
+    );
+    toast.promise(promise, {
+      loading: "Unbanning user...",
+      success(data) {
+        setTimeout(() => window.location.reload(), 3000);
+        return `${data.username} has been unbanned`;
+      },
+      error(error) {
+        return error.message || error || "An unexpected error occurred";
+      },
+    });
+  };
+
   const handleSortChange = (descriptor: SortDescriptor) => {
     const { column, direction } = descriptor;
     const valid = usersQuerySchema.safeParse({ sortBy: column, direction });
@@ -429,6 +488,7 @@ const DataTableHook = (
     page,
     delUser,
     banUser,
+    unBanUser,
     filterValue,
     sortDescriptor,
     rowsPerPage,
@@ -439,6 +499,10 @@ const DataTableHook = (
     isLoadingRefresh,
     isOpenBan,
     isOpenDelete,
+    isOpenUnBan,
+    onOpenUnBan,
+    onOpenChangeUnBan,
+    onCloseUnBan,
     setFilterValue,
     onSearchChange,
     onClickRefresh,
@@ -447,6 +511,7 @@ const DataTableHook = (
     onCloseBan,
     onCloseDelete,
     handleBan,
+    handleUnBan,
     handleDelete,
     setSelectedKeys,
     setPage,

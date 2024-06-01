@@ -1,21 +1,34 @@
-import { User } from "@prisma/client";
+import { Role, User } from "@prisma/client";
 import { ApiError } from "next/dist/server/api-utils";
 import { NextRequest, NextResponse } from "next/server";
 import { authMiddleware } from "./auth";
 
-type Permissions = Partial<Pick<User, "isAdmin" | "isSupport" | "isVendor" | "isVerified">>;
+/**
+ * Check if the user has the required permissions
+ * Hierarchy of roles: admin > support > vendor > user
+ * ex: admin means only admin is allowed
+ * ex: vendor means admin, support and vendor are allowed
+ * @param minAllowedRole  The minimum role required
+ * @param user The user object
+ * @returns { boolean } True if the user has the required permissions
+ */
+export function isAllowed(minAllowedRole: Role, user: User): boolean {
+  const rolesHierarchy: Role[] = ["admin", "support", "vendor", "user"];
+  const allowed = rolesHierarchy.slice(
+    0,
+    rolesHierarchy.findIndex(value => value === minAllowedRole)
+  );
+  return allowed.includes(user.role);
+}
+
 /**
  * Middleware to check if the user has the required permissions
  * @param permissions { Permissions } The permissions required
  */
 export const allowedMiddleware =
-  (permissions: Permissions) => async (request: NextRequest, response: NextResponse) => {
+  (role: Role) => async (request: NextRequest, response: NextResponse) => {
     await authMiddleware(request, response);
     const user = JSON.parse(request.cookies.get("user")!.value!) as User;
-    const allowed = Object.keys(permissions).filter(key => permissions[key as keyof Permissions]);
-    if (!allowed.includes("isAdmin") && user.isAdmin) return;
-    if (!allowed.includes("isSupport") && user.isSupport) return;
-    if (!allowed.includes("isVendor") && user.isVendor) return;
-    if (!allowed.includes("isVerified") && user.isVerified) return;
+    if (isAllowed(role, user)) return;
     throw new ApiError(403, "Unauthorized");
   };

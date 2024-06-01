@@ -10,15 +10,24 @@ import { toast } from "sonner";
 import CardImage from "../common/CardImage";
 import CardName from "../common/CardName";
 import Modal from "../common/Modal";
+import { useSession } from "next-auth/react";
+import { useMemo } from "react";
 
 interface Props extends CardProps {
   item: Brand;
 }
 const BrandCard = ({ item, ...props }: Props) => {
-  const router = useRouter();
   const { slug, name, image } = item;
+  const router = useRouter();
+  const { data, status } = useSession();
   const delBrandMutation = useMutationHook<Brand>(`/api/brands/${slug}`, ["deleteBrand"], "DELETE");
   const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure({});
+  const showDelete = useMemo(() => {
+    return data?.user?.role === "admin";
+  }, [data]);
+  const showEdit = useMemo(() => {
+    return data?.user?.role === "admin";
+  }, [data]);
 
   const handleDelete = () => {
     const promise = new Promise<Brand>(async (resolve, reject) => {
@@ -44,11 +53,13 @@ const BrandCard = ({ item, ...props }: Props) => {
     <Card radius="none" shadow="none" className="max-h-[30rem] w-[16rem] bg-transparent" {...props}>
       <CardBody className="p-0">
         <CardImage
-          src={image?.secure_url}
           height="16rem"
-          href={`/products?brands=${item.slug}`}
-          edit={`/admin/brands/edit/${slug}`}
+          src={image?.secure_url}
           name={name}
+          href={`/products?brands=${item.slug}`}
+          showEdit={showEdit}
+          edit={`/admin/brands/edit/${slug}`}
+          showDelete={showDelete}
           handleDelete={onOpen}
         />
       </CardBody>

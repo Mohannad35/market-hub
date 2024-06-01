@@ -156,3 +156,19 @@ export const resetPasswordTokenSchema = passwordSchema
     message: "Passwords do not match",
     path: ["confirmPassword"],
   });
+
+export type BanUserFormValues = z.infer<typeof banUserSchema>;
+export const banUserSchema = object({
+  username: usernameSchema,
+  reason: stringMinMaxSchema("Reason", 2, 10_000),
+});
+
+export type UnBanUserFormValues = z.infer<typeof unBanUserSchema>;
+export const unBanUserSchema = object({ username: usernameSchema });
+
+export type DeleteUserFormValues = z.infer<typeof deleteUserSchema>;
+export const deleteUserSchema = object({
+  username: usernameSchema,
+  reason: stringMinMaxSchema("Reason", 2, 10_000),
+  uponRequest: z.boolean(),
+});

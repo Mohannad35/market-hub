@@ -1,8 +1,11 @@
+import UserBannedTemplate from "@/emails/user-banned";
+import UserDeletedTemplate from "@/emails/user-deleted";
 import VerificationTemplate from "@/emails/verification-template";
 import { authMiddleware } from "@/lib/middleware/auth";
+import { allowedMiddleware } from "@/lib/middleware/permissions";
 import { wrapperMiddleware } from "@/lib/middleware/wrapper";
 import { formatErrors } from "@/lib/utils";
-import { editProfileSchema } from "@/lib/validation/user-schema";
+import { deleteUserSchema, editProfileSchema } from "@/lib/validation/user-schema";
 import { logger } from "@/logger";
 import prisma from "@/prisma/client";
 import { getLocalTimeZone, now } from "@internationalized/date";
@@ -102,8 +105,41 @@ async function PATCH_handler(request: NextRequest) {
 }
 
 // Delete User
+async function DELETE_handler(request: NextRequest) {
+  const body = await request.json();
+  const { success, data, error } = deleteUserSchema.safeParse(body);
+  if (!success) throw new ApiError(400, formatErrors(error).message);
+  const { username, reason, uponRequest } = data;
+  // Get the user to be deleted
+  const user = await prisma.user.findUnique({ where: { username } });
+  if (!user) throw new ApiError(404, "User not found");
 
-// Ban User
+  // Delete the user
+  const deletedUser = await prisma.user.delete({ where: { id: user.id } });
+
+  // Send emails if SENDGRID_API_KEY is set
+  if (process.env.SENDGRID_API_KEY) {
+    // Send email to notify the deleted user
+    const userBannedEmailHtml = render(
+      UserDeletedTemplate({
+        name: deletedUser.name,
+        reason,
+        uponRequest,
+        baseUrl: request.nextUrl.origin,
+      })
+    );
+    await sendgrid
+      .send({
+        from: { email: "mohannadragab53@gmail.com", name: "Market Hub Support Team" },
+        to: deletedUser.email!,
+        subject: "Account Deleted",
+        html: userBannedEmailHtml,
+      })
+      .then(() => logger.info("Email sent"))
+      .catch(logger.error);
+  }
+}
 
 export const GET = wrapperMiddleware(authMiddleware, GET_handler);
 export const PATCH = wrapperMiddleware(authMiddleware, PATCH_handler);
+export const DELETE = wrapperMiddleware(allowedMiddleware("admin"), DELETE_handler);

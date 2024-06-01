@@ -1,4 +1,5 @@
 import { authMiddleware } from "@/lib/middleware/auth";
+import { isAllowed } from "@/lib/middleware/permissions";
 import { wrapperMiddleware } from "@/lib/middleware/wrapper";
 import prisma from "@/prisma/client";
 import { User } from "@prisma/client";
@@ -22,7 +23,7 @@ async function GET_handler(
   });
   if (!order) throw new ApiError(404, "Order not found");
   // Check if the order belongs to the user or the user is an admin
-  if (order.userId !== id && !user.isAdmin) throw new ApiError(401, "Unauthorized");
+  if (order.userId !== id && isAllowed("support", user)) throw new ApiError(401, "Unauthorized");
   return NextResponse.json(order);
 }
 

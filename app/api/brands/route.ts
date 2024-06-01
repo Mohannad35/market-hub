@@ -62,4 +62,4 @@ async function GET_handler(
 }
 
 export const GET = wrapperMiddleware(GET_handler);
-export const POST = wrapperMiddleware(allowedMiddleware({ isAdmin: true }), POST_handler);
+export const POST = wrapperMiddleware(allowedMiddleware("admin"), POST_handler);

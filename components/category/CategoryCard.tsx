@@ -10,19 +10,28 @@ import { toast } from "sonner";
 import CardImage from "../common/CardImage";
 import CardName from "../common/CardName";
 import Modal from "../common/Modal";
+import { useSession } from "next-auth/react";
+import { useMemo } from "react";
 
 interface Props extends CardProps {
   item: Category;
 }
 const CategoryCard = ({ item, ...props }: Props) => {
-  const router = useRouter();
   const { path, name, image } = item;
+  const router = useRouter();
+  const { data, status } = useSession();
   const delCategoryMutation = useMutationHook<Category>(
     `/api/categories/${encodeURI(path.slice(1).replace(/\//g, "-"))}`,
     ["deleteCategory"],
     "DELETE"
   );
   const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure({});
+  const showDelete = useMemo(() => {
+    return data?.user?.role === "admin";
+  }, [data]);
+  const showEdit = useMemo(() => {
+    return data?.user?.role === "admin";
+  }, [data]);
 
   const handleDelete = () => {
     const promise = new Promise<Category>(async (resolve, reject) => {
@@ -48,11 +57,13 @@ const CategoryCard = ({ item, ...props }: Props) => {
     <Card radius="none" shadow="none" className="max-h-[30rem] w-[16rem] bg-transparent" {...props}>
       <CardBody className="p-0">
         <CardImage
-          src={image?.secure_url}
           height="16rem"
-          href={`/products?${new URLSearchParams({ category: item.path })}`}
-          edit={`/admin/categories/edit/${encodeURI(path.slice(1).replace(/\//g, "-"))}`}
           name={name}
+          src={image?.secure_url}
+          href={`/products?${new URLSearchParams({ category: item.path })}`}
+          showEdit={showEdit}
+          edit={`/admin/categories/edit/${encodeURI(path.slice(1).replace(/\//g, "-"))}`}
+          showDelete={showDelete}
           handleDelete={onOpen}
         />
       </CardBody>

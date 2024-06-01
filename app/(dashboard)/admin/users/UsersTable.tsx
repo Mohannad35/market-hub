@@ -10,17 +10,20 @@ import BottomContent from "./users-table-bottom-content";
 import DataTableHook from "./users-table-hook";
 import TopContent from "./users-table-top-content";
 import { User } from "@prisma/client";
-import { Input } from "@nextui-org/react";
+import { Input, Switch } from "@nextui-org/react";
 import { useState } from "react";
 
 export default function UsersTable() {
   const searchParams = useSearchParams();
   const { data: users, isSuccess, error, isLoading, refetch } = useUsers(searchParams);
+  const [deleteReason, setDeleteReason] = useState("");
+  const [uponRequest, setUponRequest] = useState(false);
   const [banReason, setBanReason] = useState("");
   const {
     page,
     delUser,
     banUser,
+    unBanUser,
     filterValue,
     sortDescriptor,
     rowsPerPage,
@@ -31,6 +34,10 @@ export default function UsersTable() {
     isLoadingRefresh,
     isOpenBan,
     isOpenDelete,
+    isOpenUnBan,
+    onOpenUnBan,
+    onOpenChangeUnBan,
+    onCloseUnBan,
     setFilterValue,
     onSearchChange,
     onClickRefresh,
@@ -39,6 +46,7 @@ export default function UsersTable() {
     onCloseBan,
     onCloseDelete,
     handleBan,
+    handleUnBan,
     handleDelete,
     setSelectedKeys,
     setPage,
@@ -143,13 +151,29 @@ export default function UsersTable() {
         <ModalContent>
           <ModalHeader className="flex flex-col gap-1">Delete {delUser?.username}?</ModalHeader>
           <ModalBody>
-            <Text>This Action can&apos;t be undone.</Text>
+            <Text>
+              This Action can&apos;t be undone. Please provide a reason for the deletion and whether
+              it was upon the user&apos;s request.
+            </Text>
+            <Input
+              placeholder="Reason for deletion"
+              className="mt-2"
+              value={deleteReason}
+              onValueChange={setDeleteReason}
+            />
+            <Switch isSelected={uponRequest} onValueChange={setUponRequest}>
+              Upon user&apos;s request
+            </Switch>
           </ModalBody>
           <ModalFooter>
             <Button color="default" variant="light" onPress={onCloseDelete}>
               Close
             </Button>
-            <Button color="danger" onPress={handleDelete}>
+            <Button
+              color="danger"
+              isDisabled={deleteReason.length < 3}
+              onPress={() => handleDelete(deleteReason, uponRequest)}
+            >
               Delete
             </Button>
           </ModalFooter>
@@ -181,6 +205,23 @@ export default function UsersTable() {
               onPress={() => handleBan(banReason)}
             >
               Ban
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+
+      <Modal isOpen={isOpenUnBan} onOpenChange={onOpenChangeUnBan}>
+        <ModalContent>
+          <ModalHeader className="flex flex-col gap-1">Un ban {unBanUser?.username}?</ModalHeader>
+          <ModalBody>
+            <Text>The user will be unbanned from accessing the platform.</Text>
+          </ModalBody>
+          <ModalFooter>
+            <Button color="default" variant="light" onPress={onCloseBan}>
+              Close
+            </Button>
+            <Button color="danger" onPress={() => handleUnBan()}>
+              Un ban
             </Button>
           </ModalFooter>
         </ModalContent>
