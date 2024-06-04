@@ -2,7 +2,7 @@
 
 import Pagination from "@/components/common/Pagination";
 import { Modify } from "@/lib/types";
-import { Flex, FlexProps, Text } from "@radix-ui/themes";
+import { Flex, FlexProps, Grid, Text } from "@radix-ui/themes";
 import ProductCard from "./ProductCard";
 
 type Props = Modify<
@@ -33,14 +33,11 @@ const ProductCardContainer = ({
     );
   return (
     <Flex width="100%" direction="column" align="center" gapY="5">
-      <Flex
-        width="100%"
-        direction="row"
-        wrap="wrap"
-        gap="6"
-        justify="start"
-        align="start"
-        {...props}
+      <Grid
+        columns={{ initial: "2", sm: "3", md: "4", lg: "5", xl: "5" }}
+        gapX="6"
+        gapY="8"
+        width="dauto"
       >
         {items &&
           items.map((item, index) => (
@@ -52,7 +49,7 @@ const ProductCardContainer = ({
               showFav={showFav}
             />
           ))}
-      </Flex>
+      </Grid>
       {count && <Pagination count={count} />}
     </Flex>
   );

@@ -27,6 +27,7 @@ type Props = Modify<
     multiple?: boolean;
     maxFiles?: number;
     cropping?: boolean;
+    label?: string;
   }
 >;
 /**
@@ -54,6 +55,7 @@ const Uoload = ({
   multiple = false,
   maxFiles,
   cropping = false,
+  label,
   ...props
 }: Props) => {
   const { theme, systemTheme } = useTheme();
@@ -190,7 +192,7 @@ const Uoload = ({
             }}
           >
             <Text size="4" weight="medium">
-              Images
+              {label || "Upload"}
             </Text>
           </Button>
         )}

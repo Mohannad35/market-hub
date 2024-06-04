@@ -86,7 +86,7 @@ const Profile = ({ username }: { username: string }) => {
             size="sm"
             radius="lg"
             as={NextLink}
-            href={`${pathname}/edit`}
+            href={`${pathname}/settings`}
           >
             <Text size="4" weight="medium">
               Edit Profile

@@ -14,7 +14,7 @@ const sortOpts = [
   { label: "Title: Z-A", value: "name-desc" },
   { label: "Price: Low to High", value: "price-asc" },
   { label: "Price: High to Low", value: "price-desc" },
-  { label: "Popular", value: "sold-asc" },
+  { label: "Popular", value: "sold-desc" },
   { label: "Rating", value: "rating-desc" },
 ];
 

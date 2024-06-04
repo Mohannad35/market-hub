@@ -12,9 +12,13 @@ import CardName from "../common/CardName";
 import Modal from "../common/Modal";
 import { useSession } from "next-auth/react";
 import { useMemo } from "react";
+import { Flex } from "@radix-ui/themes";
 
 interface Props extends CardProps {
   item: Category;
+  width?: string;
+  height?: string;
+  imageHeight?: string;
 }
 const CategoryCard = ({ item, ...props }: Props) => {
   const { path, name, image } = item;
@@ -54,32 +58,39 @@ const CategoryCard = ({ item, ...props }: Props) => {
   };
 
   return (
-    <Card radius="none" shadow="none" className="max-h-[30rem] w-[16rem] bg-transparent" {...props}>
-      <CardBody className="p-0">
-        <CardImage
-          height="16rem"
-          name={name}
-          src={image?.secure_url}
-          href={`/products?${new URLSearchParams({ category: item.path })}`}
-          showEdit={showEdit}
-          edit={`/admin/categories/edit/${encodeURI(path.slice(1).replace(/\//g, "-"))}`}
-          showDelete={showDelete}
-          handleDelete={onOpen}
+    <Flex width={props.width || "100%"}>
+      <Card radius="none" shadow="none" className="bg-transparent" {...props}>
+        <CardBody className="p-0">
+          <CardImage
+            width={props.width || "16rem"}
+            height={props.height || "16rem"}
+            imageHeight={props.imageHeight || "15rem"}
+            name={name}
+            src={image?.secure_url}
+            href={`/products?${new URLSearchParams({ category: item.path })}`}
+            showEdit={showEdit}
+            edit={`/admin/categories/edit/${encodeURI(path.slice(1).replace(/\//g, "-"))}`}
+            showDelete={showDelete}
+            handleDelete={onOpen}
+          />
+        </CardBody>
+        <CardFooter className="flex-col p-2 text-small">
+          <CardName
+            href={`/products?${new URLSearchParams({ category: item.path })}`}
+            name={name}
+          />
+        </CardFooter>
+        <Modal
+          title={`Delete ${truncate(name, { length: 30 })}`}
+          action="Delete"
+          content="Are you sure?"
+          isOpen={isOpen}
+          onOpenChange={onOpenChange}
+          onAction={handleDelete}
+          isLoading={delCategoryMutation.isPending}
         />
-      </CardBody>
-      <CardFooter className="flex-col p-2 text-small">
-        <CardName href={`/products?${new URLSearchParams({ category: item.path })}`} name={name} />
-      </CardFooter>
-      <Modal
-        title={`Delete ${truncate(name, { length: 30 })}`}
-        action="Delete"
-        content="Are you sure?"
-        isOpen={isOpen}
-        onOpenChange={onOpenChange}
-        onAction={handleDelete}
-        isLoading={delCategoryMutation.isPending}
-      />
-    </Card>
+      </Card>
+    </Flex>
   );
 };
 

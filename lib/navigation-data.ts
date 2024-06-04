@@ -29,12 +29,6 @@ export const listItems = (username: string) => [
     href: `/user/${username}/settings`,
     icon: "solar:settings-bold-duotone",
   },
-  {
-    key: "security",
-    label: "Security",
-    href: `/user/${username}/security`,
-    icon: "mdi:security-account",
-  },
 ];
 
 export const accordionItems = (username: string) => [

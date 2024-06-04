@@ -13,7 +13,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
-const ChangePasswordForm = () => {
+const SecurityTabForm = () => {
   const router = useRouter();
   const [isVisible, setIsVisible] = useState({
     oldPassword: false,
@@ -53,9 +53,12 @@ const ChangePasswordForm = () => {
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)}>
         <Flex direction="column" gap="4" align="start">
-          <Text size="7" weight="medium">
-            Change Password
+          <Text size="3" weight="medium">
+            Security Settings
+            <br />
+            <span className="text-sm text-muted-foreground">Manage your security preferences </span>
           </Text>
+
           <FormField
             control={form.control}
             name="oldPassword"
@@ -66,7 +69,7 @@ const ChangePasswordForm = () => {
                     isRequired
                     size="lg"
                     variant="bordered"
-                    label="Old Password"
+                    placeholder="Old Password"
                     description="Enter your old password"
                     type={isVisible.oldPassword ? "text" : "password"}
                     endContent={
@@ -106,7 +109,7 @@ const ChangePasswordForm = () => {
                       isRequired
                       size="lg"
                       variant="bordered"
-                      label="New Password"
+                      placeholder="New Password"
                       description="Enter your new password"
                       type={isVisible.newPassword ? "text" : "password"}
                       endContent={
@@ -146,7 +149,7 @@ const ChangePasswordForm = () => {
                     isRequired
                     size="lg"
                     variant="bordered"
-                    label="Confirm Password"
+                    placeholder="Confirm Password"
                     description="Confirm your new password"
                     type={isVisible.confirmPassword ? "text" : "password"}
                     endContent={
@@ -186,4 +189,4 @@ const ChangePasswordForm = () => {
   );
 };
 
-export default ChangePasswordForm;
+export default SecurityTabForm;

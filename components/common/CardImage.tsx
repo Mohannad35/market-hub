@@ -11,6 +11,7 @@ import { useSession } from "next-auth/react";
 import { getCldImageUrl } from "next-cloudinary";
 import NextImage from "next/image";
 import NextLink from "next/link";
+import { useMemo } from "react";
 
 interface Props {
   src?: string | null;
@@ -19,6 +20,7 @@ interface Props {
   name: string;
   width?: string;
   height?: string;
+  imageHeight?: string;
   showEdit?: boolean;
   showDelete?: boolean;
   showFav?: boolean;
@@ -34,13 +36,17 @@ const CardImage = ({
   handleDelete,
   width,
   height,
+  imageHeight,
   showDelete,
   showEdit,
   showFav,
   isFav,
   handleFav,
 }: Props) => {
-  const className = `h-[${height || "16rem"}] w-[${width || "16rem"}]`;
+  const className = useMemo(
+    () => `h-[${imageHeight || height || "16rem"}] w-${width ? `[${width}]` : "full"}`,
+    [height, imageHeight, width]
+  );
 
   return (
     <Card radius="none" shadow="none" className={cn("border-none bg-transparent")}>

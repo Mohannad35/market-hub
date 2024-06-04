@@ -19,6 +19,7 @@ import { useSession } from "next-auth/react";
 import { ModifyListFormValues } from "@/lib/validation/list-schema";
 import { ListWithProducts } from "@/lib/types";
 import { useQueryClient } from "@tanstack/react-query";
+import { cn } from "@/lib/utils";
 
 const TRUNCATE_LENGTH = 60;
 
@@ -128,7 +129,12 @@ const ProductCard = ({ item, ...props }: Props) => {
   if (wishlist.isLoading) return null;
 
   return (
-    <Card radius="none" shadow="none" className="w-[16rem] bg-card" {...props}>
+    <Card
+      radius={props.radius || "none"}
+      shadow={props.shadow || "none"}
+      className={cn("bg-card", props.className)}
+      {...props}
+    >
       <CardBody className="p-0">
         <CardImage
           name={name}
@@ -148,7 +154,7 @@ const ProductCard = ({ item, ...props }: Props) => {
         />
       </CardBody>
       <CardFooter className="text-small">
-        <Flex width="260px" gap="2" direction="column" justify="start" align="start">
+        <Flex gap="2" direction="column" justify="start" align="start">
           <CardName href={`/products/${slug}`} name={name} size="3" />
 
           <Rating readOnly size="small" defaultValue={rating} ratingCount={ratingCount} />

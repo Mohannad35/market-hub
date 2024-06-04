@@ -15,6 +15,9 @@ import { useMemo } from "react";
 
 interface Props extends CardProps {
   item: Brand;
+  width?: string;
+  height?: string;
+  imageHeight?: string;
 }
 const BrandCard = ({ item, ...props }: Props) => {
   const { slug, name, image } = item;
@@ -50,10 +53,12 @@ const BrandCard = ({ item, ...props }: Props) => {
   };
 
   return (
-    <Card radius="none" shadow="none" className="max-h-[30rem] w-[16rem] bg-transparent" {...props}>
+    <Card radius="none" shadow="none" className="bg-transparent" {...props}>
       <CardBody className="p-0">
         <CardImage
-          height="16rem"
+          width={props.width || "16rem"}
+          height={props.height || "16rem"}
+          imageHeight={props.imageHeight || "15rem"}
           src={image?.secure_url}
           name={name}
           href={`/products?brands=${item.slug}`}

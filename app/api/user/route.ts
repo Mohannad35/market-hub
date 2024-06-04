@@ -1,4 +1,3 @@
-import UserBannedTemplate from "@/emails/user-banned";
 import UserDeletedTemplate from "@/emails/user-deleted";
 import VerificationTemplate from "@/emails/verification-template";
 import { authMiddleware } from "@/lib/middleware/auth";
@@ -12,7 +11,6 @@ import { getLocalTimeZone, now } from "@internationalized/date";
 import { Gender, User } from "@prisma/client";
 import { render } from "@react-email/render";
 import sendgrid from "@sendgrid/mail";
-import { hash } from "bcryptjs";
 import { randomBytes } from "crypto";
 import { isEqual } from "lodash";
 import { ApiError } from "next/dist/server/api-utils";
@@ -65,21 +63,23 @@ async function PATCH_handler(request: NextRequest) {
       ...data,
       gender: data.gender ? (data.gender as Gender) : undefined,
       isVerified: data.email ? false : undefined,
-      tokens: {
-        upsert: {
-          where: { userId_type: { userId: user.id, type: "verification" } },
-          create: { ...token, type: "verification" },
-          update: { ...token },
-        },
-      },
+      tokens: data.email
+        ? {
+            upsert: {
+              where: { userId_type: { userId: user.id, type: "verification" } },
+              create: { ...token, type: "verification" },
+              update: { ...token },
+            },
+          }
+        : undefined,
     },
     include: { tokens: true },
   });
-  // Find verification token
-  const verificationToken = user.tokens.find(token => token.type === "verification");
-  if (!verificationToken) throw new ApiError(500, "Token not found");
   // Send verification email if the email was changed
   if (data.email) {
+    // Find verification token
+    const verificationToken = user.tokens.find(token => token.type === "verification");
+    if (!verificationToken) throw new ApiError(500, "Token not found");
     // Send emails if SENDGRID_API_KEY is set
     if (process.env.SENDGRID_API_KEY) {
       // Send verification email

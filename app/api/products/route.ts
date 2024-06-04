@@ -81,7 +81,7 @@ async function GET_handler(
       price: { gte: minPrice, lte: maxPrice },
     },
     orderBy: popular
-      ? [{ rating: "desc" }, { ratingCount: "desc" }, { sold: "desc" }, { createdAt: "desc" }]
+      ? [{ sold: "desc" }, { rating: "desc" }, { ratingCount: "desc" }, { createdAt: "desc" }]
       : { [sortBy]: direction },
     take: pageSize || 20,
     skip: ((page || 1) - 1) * (pageSize || 20),
