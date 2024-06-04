@@ -16,6 +16,8 @@ import { Flex } from "@radix-ui/themes";
 
 interface Props extends CardProps {
   item: Category;
+  showDelete: boolean;
+  showEdit: boolean;
   width?: string;
   height?: string;
   imageHeight?: string;
@@ -31,11 +33,11 @@ const CategoryCard = ({ item, ...props }: Props) => {
   );
   const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure({});
   const showDelete = useMemo(() => {
-    return data?.user?.role === "admin";
-  }, [data]);
+    return props.showDelete && data?.user?.role === "admin";
+  }, [data, props.showDelete]);
   const showEdit = useMemo(() => {
-    return data?.user?.role === "admin";
-  }, [data]);
+    return props.showEdit && data?.user?.role === "admin";
+  }, [data, props.showEdit]);
 
   const handleDelete = () => {
     const promise = new Promise<Category>(async (resolve, reject) => {
@@ -62,9 +64,9 @@ const CategoryCard = ({ item, ...props }: Props) => {
       <Card radius="none" shadow="none" className="bg-transparent" {...props}>
         <CardBody className="p-0">
           <CardImage
-            width={props.width || "16rem"}
-            height={props.height || "16rem"}
-            imageHeight={props.imageHeight || "15rem"}
+            width={props.width}
+            height={props.height}
+            imageHeight={props.imageHeight}
             name={name}
             src={image?.secure_url}
             href={`/products?${new URLSearchParams({ category: item.path })}`}

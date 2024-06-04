@@ -1,13 +1,20 @@
 "use client";
 
 import Pagination from "@/components/common/Pagination";
-import { Modify } from "@/lib/types";
-import { Flex, FlexProps, Grid, Text } from "@radix-ui/themes";
+import { Flex, Grid, Text } from "@radix-ui/themes";
 
-type Props = Modify<
-  FlexProps,
-  { items: any[]; count: number; Card: JSX.ElementType; label: string }
->;
+type Props = {
+  items: any[];
+  count: number;
+  Card: JSX.ElementType;
+  label: string;
+  width?: string;
+  height?: string;
+  imageHeight?: string;
+  showDelete?: boolean;
+  showEdit?: boolean;
+  showFav?: boolean;
+};
 const CardContainer = ({ items, count, label, Card, ...props }: Props) => {
   if (count === 0)
     return (
@@ -17,8 +24,8 @@ const CardContainer = ({ items, count, label, Card, ...props }: Props) => {
     );
   return (
     <Flex width="100%" direction="column" align="center" gapY="5">
-      <Grid columns={{ initial: "2", sm: "3", md: "4", lg: "5" }} gapX="6" gapY="8" width="dauto">
-        {items && items.map((item, index) => <Card key={index} item={item} />)}
+      <Grid columns={{ initial: "2", sm: "3", md: "4", lg: "5" }} gapX="6" gapY="8" width="auto">
+        {items && items.map((item, index) => <Card key={index} item={item} {...props} />)}
       </Grid>
       {count && <Pagination count={count} />}
     </Flex>

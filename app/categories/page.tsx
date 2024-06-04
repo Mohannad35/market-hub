@@ -1,4 +1,3 @@
-import CategoryCard from "@/components/category/CategoryCard";
 import CategoryContainer from "@/components/category/CategoryContainer";
 import Search from "@/components/product/Search";
 import SortBy from "@/components/product/SortBy";
@@ -20,7 +19,15 @@ const CategoriesPage = () => {
       </Flex>
 
       <Flex width="100%" direction="column" gap="5" justify="start">
-        <CategoryContainer api="/api/categories" uniqueKey={["homeCategories"]} />
+        <CategoryContainer
+          api="/api/categories"
+          uniqueKey={["homeCategories"]}
+          height="16rem"
+          width="14rem"
+          imageHeight="14rem"
+          showDelete
+          showEdit
+        />
       </Flex>
     </Flex>
   );

@@ -1,25 +1,24 @@
 "use client";
 
+import AddToCartButton from "@/app/products/[slug]/AddToCartButton";
 import Rating from "@/components/common/Rating";
 import { useMutationHook, useQueryHook } from "@/hook/use-tanstack-hooks";
-import { Button } from "@nextui-org/button";
+import { ListWithProducts } from "@/lib/types";
+import { cn } from "@/lib/utils";
+import { ModifyListFormValues } from "@/lib/validation/list-schema";
 import { Card, CardBody, CardFooter, CardProps } from "@nextui-org/card";
 import { useDisclosure } from "@nextui-org/react";
 import { Product } from "@prisma/client";
 import { Flex, Text } from "@radix-ui/themes";
+import { useQueryClient } from "@tanstack/react-query";
 import { truncate } from "lodash";
+import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import { useMemo } from "react";
 import { toast } from "sonner";
 import CardImage from "../common/CardImage";
 import CardName from "../common/CardName";
 import Modal from "../common/Modal";
-import AddToCartButton from "@/app/products/[slug]/AddToCartButton";
-import { useMemo } from "react";
-import { useSession } from "next-auth/react";
-import { ModifyListFormValues } from "@/lib/validation/list-schema";
-import { ListWithProducts } from "@/lib/types";
-import { useQueryClient } from "@tanstack/react-query";
-import { cn } from "@/lib/utils";
 
 const TRUNCATE_LENGTH = 60;
 
@@ -28,6 +27,9 @@ interface Props extends CardProps {
   showDelete: boolean;
   showEdit: boolean;
   showFav: boolean;
+  width?: string;
+  height?: string;
+  imageHeight?: string;
 }
 const ProductCard = ({ item, ...props }: Props) => {
   const router = useRouter();
@@ -138,6 +140,9 @@ const ProductCard = ({ item, ...props }: Props) => {
       <CardBody className="p-0">
         <CardImage
           name={name}
+          width={props.width}
+          height={props.height}
+          imageHeight={props.imageHeight}
           src={image[0].secure_url}
           href={`/products/${slug}`}
           showEdit={showEdit}

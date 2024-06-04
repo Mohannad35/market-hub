@@ -5,16 +5,18 @@ import { Card, CardBody, CardFooter, CardProps } from "@nextui-org/card";
 import { useDisclosure } from "@nextui-org/react";
 import { Brand } from "@prisma/client";
 import { truncate } from "lodash";
+import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import { useMemo } from "react";
 import { toast } from "sonner";
 import CardImage from "../common/CardImage";
 import CardName from "../common/CardName";
 import Modal from "../common/Modal";
-import { useSession } from "next-auth/react";
-import { useMemo } from "react";
 
 interface Props extends CardProps {
   item: Brand;
+  showDelete: boolean;
+  showEdit: boolean;
   width?: string;
   height?: string;
   imageHeight?: string;
@@ -26,11 +28,11 @@ const BrandCard = ({ item, ...props }: Props) => {
   const delBrandMutation = useMutationHook<Brand>(`/api/brands/${slug}`, ["deleteBrand"], "DELETE");
   const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure({});
   const showDelete = useMemo(() => {
-    return data?.user?.role === "admin";
-  }, [data]);
+    return props.showDelete && data?.user?.role === "admin";
+  }, [data, props.showDelete]);
   const showEdit = useMemo(() => {
-    return data?.user?.role === "admin";
-  }, [data]);
+    return props.showEdit && data?.user?.role === "admin";
+  }, [data, props.showEdit]);
 
   const handleDelete = () => {
     const promise = new Promise<Brand>(async (resolve, reject) => {

@@ -9,7 +9,17 @@ import { Flex, Text } from "@radix-ui/themes";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useMemo } from "react";
 
-const BrandContainer = ({ api, uniqueKey }: { api: string; uniqueKey: string[] }) => {
+type Props = {
+  api: string;
+  uniqueKey: string[];
+  width?: string;
+  height?: string;
+  imageHeight?: string;
+  showDelete?: boolean;
+  showEdit?: boolean;
+  showFav?: boolean;
+};
+const BrandContainer = ({ api, uniqueKey, ...props }: Props) => {
   const searchParams = useSearchParams();
   const query = useMemo(() => {
     const search = searchParams.get("search") || searchParams.get("q");
@@ -34,7 +44,13 @@ const BrandContainer = ({ api, uniqueKey }: { api: string; uniqueKey: string[] }
 
   return (
     <Flex width="100%" direction="column" justify="start" align="start">
-      <CardContainer label="brands" items={data.items} count={data.count} Card={BrandCard} />
+      <CardContainer
+        label="brands"
+        items={data.items}
+        count={data.count}
+        Card={BrandCard}
+        {...props}
+      />
     </Flex>
   );
 };

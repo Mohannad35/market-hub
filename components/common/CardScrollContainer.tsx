@@ -1,10 +1,9 @@
 "use client";
 
 import { useQueryHook } from "@/hook/use-tanstack-hooks";
-import { Modify } from "@/lib/types";
-import { Flex, FlexProps, Text } from "@radix-ui/themes";
+import { ScrollShadow } from "@nextui-org/react";
+import { Flex, Text } from "@radix-ui/themes";
 import LoadingIndicator from "./LoadingIndicator";
-import { ScrollArea, ScrollBar } from "../ui/scroll-area";
 
 type Props = {
   api: string;
@@ -32,20 +31,19 @@ const CardScrollContainer = ({ api, uniqueKey, label, Card, ...props }: Props) =
   const { items, count } = data;
   return (
     <Flex width="100%" direction="column" align="start" gap="2">
-      <ScrollArea className="w-full whitespace-nowrap">
-        <Flex width="100%" justify="start" gap="6" p="5">
+      <ScrollShadow orientation="horizontal" hideScrollBar className="container p-0">
+        <Flex width="100%" justify="start" gap="6">
           {items.map((item, index) => (
             <Card
               key={index}
               item={item}
-              width={props.width || "12rem"}
+              width={props.width || "11rem"}
               height={props.height || "12rem"}
               imageHeight={props.imageHeight || "11rem"}
             />
           ))}
         </Flex>
-        <ScrollBar orientation="horizontal" />
-      </ScrollArea>
+      </ScrollShadow>
     </Flex>
   );
 };
