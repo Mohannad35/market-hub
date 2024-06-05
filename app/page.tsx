@@ -4,11 +4,40 @@ import CardScrollContainer from "@/components/common/CardScrollContainer";
 import ProductRowContainer from "@/components/product/ProductRowContainer";
 import { Card, Link } from "@nextui-org/react";
 import { Flex, Text } from "@radix-ui/themes";
+import HeroCarousel from "./HeroCarousel";
 
 export default function Home() {
   return (
     <Flex className="container min-h-[calc(100vh-70px)]" direction="column" gap="8" pt="6">
       {/* Slider with some images */}
+      <Flex
+        width="100%"
+        align={{ initial: "center", md: "start" }}
+        direction={{ initial: "column", md: "row" }}
+        gap={{ initial: "6", md: "9" }}
+        pt="9"
+        px="9"
+        mx="auto"
+        maxWidth="60rem"
+      >
+        <Flex width="50%" direction="column">
+          <Text
+            size="8"
+            className="bg-gradient-to-br from-foreground-800 to-foreground-500 bg-clip-text pt-4 font-semibold tracking-tight text-transparent dark:to-foreground-200 lg:inline-block"
+          >
+            Market hub
+            <br />
+          </Text>
+          <Text size="3" className="text-justify">
+            Welcome to our online shopping platform where you can buy or sell products. We have a
+            wide range of products from different categories, brands, and prices with a secure
+            payment system and fast delivery. Enjoy your shopping experience with us.
+          </Text>
+        </Flex>
+        <Flex width="50%" direction="column">
+          <HeroCarousel />
+        </Flex>
+      </Flex>
 
       {/* Shop by category */}
       <Card className="p-6">
