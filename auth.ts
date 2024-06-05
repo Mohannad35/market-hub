@@ -10,6 +10,7 @@ import Google from "next-auth/providers/google";
 import slugify from "slugify";
 import { idSchema } from "./lib/validation/common-schema";
 import prisma from "./prisma/client";
+import { Role } from "@prisma/client";
 
 if (!process.env.NEXT_PUBLIC_AUTH_GOOGLE_ID) {
   throw new Error("NEXT_PUBLIC_AUTH_GOOGLE_ID is not set");
@@ -25,7 +26,7 @@ declare module "next-auth" {
   interface Session {
     user: {
       username: string;
-      role: string;
+      role: Role;
     } & DefaultSession["user"];
   }
   /**
@@ -179,7 +180,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       session.user.id = token.id as string;
       session.user.name = token.name;
       session.user.email = token.email!;
-      session.user.role = token.role;
+      session.user.role = token.role as Role;
       session.user.username = token.username;
       session.user.image = token.picture;
       return session;

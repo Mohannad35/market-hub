@@ -1,6 +1,7 @@
 import { nextui } from "@nextui-org/theme";
 import type { Config } from "tailwindcss";
 import flowbite from "flowbite-react/tailwind";
+import { addDynamicIconSelectors } from "@iconify/tailwind";
 
 const config: Config = {
   content: [
@@ -104,7 +105,11 @@ const config: Config = {
     },
   },
   darkMode: ["class"],
-  plugins: [require("tailwindcss-animate"), nextui()],
+  plugins: [
+    require("tailwindcss-animate"),
+    nextui(),
+    addDynamicIconSelectors({ prefix: "icon", scale: 1 }),
+  ],
 } satisfies Config;
 
 export default config;

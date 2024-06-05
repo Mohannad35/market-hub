@@ -13,7 +13,7 @@ export default function NavBar({ ...props }: NavbarProps) {
       {...props}
       isBordered
       maxWidth="full"
-      className="border-none font-inter"
+      className="border-b border-black/5 font-inter dark:border-white/10 dark:bg-black/30"
       classNames={{
         item: [
           "flex",

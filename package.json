@@ -82,7 +82,9 @@
     "zod": "^3.23.8"
   },
   "devDependencies": {
+    "@iconify/json": "^2.2.216",
     "@iconify/react": "^5.0.0-beta.2",
+    "@iconify/tailwind": "^1.1.1",
     "@tanstack/eslint-plugin-query": "^5.28.11",
     "@types/node": "^20",
     "@types/react": "^18",

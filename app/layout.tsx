@@ -5,6 +5,7 @@ import { inter, satisfy, fira_code, akaya_kanadaka, dosis } from "@/lib/fonts";
 import "@radix-ui/themes/styles.css";
 import type { Metadata } from "next";
 import "./globals.css";
+import Footer from "./Footer";
 
 export const metadata: Metadata = {
   title: "MarketHub",
@@ -17,13 +18,16 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
     <html
       lang="en"
       suppressHydrationWarning
-      className={`${inter.variable} ${satisfy.variable} ${fira_code.variable} ${akaya_kanadaka.variable} ${dosis.variable}`}
+      className={`${inter.variable} ${satisfy.variable} ${fira_code.variable} ${akaya_kanadaka.variable} ${dosis.variable} font-inter`}
     >
-      <body className="min-h-screen">
+      <body className="min-h-screen font-inter">
         <Providers>
-          <NavBar height="70px" />
-          <main className="font-inter">{children}</main>
-          <ToastContainer />
+          <main className="bg-white font-inter dark:bg-black">
+            <NavBar height="70px" />
+            {children}
+            <Footer />
+            <ToastContainer />
+          </main>
         </Providers>
       </body>
     </html>
