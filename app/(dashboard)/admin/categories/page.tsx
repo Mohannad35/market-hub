@@ -19,7 +19,15 @@ const DashboardCategoriesPage = () => {
       </Flex>
 
       <Flex width="100%" direction="column">
-        <CategoryContainer api="/api/categories" uniqueKey={["dashboardCategories"]} />
+        <CategoryContainer
+          api="/api/categories"
+          uniqueKey={["dashboardCategories"]}
+          height="12rem"
+          imageHeight="10rem"
+          width="10rem"
+          showDelete
+          showEdit
+        />
       </Flex>
     </Flex>
   );

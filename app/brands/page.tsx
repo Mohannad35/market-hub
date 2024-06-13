@@ -19,7 +19,15 @@ const BrandsPage = () => {
       </Flex>
 
       <Flex width="100%" direction="column">
-        <BrandContainer api="/api/brands" uniqueKey={["homeBrands"]} />
+        <BrandContainer
+          api="/api/brands"
+          uniqueKey={["homeBrands"]}
+          height="12rem"
+          imageHeight="10rem"
+          width="10rem"
+          showDelete
+          showEdit
+        />
       </Flex>
     </Flex>
   );

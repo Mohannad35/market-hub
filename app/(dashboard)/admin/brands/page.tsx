@@ -19,7 +19,15 @@ const DashboardBrandsPage = () => {
       </Flex>
 
       <Flex direction="column" width="100%">
-        <BrandContainer api="/api/brands" uniqueKey={["dashboardBrands"]} />
+        <BrandContainer
+          api="/api/brands"
+          uniqueKey={["dashboardBrands"]}
+          height="12rem"
+          imageHeight="10rem"
+          width="10rem"
+          showDelete
+          showEdit
+        />
       </Flex>
     </Flex>
   );

@@ -22,9 +22,9 @@ const CategoriesPage = () => {
         <CategoryContainer
           api="/api/categories"
           uniqueKey={["homeCategories"]}
-          height="16rem"
-          width="14rem"
-          imageHeight="14rem"
+          height="12rem"
+          imageHeight="10rem"
+          width="10rem"
           showDelete
           showEdit
         />

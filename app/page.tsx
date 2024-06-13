@@ -11,31 +11,37 @@ export default function Home() {
     <Flex className="container min-h-[calc(100vh-70px)]" direction="column" gap="8" pt="6">
       {/* Slider with some images */}
       <Flex
+        mt="-6"
         width="100%"
-        align={{ initial: "center", md: "start" }}
-        direction={{ initial: "column", md: "row" }}
-        gap={{ initial: "6", md: "9" }}
-        pt="9"
-        px="9"
-        mx="auto"
-        maxWidth="60rem"
+        align="center"
+        justify="center"
+        direction="column"
+        className="min-h-[calc(100vh-70px)]"
       >
-        <Flex width="50%" direction="column">
-          <Text
-            size="8"
-            className="bg-gradient-to-br from-foreground-800 to-foreground-500 bg-clip-text pt-4 font-semibold tracking-tight text-transparent dark:to-foreground-200 lg:inline-block"
-          >
-            Market hub
-            <br />
-          </Text>
-          <Text size="3" className="text-justify">
-            Welcome to our online shopping platform where you can buy or sell products. We have a
-            wide range of products from different categories, brands, and prices with a secure
-            payment system and fast delivery. Enjoy your shopping experience with us.
-          </Text>
-        </Flex>
-        <Flex width="50%" direction="column">
-          <HeroCarousel />
+        <Flex
+          width="100%"
+          align={{ initial: "center", md: "start" }}
+          direction={{ initial: "column", md: "row" }}
+          gap={{ initial: "6", md: "9" }}
+          maxWidth="60rem"
+        >
+          <Flex width="50%" direction="column">
+            <Text
+              size="8"
+              className="bg-gradient-to-br from-foreground-800 to-foreground-500 bg-clip-text pt-4 font-semibold tracking-tight text-transparent dark:to-foreground-200 lg:inline-block"
+            >
+              Market hub
+              <br />
+            </Text>
+            <Text size="3" className="text-justify">
+              Welcome to our online shopping platform where you can buy or sell products. We have a
+              wide range of products from different categories, brands, and prices with a secure
+              payment system and fast delivery. Enjoy your shopping experience with us.
+            </Text>
+          </Flex>
+          <Flex width="50%" direction="column">
+            <HeroCarousel />
+          </Flex>
         </Flex>
       </Flex>
 
@@ -100,8 +106,8 @@ export default function Home() {
             Card={BrandCard}
             label="Brands"
             height="12rem"
-            imageHeight="11rem"
-            width="12rem"
+            imageHeight="10rem"
+            width="10rem"
           />
         </Flex>
       </Card>

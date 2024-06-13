@@ -16,7 +16,7 @@ export function isAllowed(minAllowedRole: Role, user: User): boolean {
   const rolesHierarchy: Role[] = ["admin", "support", "vendor", "user"];
   const allowed = rolesHierarchy.slice(
     0,
-    rolesHierarchy.findIndex(value => value === minAllowedRole)
+    rolesHierarchy.findIndex(value => value === minAllowedRole) + 1
   );
   return allowed.includes(user.role);
 }

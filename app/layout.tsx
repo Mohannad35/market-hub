@@ -22,9 +22,9 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
     >
       <body className="min-h-screen font-inter">
         <Providers>
-          <main className="bg-white font-inter dark:bg-black">
+          <main className="min-h-screen bg-white font-inter dark:bg-black">
             <NavBar height="70px" />
-            {children}
+            <section className="min-h-[calc(100vh_-_70px)]">{children}</section>
             <Footer />
             <ToastContainer />
           </main>
