@@ -46,6 +46,8 @@ const ProductContainer = ({ api, uniqueKey }: { api: string; uniqueKey: string[]
           showDelete={true}
           showEdit={true}
           showFav={true}
+          className={"h-[16rem] w-[16rem]"}
+          // width={"14rem"}
         />
       </Flex>
     </Flex>

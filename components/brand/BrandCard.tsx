@@ -12,14 +12,14 @@ import { toast } from "sonner";
 import CardImage from "../common/CardImage";
 import CardName from "../common/CardName";
 import Modal from "../common/Modal";
+import { Flex } from "@radix-ui/themes";
 
 interface Props extends CardProps {
   item: Brand;
   showDelete: boolean;
   showEdit: boolean;
   width?: string;
-  height?: string;
-  imageHeight?: string;
+  className?: string;
 }
 const BrandCard = ({ item, ...props }: Props) => {
   const { slug, name, image } = item;
@@ -55,34 +55,34 @@ const BrandCard = ({ item, ...props }: Props) => {
   };
 
   return (
-    <Card radius="none" shadow="none" className="bg-transparent" {...props}>
-      <CardBody className="p-0">
-        <CardImage
-          width={props.width || "16rem"}
-          height={props.height || "16rem"}
-          imageHeight={props.imageHeight || "15rem"}
-          src={image?.secure_url}
-          name={name}
-          href={`/products?brands=${item.slug}`}
-          showEdit={showEdit}
-          edit={`/admin/brands/edit/${slug}`}
-          showDelete={showDelete}
-          handleDelete={onOpen}
+    <Flex justify="center" align="center" minWidth={props.width || "12rem"}>
+      <Card radius="none" shadow="none" className="bg-transparent">
+        <CardBody className="p-0">
+          <CardImage
+            className={props.className || "h-[12rem] w-[12rem]"}
+            src={image?.secure_url}
+            name={name}
+            href={`/products?brands=${item.slug}`}
+            showEdit={showEdit}
+            edit={`/admin/brands/edit/${slug}`}
+            showDelete={showDelete}
+            handleDelete={onOpen}
+          />
+        </CardBody>
+        <CardFooter className="flex-col p-2 text-small">
+          <CardName href={`/products?brands=${item.slug}`} name={name} />
+        </CardFooter>
+        <Modal
+          title={`Delete ${truncate(name, { length: 30 })}`}
+          action="Delete"
+          content="Are you sure?"
+          isOpen={isOpen}
+          onOpenChange={onOpenChange}
+          onAction={handleDelete}
+          isLoading={delBrandMutation.isPending}
         />
-      </CardBody>
-      <CardFooter className="flex-col p-2 text-small">
-        <CardName href={`/products?brands=${item.slug}`} name={name} />
-      </CardFooter>
-      <Modal
-        title={`Delete ${truncate(name, { length: 30 })}`}
-        action="Delete"
-        content="Are you sure?"
-        isOpen={isOpen}
-        onOpenChange={onOpenChange}
-        onAction={handleDelete}
-        isLoading={delBrandMutation.isPending}
-      />
-    </Card>
+      </Card>
+    </Flex>
   );
 };
 

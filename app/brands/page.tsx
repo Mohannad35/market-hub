@@ -22,9 +22,7 @@ const BrandsPage = () => {
         <BrandContainer
           api="/api/brands"
           uniqueKey={["homeBrands"]}
-          height="12rem"
-          imageHeight="10rem"
-          width="10rem"
+          className="!h-[12rem] !w-[12rem]"
           showDelete
           showEdit
         />

@@ -4,8 +4,8 @@ import Image from "next/image";
 import Link from "next/link";
 import Search from "../product/Search";
 import NavBarAuth from "./NavBarAuth";
-import { ThemeToggle } from "./ThemeModeToggle";
 import NavCart from "./NavCart";
+import { ThemeToggle } from "./ThemeModeToggle";
 
 export default function NavBar({ ...props }: NavbarProps) {
   return (
@@ -13,7 +13,7 @@ export default function NavBar({ ...props }: NavbarProps) {
       {...props}
       isBordered
       maxWidth="full"
-      className="border-b border-black/5 font-inter dark:border-white/10 dark:bg-black/30"
+      className="z-50 border-b border-black/5 font-inter dark:border-white/10 dark:bg-black/30"
       classNames={{
         item: [
           "flex",
@@ -35,22 +35,27 @@ export default function NavBar({ ...props }: NavbarProps) {
       }}
     >
       {/* Left side of the navbar */}
-      <NavbarBrand>
-        <Link href="/" className="flex items-center gap-2">
-          {/* <Logo className="h-6 w-6" /> */}
-          <Image
-            alt="Logo"
-            src={`/logo-transparent.png`}
-            width={1000}
-            height={1000}
-            className="h-10 w-10"
-          />
-          <Heading className="hidden !font-akaya_kanadaka text-accent md:flex">MarketHub</Heading>
-        </Link>
-      </NavbarBrand>
+      <NavbarContent className="basis-1/5 sm:basis-full" justify="start">
+        {/* <NavbarMenuToggle className="md:hidden" /> */}
+        <NavbarBrand as="li" className="max-w-fit gap-3">
+          <Link className="flex items-center justify-start gap-1" href="/">
+            <Image
+              alt="Logo"
+              src={`/logo-transparent.png`}
+              width={1000}
+              height={1000}
+              className="h-10 w-10"
+            />
+            <Heading className="!font-akaya_kanadaka text-accent">MarketHub</Heading>
+          </Link>
+        </NavbarBrand>
+      </NavbarContent>
 
       {/* Center of the navbar */}
-      <NavbarContent justify="center" className="hidden w-full max-w-[30rem] md:flex">
+      <NavbarContent
+        justify="center"
+        className="hidden w-full max-w-[20rem] md:flex lg:max-w-[30rem]"
+      >
         <Search queryName="search" api="/products" />
       </NavbarContent>
 
@@ -62,6 +67,13 @@ export default function NavBar({ ...props }: NavbarProps) {
         <NavCart />
         <ThemeToggle />
       </NavbarContent>
+
+      {/* Navbar menu */}
+      {/* <NavbarMenu>
+        <NavbarMenuItem className="flex h-full w-full">
+          <Search queryName="search" api="/products" />
+        </NavbarMenuItem>
+      </NavbarMenu> */}
     </Navbar>
   );
 }

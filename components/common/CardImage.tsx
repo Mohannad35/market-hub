@@ -20,7 +20,7 @@ interface Props {
   name: string;
   width?: string;
   height?: string;
-  imageHeight?: string;
+  className?: string;
   showEdit?: boolean;
   showDelete?: boolean;
   showFav?: boolean;
@@ -36,18 +36,13 @@ const CardImage = ({
   handleDelete,
   width,
   height,
-  imageHeight,
+  className,
   showDelete,
   showEdit,
   showFav,
   isFav,
   handleFav,
 }: Props) => {
-  const className = useMemo(
-    () => `h-[${imageHeight || height || "16rem"}] w-${width ? `[${width}]` : "full"}`,
-    [height, imageHeight, width]
-  );
-
   return (
     <Card radius="none" shadow="none" className={cn("border-none bg-transparent")}>
       <CardBody
@@ -55,25 +50,22 @@ const CardImage = ({
         href={href}
         className="items-center justify-center overflow-x-clip overflow-y-visible p-0"
       >
-        <Flex width={width || "100%"} height={height || "100%"} justify="center" align="center">
-          <Image
-            isZoomed
-            removeWrapper
-            radius="none"
-            width={480}
-            height={480}
-            className={cn("object-contain", className)}
-            as={NextImage}
-            alt={name}
-            src={src || undefined}
-            fallbackSrc={getCldImageUrl({
-              src: "my-next-app/No-Image-Placeholder_fabmtj",
-              width: 265,
-              height: 300,
-              crop: "auto",
-            })}
-          />
-        </Flex>
+        <Image
+          isZoomed
+          radius="none"
+          width={720}
+          height={720}
+          className={cn("object-contain", className || "h-[12rem] w-[12rem]")}
+          as={NextImage}
+          alt={name}
+          src={src || undefined}
+          fallbackSrc={getCldImageUrl({
+            src: "my-next-app/No-Image-Placeholder_fabmtj",
+            width: 265,
+            height: 300,
+            crop: "auto",
+          })}
+        />
       </CardBody>
 
       {showFav && (
@@ -82,7 +74,7 @@ const CardImage = ({
           variant="faded"
           size="sm"
           radius="full"
-          className="absolute right-1 top-1 z-50"
+          className="absolute right-1 top-1 z-40"
           onPress={() => handleFav && handleFav()}
         >
           <Iconify icon="solar:star-bold" color={isFav ? "#f5a524" : ""} fontSize={20} />
@@ -95,7 +87,7 @@ const CardImage = ({
           variant="faded"
           size="sm"
           radius="lg"
-          className="absolute bottom-1 left-1 z-50"
+          className="absolute bottom-1 left-1 z-40"
           as={NextLink}
           href={edit}
         >
@@ -109,7 +101,7 @@ const CardImage = ({
           variant="faded"
           color="danger"
           size="sm"
-          className="absolute bottom-1 right-1 z-50"
+          className="absolute bottom-1 right-1 z-40"
           radius="lg"
           onPress={() => handleDelete && handleDelete()}
         >

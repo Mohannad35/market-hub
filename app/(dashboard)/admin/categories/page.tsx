@@ -22,9 +22,7 @@ const DashboardCategoriesPage = () => {
         <CategoryContainer
           api="/api/categories"
           uniqueKey={["dashboardCategories"]}
-          height="12rem"
-          imageHeight="10rem"
-          width="10rem"
+          className="h-[12rem] w-[12rem]"
           showDelete
           showEdit
         />

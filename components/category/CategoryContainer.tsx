@@ -12,9 +12,7 @@ import { useEffect, useMemo } from "react";
 type Props = {
   api: string;
   uniqueKey: string[];
-  width?: string;
-  height?: string;
-  imageHeight?: string;
+  className?: string;
   showDelete?: boolean;
   showEdit?: boolean;
   showFav?: boolean;

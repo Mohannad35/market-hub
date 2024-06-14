@@ -238,8 +238,7 @@ const Checkout = () => {
                   <Flex width="100%" gap="2">
                     <Flex width="16rem">
                       <CardImage
-                        width="8rem"
-                        height="8rem"
+                        className="h-[8rem] w-[8rem]"
                         src={product.image[0].secure_url}
                         href={`/products/${product.slug}`}
                         edit={`/admin/products/edit/${product.slug}`}

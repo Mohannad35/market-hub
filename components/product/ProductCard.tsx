@@ -28,8 +28,7 @@ interface Props extends CardProps {
   showEdit: boolean;
   showFav: boolean;
   width?: string;
-  height?: string;
-  imageHeight?: string;
+  className?: string;
 }
 const ProductCard = ({ item, ...props }: Props) => {
   const router = useRouter();
@@ -131,57 +130,52 @@ const ProductCard = ({ item, ...props }: Props) => {
   if (wishlist.isLoading) return null;
 
   return (
-    <Card
-      radius={props.radius || "none"}
-      shadow={props.shadow || "none"}
-      className={cn("bg-card", props.className)}
-      {...props}
-    >
-      <CardBody className="p-0">
-        <CardImage
-          name={name}
-          width={props.width}
-          height={props.height}
-          imageHeight={props.imageHeight}
-          src={image[0].secure_url}
-          href={`/products/${slug}`}
-          showEdit={showEdit}
-          edit={`/admin/products/edit/${slug}`}
-          showDelete={showDelete}
-          handleDelete={onOpen}
-          showFav={showFav}
-          isFav={wishlist.data && wishlist.data.productsId.includes(item.id)}
-          handleFav={
-            wishlist.data && wishlist.data.productsId.includes(item.id)
-              ? handleRemoveFav
-              : handleFav
-          }
-        />
-      </CardBody>
-      <CardFooter className="text-small">
-        <Flex gap="2" direction="column" justify="start" align="start">
-          <CardName href={`/products/${slug}`} name={name} size="3" />
+    <Flex justify="center" align="center" minWidth={props.width}>
+      <Card radius="none" shadow="none" className="bg-card">
+        <CardBody className="items-center justify-center p-0">
+          <CardImage
+            name={name}
+            className={props.className}
+            src={image[0].secure_url}
+            href={`/products/${slug}`}
+            showEdit={showEdit}
+            edit={`/admin/products/edit/${slug}`}
+            showDelete={showDelete}
+            handleDelete={onOpen}
+            showFav={showFav}
+            isFav={wishlist.data && wishlist.data.productsId.includes(item.id)}
+            handleFav={
+              wishlist.data && wishlist.data.productsId.includes(item.id)
+                ? handleRemoveFav
+                : handleFav
+            }
+          />
+        </CardBody>
+        <CardFooter className="text-small">
+          <Flex gap="2" direction="column" justify="start" align="start">
+            <CardName href={`/products/${slug}`} name={name} size="3" />
 
-          <Rating readOnly size="small" defaultValue={rating} ratingCount={ratingCount} />
+            <Rating readOnly size="small" defaultValue={rating} ratingCount={ratingCount} />
 
-          <Flex width="100%" direction="row" justify="between" align="center">
-            <Text weight="medium" className="text-muted-foreground">
-              {price} EGP
-            </Text>
-            <AddToCartButton product={item} />
+            <Flex width="100%" direction="row" justify="between" align="center">
+              <Text weight="medium" className="text-muted-foreground">
+                {price} EGP
+              </Text>
+              <AddToCartButton product={item} />
+            </Flex>
           </Flex>
-        </Flex>
-      </CardFooter>
-      <Modal
-        title={`Delete ${truncate(name, { length: 30 })}`}
-        action="Delete"
-        content="Are you sure?"
-        isOpen={isOpen}
-        onOpenChange={onOpenChange}
-        onAction={handleDelete}
-        isLoading={delProductMutation.isPending}
-      />
-    </Card>
+        </CardFooter>
+        <Modal
+          title={`Delete ${truncate(name, { length: 30 })}`}
+          action="Delete"
+          content="Are you sure?"
+          isOpen={isOpen}
+          onOpenChange={onOpenChange}
+          onAction={handleDelete}
+          isLoading={delProductMutation.isPending}
+        />
+      </Card>
+    </Flex>
   );
 };
 

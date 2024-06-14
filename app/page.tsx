@@ -1,10 +1,10 @@
 import BrandCard from "@/components/brand/BrandCard";
 import CategoryCard from "@/components/category/CategoryCard";
 import CardScrollContainer from "@/components/common/CardScrollContainer";
-import ProductRowContainer from "@/components/product/ProductRowContainer";
 import { Card, Link } from "@nextui-org/react";
 import { Flex, Text } from "@radix-ui/themes";
 import HeroCarousel from "./HeroCarousel";
+import ProductCard from "@/components/product/ProductCard";
 
 export default function Home() {
   return (
@@ -63,9 +63,6 @@ export default function Home() {
             uniqueKey={["homeCategories"]}
             Card={CategoryCard}
             label="Categories"
-            height="12rem"
-            imageHeight="10rem"
-            width="10rem"
           />
         </Flex>
       </Card>
@@ -83,7 +80,14 @@ export default function Home() {
               </Text>
             </Link>
           </Flex>
-          <ProductRowContainer api="/api/products?pageSize=5" uniqueKey={["latestProducts"]} />
+          <CardScrollContainer
+            api="/api/products?pageSize=5"
+            uniqueKey={["latestProducts"]}
+            Card={ProductCard}
+            label="Products"
+            className="h-[16rem] w-[16rem]"
+            width="16rem"
+          />
         </Flex>
       </Card>
 
@@ -105,9 +109,6 @@ export default function Home() {
             uniqueKey={["homeBrands"]}
             Card={BrandCard}
             label="Brands"
-            height="12rem"
-            imageHeight="10rem"
-            width="10rem"
           />
         </Flex>
       </Card>
@@ -125,9 +126,13 @@ export default function Home() {
               </Text>
             </Link>
           </Flex>
-          <ProductRowContainer
+          <CardScrollContainer
             api="/api/products?pageSize=5&popular=true"
             uniqueKey={["popularProducts"]}
+            Card={ProductCard}
+            label="Products"
+            className="h-[16rem] w-[16rem]"
+            width="16rem"
           />
         </Flex>
       </Card>

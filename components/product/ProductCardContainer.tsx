@@ -5,17 +5,16 @@ import { Modify } from "@/lib/types";
 import { Flex, FlexProps, Grid, Text } from "@radix-ui/themes";
 import ProductCard from "./ProductCard";
 
-type Props = Modify<
-  FlexProps,
-  {
-    items: any[];
-    count: number;
-    label: string;
-    showDelete: boolean;
-    showEdit: boolean;
-    showFav: boolean;
-  }
->;
+type Props = {
+  items: any[];
+  count: number;
+  label: string;
+  width?: string;
+  className?: string;
+  showDelete: boolean;
+  showEdit: boolean;
+  showFav: boolean;
+};
 const ProductCardContainer = ({
   items,
   count,
@@ -47,6 +46,8 @@ const ProductCardContainer = ({
               showDelete={showDelete}
               showEdit={showEdit}
               showFav={showFav}
+              className={props.className}
+              width={props.width}
             />
           ))}
       </Grid>

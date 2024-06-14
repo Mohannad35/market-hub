@@ -11,8 +11,10 @@ type Props = {
   Card: JSX.ElementType;
   label: string;
   width?: string;
-  height?: string;
-  imageHeight?: string;
+  className?: string;
+  showDelete?: boolean;
+  showEdit?: boolean;
+  showFav?: boolean;
 };
 const CardScrollContainer = ({ api, uniqueKey, label, Card, ...props }: Props) => {
   const { data, isSuccess, error, isLoading, isRefetching } = useQueryHook<{
@@ -31,18 +33,10 @@ const CardScrollContainer = ({ api, uniqueKey, label, Card, ...props }: Props) =
   const { items, count } = data;
   return (
     <Flex width="100%" direction="column" align="start" gap="2">
-      <ScrollShadow orientation="horizontal" hideScrollBar className="container p-0">
-        <Flex width="100%" justify="start" gap="6">
-          {items.map((item, index) => (
-            <Card
-              key={index}
-              item={item}
-              width={props.width || "11rem"}
-              height={props.height || "12rem"}
-              imageHeight={props.imageHeight || "11rem"}
-            />
-          ))}
-        </Flex>
+      <ScrollShadow orientation="horizontal" hideScrollBar className="container flex gap-6 p-0">
+        {items.map((item, index) => (
+          <Card key={index} item={item} {...props} />
+        ))}
       </ScrollShadow>
     </Flex>
   );

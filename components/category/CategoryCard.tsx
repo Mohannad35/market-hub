@@ -20,7 +20,7 @@ interface Props extends CardProps {
   showEdit: boolean;
   width?: string;
   height?: string;
-  imageHeight?: string;
+  className?: string;
 }
 const CategoryCard = ({ item, ...props }: Props) => {
   const { path, name, image } = item;
@@ -60,13 +60,11 @@ const CategoryCard = ({ item, ...props }: Props) => {
   };
 
   return (
-    <Flex width={props.width || "100%"}>
-      <Card radius="none" shadow="none" className="bg-transparent" {...props}>
+    <Flex justify="center" align="center" minWidth={props.width || "12rem"}>
+      <Card radius="none" shadow="none" className="bg-transparent">
         <CardBody className="p-0">
           <CardImage
-            width={props.width}
-            height={props.height}
-            imageHeight={props.imageHeight}
+            className={props.className || "h-[12rem] w-[12rem]"}
             name={name}
             src={image?.secure_url}
             href={`/products?${new URLSearchParams({ category: item.path })}`}

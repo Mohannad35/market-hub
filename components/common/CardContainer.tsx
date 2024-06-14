@@ -8,9 +8,7 @@ type Props = {
   count: number;
   Card: JSX.ElementType;
   label: string;
-  width?: string;
-  height?: string;
-  imageHeight?: string;
+  className?: string;
   showDelete?: boolean;
   showEdit?: boolean;
   showFav?: boolean;

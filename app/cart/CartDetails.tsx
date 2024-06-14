@@ -83,6 +83,7 @@ const CartDetails = () => {
             <Flex width="100%" gap="2">
               <Flex width="16rem">
                 <CardImage
+                  className="h-[12rem] w-[12rem]"
                   src={product.image[0].secure_url}
                   href={`/products/${product.slug}`}
                   name={product.name}
