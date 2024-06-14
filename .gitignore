@@ -83,4 +83,10 @@ sketch
 # Million Lint
 .million
 
+# google project idx files
+.idx/
+
+# VScode settings
+.vscode
+
 # End of https://www.toptal.com/developers/gitignore/api/visualstudiocode,nextjs,react
