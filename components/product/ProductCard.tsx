@@ -130,7 +130,7 @@ const ProductCard = ({ item, ...props }: Props) => {
   if (wishlist.isLoading) return null;
 
   return (
-    <Flex justify="center" align="center" minWidth={props.width}>
+    <Flex justify="center" align="center" minWidth={props.width} width={props.width}>
       <Card radius="none" shadow="none" className="bg-card">
         <CardBody className="items-center justify-center p-0">
           <CardImage

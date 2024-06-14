@@ -3,7 +3,7 @@
 import ProductCard from "@/components/product/ProductCard";
 import { getProduct, getRelatedProducts } from "@/lib/query-functions/product";
 import { ProductWithBrandAndCategoryAndRates } from "@/lib/types";
-import { Divider } from "@nextui-org/react";
+import { Divider, ScrollShadow } from "@nextui-org/react";
 import { Product } from "@prisma/client";
 import { Flex, Text } from "@radix-ui/themes";
 import { useQuery } from "@tanstack/react-query";
@@ -35,11 +35,19 @@ const RelatedProducts = ({ slug }: { slug: string }) => {
       <Text size="4" weight="medium">
         Related Products
       </Text>
-      <Flex width="100%" direction="row" gap="3" justify="start" align="start">
+      <ScrollShadow orientation="horizontal" hideScrollBar className="container flex gap-6 p-0">
         {products.map((product, index) => (
-          <ProductCard key={index} item={product} showDelete={false} showEdit={false} showFav />
+          <ProductCard
+            key={index}
+            item={product}
+            showDelete={false}
+            showEdit={false}
+            showFav
+            width="16rem"
+            className="h-[16rem] w-[16rem]"
+          />
         ))}
-      </Flex>
+      </ScrollShadow>
     </>
   );
 };
