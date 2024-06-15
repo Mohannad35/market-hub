@@ -158,7 +158,7 @@ const ProductCard = ({ item, ...props }: Props) => {
             <Rating readOnly size="small" defaultValue={rating} ratingCount={ratingCount} />
 
             <Flex width="100%" direction="row" justify="between" align="center">
-              <Text weight="medium" className="text-muted-foreground">
+              <Text weight="medium" className="w-full text-muted-foreground">
                 {price} EGP
               </Text>
               <AddToCartButton product={item} />

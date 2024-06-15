@@ -1,8 +1,7 @@
 "use client";
 
 import Pagination from "@/components/common/Pagination";
-import { Modify } from "@/lib/types";
-import { Flex, FlexProps, Grid, Text } from "@radix-ui/themes";
+import { Flex, Grid, GridProps, Text } from "@radix-ui/themes";
 import ProductCard from "./ProductCard";
 
 type Props = {
@@ -14,16 +13,9 @@ type Props = {
   showDelete: boolean;
   showEdit: boolean;
   showFav: boolean;
+  columns?: GridProps["columns"];
 };
-const ProductCardContainer = ({
-  items,
-  count,
-  label,
-  showDelete,
-  showEdit,
-  showFav,
-  ...props
-}: Props) => {
+const ProductCardContainer = ({ items, count, label, columns, ...props }: Props) => {
   if (count === 0)
     return (
       <Flex width="100%" direction="column" align="center" gapY="5">
@@ -33,23 +25,12 @@ const ProductCardContainer = ({
   return (
     <Flex width="100%" direction="column" align="center" gapY="5">
       <Grid
-        columns={{ initial: "2", sm: "3", md: "4", lg: "5", xl: "5" }}
+        columns={columns || { initial: "2", sm: "3", md: "4", lg: "5", xl: "5" }}
         gapX="6"
         gapY="8"
         width="dauto"
       >
-        {items &&
-          items.map((item, index) => (
-            <ProductCard
-              key={index}
-              item={item}
-              showDelete={showDelete}
-              showEdit={showEdit}
-              showFav={showFav}
-              className={props.className}
-              width={props.width}
-            />
-          ))}
+        {items && items.map((item, index) => <ProductCard key={index} item={item} {...props} />)}
       </Grid>
       {count && <Pagination count={count} />}
     </Flex>

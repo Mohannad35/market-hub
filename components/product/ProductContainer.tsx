@@ -3,14 +3,22 @@
 import LoadingIndicator from "@/components/common/LoadingIndicator";
 import { useQueryHook } from "@/hook/use-tanstack-hooks";
 import { Product } from "@prisma/client";
-import { Flex, Text } from "@radix-ui/themes";
+import { Flex, GridProps, Text } from "@radix-ui/themes";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useMemo } from "react";
 import AppliedFilters from "./AppliedFilters";
 import ProductCardContainer from "./ProductCardContainer";
 import ProductFilter from "./ProductFilter";
 
-const ProductContainer = ({ api, uniqueKey }: { api: string; uniqueKey: string[] }) => {
+type Props = {
+  api: string;
+  uniqueKey: string[];
+  width?: string;
+  className?: string;
+  columns?: GridProps["columns"];
+};
+
+const ProductContainer = ({ api, uniqueKey, ...props }: Props) => {
   const searchParams = useSearchParams();
   const query = useMemo(() => {
     const search = searchParams.get("search") || searchParams.get("q");
@@ -46,8 +54,7 @@ const ProductContainer = ({ api, uniqueKey }: { api: string; uniqueKey: string[]
           showDelete={true}
           showEdit={true}
           showFav={true}
-          className={"h-[16rem] w-[16rem]"}
-          // width={"14rem"}
+          {...props}
         />
       </Flex>
     </Flex>

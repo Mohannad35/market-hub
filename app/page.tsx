@@ -87,6 +87,7 @@ export default function Home() {
             label="Products"
             className="h-[16rem] w-[16rem]"
             width="16rem"
+            showFav
           />
         </Flex>
       </Card>
@@ -133,6 +134,7 @@ export default function Home() {
             label="Products"
             className="h-[16rem] w-[16rem]"
             width="16rem"
+            showFav
           />
         </Flex>
       </Card>
