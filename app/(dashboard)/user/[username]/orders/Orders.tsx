@@ -17,7 +17,7 @@ const Orders = () => {
 
   if (isLoading) return <LoadingIndicator />;
   if (error) return <Text>Error: {error.message}</Text>;
-  if (!isSuccess || !data) return <Text>No orders found</Text>;
+  if (!isSuccess || !data || data.length < 1) return <Text>No orders found</Text>;
 
   return (
     <Flex direction="column" gap="6">

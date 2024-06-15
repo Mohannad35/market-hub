@@ -76,7 +76,7 @@ const Profile = ({ username }: { username: string }) => {
   const { name: roleName, Icon, className } = roles[role];
   return (
     <Flex direction="column" gapY="2">
-      <Flex justify="between">
+      <Flex justify="between" mb="4">
         <ProfileImage src={image ? image.secure_url : avatar ?? undefined} name={name} />
 
         {status === "authenticated" && session.user.username === username && (
@@ -162,7 +162,11 @@ const Profile = ({ username }: { username: string }) => {
       )}
 
       {(gender || birthday) && <Divider className="my-2" />}
-      <Flex direction={{ initial: "column", xs: "row" }} width="100%">
+      <Flex
+        direction={{ initial: "column", md: "row" }}
+        width="100%"
+        gap={{ initial: "4", md: "0" }}
+      >
         {gender && (
           <Text size="4" weight="medium" className="w-1/2">
             <Snippet className="bg-transparent" text="Gender" />

@@ -11,7 +11,7 @@ const SettingsPage = async () => {
   if (!session) return signIn();
   const { user } = session;
   return (
-    <div className="container">
+    <div className="w-full">
       <HydrationBoundary state={dehydrate(queryClient)}>
         <SettingTabs username={user.username} />
       </HydrationBoundary>

@@ -7,7 +7,7 @@ export default async function ProductDetailsPage() {
   if (!session) return await signIn();
 
   return (
-    <div className="container">
+    <div className="w-full">
       <Flex direction="column" width="100%" gap="2" align="start" justify="start">
         {session.user.role === "admin" && <ProductsChart />}
       </Flex>

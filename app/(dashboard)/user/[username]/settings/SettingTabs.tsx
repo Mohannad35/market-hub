@@ -12,7 +12,7 @@ const SettingTabs = ({ username }: { username: string }) => {
   const [selectedTab, setSelectedTab] = useState<string | number>("profile");
 
   return (
-    <Flex direction="column" width="42rem">
+    <Flex direction="column" maxWidth="42rem">
       <Tabs
         defaultSelectedKey={"profile"}
         // size="lg"

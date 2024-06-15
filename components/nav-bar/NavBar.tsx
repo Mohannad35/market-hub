@@ -12,7 +12,7 @@ export default function NavBar({ ...props }: NavbarProps) {
     <Navbar
       {...props}
       isBordered
-      maxWidth="full"
+      maxWidth="2xl"
       className="z-50 border-b border-black/5 font-inter dark:border-white/10 dark:bg-black/30"
       classNames={{
         item: [

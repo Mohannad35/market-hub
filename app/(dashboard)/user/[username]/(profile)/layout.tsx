@@ -8,7 +8,7 @@ const ProfileLayout = async ({ children, params: { username } }: Props) => {
   await queryClient.prefetchQuery({ queryKey: ["getProfile", username], queryFn: getProfile });
 
   return (
-    <div>
+    <div className="w-full px-4">
       <HydrationBoundary state={dehydrate(queryClient)}>{children}</HydrationBoundary>
     </div>
   );

@@ -7,7 +7,7 @@ const OrdersPage = async () => {
   await queryClient.prefetchQuery({ queryKey: ["getUserOrders"], queryFn: getUserOrders });
 
   return (
-    <div className="container">
+    <div className="w-full">
       <HydrationBoundary state={dehydrate(queryClient)}>
         <Orders />
       </HydrationBoundary>

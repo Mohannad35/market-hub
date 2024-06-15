@@ -15,38 +15,42 @@ const ProductsChart = () => {
   else if (error) return <div>Error: {error.message}</div>;
   else if (!data) return <div>No data</div>;
   return (
-    <ScrollArea className="w-[calc(100vw-20rem)] whitespace-nowrap p-4 pl-0">
-      <Flex direction="column" width="50rem" height="20rem" align="center" gapY="2">
-        <Text size="5" weight="medium">
-          New Products in the last year
-        </Text>
-        <ResponsiveContainer width="100%" height="100%">
-          <BarChart data={data}>
-            <XAxis dataKey="month" axisLine={false} tickLine={false} />
-            <YAxis
-              allowDecimals={false}
-              axisLine={false}
-              tickLine={false}
-              label={{ value: "Product", angle: -90 }}
-            />
-            <Tooltip
-              cursor={false}
-              itemStyle={{
-                color: "hsl(var(--foreground))",
-                backgroundColor: "hsl(var(--background))",
-              }}
-              contentStyle={{ backgroundColor: "hsl(var(--background))" }}
-            />
-            <Bar
-              dataKey="products"
-              style={{ fill: "hsl(var(--foreground))" }}
-              radius={[5, 5, 0, 0]}
-            />
-          </BarChart>
-        </ResponsiveContainer>
-      </Flex>
-      <ScrollBar orientation="horizontal" />
-    </ScrollArea>
+    <Flex
+      direction="column"
+      width={{ initial: "100%", md: "40rem", lg: "50rem" }}
+      height="20rem"
+      align="center"
+      gapY="2"
+      pr="4"
+    >
+      <Text size="5" weight="medium">
+        New Products in the last year
+      </Text>
+      <ResponsiveContainer width="100%" height="100%">
+        <BarChart data={data}>
+          <XAxis dataKey="month" axisLine={false} tickLine={false} />
+          <YAxis
+            allowDecimals={false}
+            axisLine={false}
+            tickLine={false}
+            label={{ value: "Product", angle: -90 }}
+          />
+          <Tooltip
+            cursor={false}
+            itemStyle={{
+              color: "hsl(var(--foreground))",
+              backgroundColor: "hsl(var(--background))",
+            }}
+            contentStyle={{ backgroundColor: "hsl(var(--background))" }}
+          />
+          <Bar
+            dataKey="products"
+            style={{ fill: "hsl(var(--foreground))" }}
+            radius={[5, 5, 0, 0]}
+          />
+        </BarChart>
+      </ResponsiveContainer>
+    </Flex>
   );
 };
 

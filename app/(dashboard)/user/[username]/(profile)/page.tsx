@@ -6,7 +6,7 @@ interface Params {
 
 const ProfilePage = async ({ params: { username } }: Params) => {
   return (
-    <div className="container">
+    <div className="w-full">
       <Profile username={username} />
     </div>
   );

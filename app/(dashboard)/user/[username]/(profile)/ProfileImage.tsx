@@ -12,10 +12,10 @@ const ProfileImage = ({ src, name }: Props) => {
   return (
     <Image
       removeWrapper
-      radius="none"
-      width={200}
-      height={200}
-      className="object-contain"
+      radius="full"
+      width={720}
+      height={720}
+      className="object-contain w-56"
       as={NextImage}
       alt={name}
       src={src || getCldImageUrl({ src: "my-next-app/gcka5o2orshvf2mgm7vm", width: 200 })}
