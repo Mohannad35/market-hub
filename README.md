@@ -1,8 +1,7 @@
-<h1 align="center">Market Hub</h1>
+# Market Hub
 
 ## Table of Contents
 
-- [Table of Contents](#table-of-contents)
 - [About The Project](#about-the-project)
 - [Main Features](#main-features)
 - [Environmental variables](#environmental-variables)
