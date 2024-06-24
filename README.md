@@ -1,5 +1,7 @@
 # Market Hub
 
+[![Made with Prisma](http://made-with.prisma.io/dark.svg)](https://prisma.io)
+
 ## Table of Contents
 
 - [About The Project](#about-the-project)
