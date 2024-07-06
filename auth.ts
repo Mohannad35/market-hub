@@ -12,11 +12,11 @@ import { idSchema } from "./lib/validation/common-schema";
 import prisma from "./prisma/client";
 import { Role } from "@prisma/client";
 
-if (!process.env.NEXT_PUBLIC_AUTH_GOOGLE_ID) {
-  throw new Error("NEXT_PUBLIC_AUTH_GOOGLE_ID is not set");
+if (!process.env.AUTH_GOOGLE_ID) {
+  throw new Error("AUTH_GOOGLE_ID is not set");
 }
-if (!process.env.NEXT_PUBLIC_AUTH_GOOGLE_SECRET) {
-  throw new Error("NEXT_PUBLIC_AUTH_GOOGLE_SECRET is not set");
+if (!process.env.AUTH_GOOGLE_SECRET) {
+  throw new Error("AUTH_GOOGLE_SECRET is not set");
 }
 
 declare module "next-auth" {
@@ -79,8 +79,8 @@ const providers: Provider[] = [
     },
   }),
   Google({
-    clientId: process.env.NEXT_PUBLIC_AUTH_GOOGLE_ID,
-    clientSecret: process.env.NEXT_PUBLIC_AUTH_GOOGLE_SECRET,
+    clientId: process.env.AUTH_GOOGLE_ID,
+    clientSecret: process.env.AUTH_GOOGLE_SECRET,
     async profile(profile, tokens) {
       // Create a username for the user
       let username = slugify(profile.name, { lower: true, strict: true, replacement: "_" });
@@ -97,8 +97,8 @@ const providers: Provider[] = [
     },
   }),
   Github({
-    clientId: process.env.NEXT_PUBLIC_AUTH_GITHUB_ID,
-    clientSecret: process.env.NEXT_PUBLIC_AUTH_GITHUB_SECRET,
+    clientId: process.env.AUTH_GITHUB_ID,
+    clientSecret: process.env.AUTH_GITHUB_SECRET,
     async profile(profile, tokens) {
       // Create a username for the user
       let username = slugify(profile.name!, { lower: true, strict: true, replacement: "_" });
@@ -131,7 +131,7 @@ export const providerMap = providers.map(provider => {
 });
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
-  secret: process.env.NEXT_PUBLIC_AUTH_SECRET,
+  secret: process.env.AUTH_SECRET,
   adapter: PrismaAdapter(prisma) as import("@auth/core/adapters").Adapter,
   trustHost: true,
   pages: { signIn: "/auth", newUser: "/auth" },

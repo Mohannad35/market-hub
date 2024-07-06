@@ -111,12 +111,11 @@ const Uoload = ({
       </Flex>
 
       <CldUploadWidget
-        uploadPreset={process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET}
         signatureEndpoint="/api/sign-cloudinary-params"
         options={{
           resourceType: "image",
-          sources: ["local", "url", "camera", "image_search", "facebook", "dropbox", "instagram"],
-          googleApiKey: process.env.NEXT_PUBLIC_CLOUDINARY_GOOGLE_API_KEY,
+          sources: ["local", "url", "camera", "image_search", "dropbox"],
+          googleApiKey: process.env.CLOUDINARY_GOOGLE_API_KEY,
           showAdvancedOptions: false,
           cropping: true,
           croppingAspectRatio: 1,
