@@ -15,7 +15,7 @@ const ProfileImage = ({ src, name }: Props) => {
       radius="full"
       width={720}
       height={720}
-      className="object-contain w-56"
+      className="w-56 object-contain"
       as={NextImage}
       alt={name}
       src={src || getCldImageUrl({ src: "my-next-app/gcka5o2orshvf2mgm7vm", width: 200 })}

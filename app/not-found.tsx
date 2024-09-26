@@ -35,7 +35,7 @@ export default function NotFound() {
           alt="astronaut"
           width={43}
           height={43}
-          className="animate-spin-slow absolute right-[30px] top-[240px]"
+          className="absolute right-[30px] top-[240px] animate-spin-slow"
         />
         <Image src="/planet.svg" alt="planet" width={400} height={400} />
         <Button

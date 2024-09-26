@@ -16,7 +16,7 @@ export default withSentryConfig(nextConfig, {
   // For all available options, see:
   // https://github.com/getsentry/sentry-webpack-plugin#options
 
-  org: "cyber-company0-0",
+  org: "mohannad-co",
   project: "market-hub",
 
   // Only print logs for uploading source maps in CI

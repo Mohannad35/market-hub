@@ -26,7 +26,7 @@ const TopContent = (props: TopContentProps) => {
   } = props;
 
   return (
-    <Flex className="flex flex-col gap-4 z-20">
+    <Flex className="z-20 flex flex-col gap-4">
       <Flex
         direction={{ initial: "column", md: "row" }}
         justify={"between"}
