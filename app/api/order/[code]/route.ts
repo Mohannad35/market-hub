@@ -8,8 +8,9 @@ import { NextRequest, NextResponse } from "next/server";
 
 async function GET_handler(
   request: NextRequest,
-  { params: { code } }: { params: { code: string } }
+  { params }: { params: Promise<{ code: string }> }
 ) {
+  const { code } = await params;
   const { id } = JSON.parse(request.cookies.get("user")!.value!) as User;
   const user = await prisma.user.findUnique({ where: { id } });
   if (!user) throw new ApiError(401, "Unauthorized");

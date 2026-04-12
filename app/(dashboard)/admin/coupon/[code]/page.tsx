@@ -3,7 +3,8 @@ import { dehydrate, HydrationBoundary, QueryClient } from "@tanstack/react-query
 import React from "react";
 import CouponDetails from "./CouponDetails";
 
-const CouponDetailsPage = async ({ params: { code } }: { params: { code: string } }) => {
+const CouponDetailsPage = async ({ params }: { params: Promise<{ code: string }> }) => {
+  const { code } = await params;
   const queryClient = new QueryClient();
   await queryClient.prefetchQuery({ queryKey: ["getCoupon", code], queryFn: getCoupon });
 

@@ -23,8 +23,9 @@ import { NextRequest, NextResponse } from "next/server";
  */
 async function GET_handler(
   request: NextRequest,
-  { params: { slug } }: { params: { slug: string } }
+  { params }: { params: Promise<{ slug: string }> }
 ): Promise<NextResponse<CategoryWithProducts | Category | null>> {
+  const { slug } = await params;
   const path = decodeURI("/" + slug.replace(/\-/g, "/"));
   const searchParams = request.nextUrl.searchParams;
   const query = getQueryObject(searchParams);
@@ -40,8 +41,9 @@ async function GET_handler(
 
 const PATCH_handler = async (
   request: NextRequest,
-  { params: { slug } }: { params: { slug: string } }
+  { params }: { params: Promise<{ slug: string }> }
 ): Promise<NextResponse<Category>> => {
+  const { slug } = await params;
   const path = decodeURI("/" + slug.replace(/\-/g, "/"));
   // Get the category from the database and check if it exists
   const category = await prisma.category.findUnique({ where: { path } });
@@ -78,8 +80,9 @@ const PATCH_handler = async (
 
 const DELETE_handler = async (
   request: NextRequest,
-  { params: { slug } }: { params: { slug: string } }
+  { params }: { params: Promise<{ slug: string }> }
 ): Promise<NextResponse<Category>> => {
+  const { slug } = await params;
   const path = decodeURI("/" + slug.replace(/\-/g, "/"));
   // Check if the category exists
   const category = await prisma.category.findUnique({ where: { path } });

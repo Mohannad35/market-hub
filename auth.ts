@@ -12,11 +12,11 @@ import { idSchema } from "./lib/validation/common-schema";
 import prisma from "./prisma/client";
 import { Role } from "@prisma/client";
 
-if (!process.env.AUTH_GOOGLE_ID) {
-  throw new Error("AUTH_GOOGLE_ID is not set");
+if (!process.env.AUTH_GOOGLE_ID && process.env.NODE_ENV === "production" && !process.env.NEXT_PHASE) {
+  console.warn("AUTH_GOOGLE_ID is not set");
 }
-if (!process.env.AUTH_GOOGLE_SECRET) {
-  throw new Error("AUTH_GOOGLE_SECRET is not set");
+if (!process.env.AUTH_GOOGLE_SECRET && process.env.NODE_ENV === "production" && !process.env.NEXT_PHASE) {
+  console.warn("AUTH_GOOGLE_SECRET is not set");
 }
 
 declare module "next-auth" {

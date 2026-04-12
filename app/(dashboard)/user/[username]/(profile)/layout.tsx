@@ -2,8 +2,9 @@ import { getProfile } from "@/lib/query-functions/user";
 import { dehydrate, HydrationBoundary, QueryClient } from "@tanstack/react-query";
 import { ReactNode } from "react";
 
-type Props = Readonly<{ children: ReactNode; params: { username: string } }>;
-const ProfileLayout = async ({ children, params: { username } }: Props) => {
+type Props = Readonly<{ children: ReactNode; params: Promise<{ username: string }> }>;
+const ProfileLayout = async ({ children, params }: Props) => {
+  const { username } = await params;
   const queryClient = new QueryClient();
   await queryClient.prefetchQuery({ queryKey: ["getProfile", username], queryFn: getProfile });
 

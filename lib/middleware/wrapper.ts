@@ -1,6 +1,7 @@
 import { logger } from "@/logger";
 import { ApiError } from "next/dist/server/api-utils";
 import { NextRequest, NextResponse } from "next/server";
+import type { AppRouteContext } from "./route-context";
 
 /**
  * Wrapper middleware to handle errors and exceptions in the route handlers
@@ -9,10 +10,10 @@ import { NextRequest, NextResponse } from "next/server";
  */
 export const wrapperMiddleware =
   (...handlers: Function[]) =>
-  async (request: NextRequest, response: NextResponse) => {
+  async (request: NextRequest, context: AppRouteContext) => {
     try {
       for (const handler of handlers) {
-        const res = await handler(request, response);
+        const res = await handler(request, context);
         if (res instanceof NextResponse) return res;
       }
     } catch (error) {

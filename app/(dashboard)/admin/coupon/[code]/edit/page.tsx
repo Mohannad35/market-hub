@@ -2,7 +2,8 @@ import { getCoupon } from "@/lib/query-functions/coupon";
 import { dehydrate, HydrationBoundary, QueryClient } from "@tanstack/react-query";
 import EditCouponForm from "./EditCouponForm";
 
-const EditCouponPage = async ({ params: { code } }: { params: { code: string } }) => {
+const EditCouponPage = async ({ params }: { params: Promise<{ code: string }> }) => {
+  const { code } = await params;
   const queryClient = new QueryClient();
   await queryClient.prefetchQuery({ queryKey: ["getCouponEdit", code], queryFn: getCoupon });
 

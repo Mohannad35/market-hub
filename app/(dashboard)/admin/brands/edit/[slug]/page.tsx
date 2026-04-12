@@ -2,7 +2,8 @@ import { getBrand } from "@/lib/query-functions/brand";
 import { dehydrate, HydrationBoundary, QueryClient } from "@tanstack/react-query";
 import EditProductForm from "./EditBrandForm";
 
-const EditProductPage = async ({ params: { slug } }: { params: { slug: string } }) => {
+const EditProductPage = async ({ params }: { params: Promise<{ slug: string }> }) => {
+  const { slug } = await params;
   const queryClient = new QueryClient();
   await queryClient.prefetchQuery({ queryKey: ["getBrandEdit", slug], queryFn: getBrand });
 

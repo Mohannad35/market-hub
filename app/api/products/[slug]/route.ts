@@ -27,8 +27,9 @@ import slugify from "slugify";
  */
 const GET_handler = async (
   request: NextRequest,
-  { params: { slug } }: { params: { slug: string } }
+  { params }: { params: Promise<{ slug: string }> }
 ): Promise<NextResponse<ProductWithBrandAndCategoryAndRates | Product | null>> => {
+  const { slug } = await params;
   const searchParams = request.nextUrl.searchParams;
   const query = getQueryObject(searchParams);
   const { success, data, error } = productDetailsQuerySchema.safeParse(query);
@@ -49,8 +50,9 @@ const GET_handler = async (
 
 const PATCH_handler = async (
   request: NextRequest,
-  { params: { slug } }: { params: { slug: string } }
+  { params }: { params: Promise<{ slug: string }> }
 ): Promise<NextResponse<ProductWithBrandAndCategory | Product | {}>> => {
+  const { slug } = await params;
   const user = JSON.parse(request.cookies.get("user")!.value!) as User;
   // Check if the product exists
   const product = await prisma.product.findUnique({ where: { slug } });
@@ -79,8 +81,9 @@ const PATCH_handler = async (
 
 const DELETE_handler = async (
   request: NextRequest,
-  { params: { slug } }: { params: { slug: string } }
+  { params }: { params: Promise<{ slug: string }> }
 ): Promise<NextResponse<ProductWithBrandAndCategoryAndRates | Product>> => {
+  const { slug } = await params;
   const user = JSON.parse(request.cookies.get("user")!.value!) as User;
   // Check if the product exists
   const product = await prisma.product.findUnique({ where: { slug } });

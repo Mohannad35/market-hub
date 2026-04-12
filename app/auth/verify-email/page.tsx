@@ -16,11 +16,12 @@ else sendgrid.setApiKey(process.env.SENDGRID_API_KEY);
 const VerifyEmailPage = async ({
   searchParams,
 }: {
-  searchParams?: { [key: string]: string | string[] | undefined };
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }) => {
-  const headersList = headers();
+  const headersList = await headers();
   const baseUrl = `${headersList.get("x-forwarded-proto")}://${headersList.get("host")}`;
-  const token = searchParams?.token as string | undefined;
+  const sp = await searchParams;
+  const token = sp?.token as string | undefined;
   let message = "Verifying email...";
   let verified = false;
   // Checks if a verification token is provided in the URL.

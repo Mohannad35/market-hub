@@ -1,7 +1,8 @@
 import { Role, User } from "@prisma/client";
 import { ApiError } from "next/dist/server/api-utils";
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import { authMiddleware } from "./auth";
+import type { AppRouteContext } from "./route-context";
 
 /**
  * Check if the user has the required permissions
@@ -26,8 +27,8 @@ export function isAllowed(minAllowedRole: Role, user: User): boolean {
  * @param permissions { Permissions } The permissions required
  */
 export const allowedMiddleware =
-  (role: Role) => async (request: NextRequest, response: NextResponse) => {
-    await authMiddleware(request, response);
+  (role: Role) => async (request: NextRequest, context: AppRouteContext) => {
+    await authMiddleware(request, context);
     const user = JSON.parse(request.cookies.get("user")!.value!) as User;
     if (isAllowed(role, user)) return;
     throw new ApiError(403, "Unauthorized");

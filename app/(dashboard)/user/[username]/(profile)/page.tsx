@@ -1,10 +1,11 @@
 import Profile from "./Profile";
 
 interface Params {
-  params: { username: string };
+  params: Promise<{ username: string }>;
 }
 
-const ProfilePage = async ({ params: { username } }: Params) => {
+const ProfilePage = async ({ params }: Params) => {
+  const { username } = await params;
   return (
     <div className="w-full">
       <Profile username={username} />

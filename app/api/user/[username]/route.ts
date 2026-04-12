@@ -8,8 +8,9 @@ import { NextRequest, NextResponse } from "next/server";
 
 async function GET_handler(
   request: NextRequest,
-  { params: { username } }: { params: { username: string } }
+  { params }: { params: Promise<{ username: string }> }
 ): Promise<NextResponse<Partial<User> | null>> {
+  const { username } = await params;
   const session = await auth();
   const user = await prisma.user.findUnique({ where: { username } });
   if (!user) throw new ApiError(404, "Not Found");

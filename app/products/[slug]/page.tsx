@@ -8,10 +8,11 @@ import ProductsYouMayLike from "./ProductsYouMayLike";
 import { getProduct } from "@/lib/query-functions/product";
 
 interface Params {
-  params: { slug: string };
+  params: Promise<{ slug: string }>;
 }
 
-export default async function ProductDetailsPage({ params: { slug } }: Params) {
+export default async function ProductDetailsPage({ params }: Params) {
+  const { slug } = await params;
   const queryClient = new QueryClient();
 
   await queryClient.prefetchQuery({ queryKey: ["product", slug], queryFn: getProduct });

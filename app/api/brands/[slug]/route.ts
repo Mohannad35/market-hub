@@ -13,8 +13,9 @@ import slugify from "slugify";
 
 async function GET_handler(
   request: NextRequest,
-  { params: { slug } }: { params: { slug: string } }
+  { params }: { params: Promise<{ slug: string }> }
 ): Promise<NextResponse<BrandWithProducts | Brand | null>> {
+  const { slug } = await params;
   const searchParams = request.nextUrl.searchParams;
   const query = getQueryObject(searchParams);
   const { success, data, error } = brandQuerySchema.safeParse(query);
@@ -26,8 +27,9 @@ async function GET_handler(
 
 const PATCH_handler = async (
   request: NextRequest,
-  { params: { slug } }: { params: { slug: string } }
+  { params }: { params: Promise<{ slug: string }> }
 ): Promise<NextResponse<Brand>> => {
+  const { slug } = await params;
   // Get the brand from the database and check if it exists
   const brand = await prisma.brand.findUnique({ where: { slug } });
   if (!brand) throw new ApiError(404, "Brand not found");
@@ -53,8 +55,9 @@ const PATCH_handler = async (
 
 const DELETE_handler = async (
   request: NextRequest,
-  { params: { slug } }: { params: { slug: string } }
+  { params }: { params: Promise<{ slug: string }> }
 ): Promise<NextResponse<Brand>> => {
+  const { slug } = await params;
   // Check if the brand exists
   const brand = await prisma.brand.findUnique({ where: { slug } });
   if (!brand) throw new ApiError(404, "Brand not found");
