@@ -2,11 +2,12 @@
 
 import Pagination from "@/components/common/Pagination";
 import { Flex, Grid, Text } from "@radix-ui/themes";
+import React from "react";
 
 type Props = {
   items: any[];
   count: number;
-  Card: JSX.ElementType;
+  Card: React.ComponentType<any>;
   label: string;
   className?: string;
   showDelete?: boolean;

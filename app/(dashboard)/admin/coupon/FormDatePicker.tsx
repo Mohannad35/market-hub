@@ -41,7 +41,7 @@ const FormDatePicker = ({ form, tooltip, ...props }: Props) => {
                       : undefined
                   }
                   onChange={date => {
-                    field.onChange(new Date(date.toDate(getLocalTimeZone())));
+                    field.onChange(date ? new Date(date.toDate(getLocalTimeZone())) : null);
                   }}
                   isDisabled={field.disabled}
                   onBlur={field.onBlur}

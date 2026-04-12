@@ -81,7 +81,10 @@ const ProfileTabForm = ({ username }: { username: string }) => {
       }
     });
     // if no changes detected, return
-    if (differences.length < 1) return toast.error("No changes detected");
+    if (differences.length < 1) {
+      toast.error("No changes detected");
+      return;
+    }
     const bodyEdits = pick(newData, differences);
     const promise = new Promise<User>(async (resolve, reject) => {
       await editProfileMutation.mutateAsync(bodyEdits).then(resolve).catch(reject);
@@ -172,7 +175,7 @@ const ProfileTabForm = ({ username }: { username: string }) => {
             )
           }
           value={birthday}
-          onChange={setBirthday}
+          onChange={(value: DateValue | null) => setBirthday(value ?? undefined)}
         />
 
         <Button type="submit" color="primary" isLoading={editProfileMutation.isPending}>

@@ -65,8 +65,14 @@ const EditProductForm = ({ slug }: { slug: string }) => {
   if (!isSuccess || !data) return <Text>Product not found</Text>;
 
   const handleSubmit = async (formData: FormData) => {
-    if (resources.length < 1) return toast.error("A product needs at least one image");
-    if (!brandId || !categoryId) return toast.error("Brand and Category are required");
+    if (resources.length < 1) {
+      toast.error("A product needs at least one image");
+      return;
+    }
+    if (!brandId || !categoryId) {
+      toast.error("Brand and Category are required");
+      return;
+    }
     const body = getFormDataObject<TBody>(formData);
     // compare old product data with new data
     const newData = { ...body, image: resources, brandId, categoryId };
@@ -85,7 +91,10 @@ const EditProductForm = ({ slug }: { slug: string }) => {
       }
     });
     // if no changes detected, return
-    if (differences.length < 1) return toast.error("No changes detected");
+    if (differences.length < 1) {
+      toast.error("No changes detected");
+      return;
+    }
     const bodyEdits = pick(newData, differences);
     const promise = new Promise<Product>(async (resolve, reject) => {
       await editProductMutation.mutateAsync(bodyEdits).then(resolve).catch(reject);
@@ -175,11 +184,11 @@ const EditProductForm = ({ slug }: { slug: string }) => {
               label="Category"
               variant="underlined"
               selectedKey={categoryId}
-              onSelectionChange={key => setCategoryId(key as string)}
+              onSelectionChange={(key: React.Key | null) => setCategoryId(key as string)}
               validate={() => validateSchema(categoryId, idSchema("Category"))}
-              errorMessage={valid => valid.validationErrors}
+              errorMessage={valid => (valid as any).validationErrors}
             >
-              {category => <AutocompleteItem key={category.id}>{category.name}</AutocompleteItem>}
+              {(category: Category) => <AutocompleteItem key={category.id}>{category.name}</AutocompleteItem>}
             </Autocomplete>
           )}
           {brandQuery.isSuccess && (
@@ -189,11 +198,11 @@ const EditProductForm = ({ slug }: { slug: string }) => {
               label="Brand"
               variant="underlined"
               selectedKey={brandId}
-              onSelectionChange={key => setBrandId(key as string)}
+              onSelectionChange={(key: React.Key | null) => setBrandId(key as string)}
               validate={() => validateSchema(brandId, idSchema("Brand"))}
-              errorMessage={valid => valid.validationErrors}
+              errorMessage={valid => (valid as any).validationErrors}
             >
-              {brand => <AutocompleteItem key={brand.id}>{brand.name}</AutocompleteItem>}
+              {(brand: Brand) => <AutocompleteItem key={brand.id}>{brand.name}</AutocompleteItem>}
             </Autocomplete>
           )}
         </Flex>

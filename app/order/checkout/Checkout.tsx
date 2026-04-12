@@ -10,9 +10,6 @@ import { stringMinMaxSchema, stringSchema } from "@/lib/validation/common-schema
 import { OrderValues } from "@/lib/validation/order-schema";
 import { Icon as Iconify } from "@iconify/react";
 import {
-  Autocomplete,
-  AutocompleteItem,
-  Avatar,
   Button,
   Card,
   CardBody,
@@ -23,6 +20,8 @@ import {
   SelectItem,
   Textarea,
 } from "@nextui-org/react";
+import { Autocomplete, AutocompleteItem } from "@nextui-org/autocomplete";
+import { Avatar } from "@nextui-org/avatar";
 import { MailFilledIcon } from "@nextui-org/shared-icons";
 import { Order, Phone } from "@prisma/client";
 import { Flex, Text } from "@radix-ui/themes";
@@ -34,6 +33,7 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
+import React from "react";
 
 const Checkout = () => {
   const router = useRouter();
@@ -95,8 +95,10 @@ const Checkout = () => {
     const paymentMethod = payment === "all" ? "cod" : payment.values().next().value;
     const body = getFormDataObject<{ address: string; phone: string; email: string }>(form);
     const phoneNumber = parsePhoneNumber(body.phone, countryCode as CountryCode);
-    if (!phoneNumber.isValid() || !phoneNumber.isPossible())
-      return toast.error("Invalid phone number", { id: "phone" + nanoid(4) });
+    if (!phoneNumber.isValid() || !phoneNumber.isPossible()) {
+      toast.error("Invalid phone number", { id: "phone" + nanoid(4) });
+      return;
+    }
     const promise = new Promise<Order>(async (resolve, reject) =>
       orderMutation
         .mutateAsync({
@@ -168,16 +170,16 @@ const Checkout = () => {
                 <div className="flex items-center">
                   <Autocomplete
                     type="tel"
-                    defaultItems={Object.entries(pick(countries, ["US", "EG", "NG", "IN", "BR"]))}
+                    defaultItems={Object.entries(pick(countries, ["US", "EG", "NG", "IN", "BR"])) as any}
                     aria-label="Select Country"
                     variant="underlined"
                     size="sm"
                     classNames={{ base: "w-[8rem] p-0", popoverContent: "w-[20rem]" }}
                     isClearable={false}
                     selectedKey={countryCode}
-                    onSelectionChange={key => setCountryCode(key as string)}
+                    onSelectionChange={(key: React.Key | null) => setCountryCode(key as string)}
                   >
-                    {([key, { name, phone }]) => (
+                    {([key, { name, phone }]: [string, any]) => (
                       <AutocompleteItem
                         key={key}
                         value={name}

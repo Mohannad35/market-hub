@@ -15,9 +15,10 @@ import { Button } from "@nextui-org/button";
 import { Input, Textarea } from "@nextui-org/input";
 import { Brand, Category, Product } from "@prisma/client";
 import { Flex, Text } from "@radix-ui/themes";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
 import { toast } from "sonner";
+import React, { useState } from "react";
+import { useRouter } from "next/navigation";
+
 
 type DataKey = "name" | "description" | "price" | "quantity" | "image" | "brandId" | "categoryId";
 type TBody = Pick<Modify<Product, { price: string; quantity: string }>, DataKey>;
@@ -39,8 +40,14 @@ const NewProductForm = () => {
   });
 
   const handleSubmit = async (formData: FormData) => {
-    if (resources.length < 1) return toast.error("A product needs at least one image");
-    if (!brandId || !categoryId) return toast.error("Brand and Category are required");
+    if (resources.length < 1) {
+      toast.error("A product needs at least one image");
+      return;
+    }
+    if (!brandId || !categoryId) {
+      toast.error("Brand and Category are required");
+      return;
+    }
     const data = getFormDataObject<TBody>(formData);
     const promise = new Promise<{ name: string }>(async (resolve, reject) => {
       await addProductMutation
@@ -130,11 +137,11 @@ const NewProductForm = () => {
               label="Category"
               variant="underlined"
               selectedKey={categoryId}
-              onSelectionChange={key => setCategoryId(key as string)}
+              onSelectionChange={(key: React.Key | null) => setCategoryId(key as string)}
               validate={() => validateSchema(categoryId, idSchema("Category"))}
-              errorMessage={valid => valid.validationErrors}
+              errorMessage={(valid: any) => valid.validationErrors}
             >
-              {category => <AutocompleteItem key={category.id}>{category.name}</AutocompleteItem>}
+              {(category: Category) => <AutocompleteItem key={category.id}>{category.name}</AutocompleteItem>}
             </Autocomplete>
           )}
           {brandQuery.isSuccess && (
@@ -144,11 +151,11 @@ const NewProductForm = () => {
               label="Brand"
               variant="underlined"
               selectedKey={brandId}
-              onSelectionChange={key => setBrandId(key as string)}
+              onSelectionChange={(key: React.Key | null) => setBrandId(key as string)}
               validate={() => validateSchema(brandId, idSchema("Brand"))}
-              errorMessage={valid => valid.validationErrors}
+              errorMessage={(valid: any) => valid.validationErrors}
             >
-              {brand => <AutocompleteItem key={brand.id}>{brand.name}</AutocompleteItem>}
+              {(brand: Brand) => <AutocompleteItem key={brand.id}>{brand.name}</AutocompleteItem>}
             </Autocomplete>
           )}
         </Flex>

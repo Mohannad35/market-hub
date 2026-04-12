@@ -7,7 +7,7 @@ import { Modify } from "@/lib/types";
 import { Autocomplete, AutocompleteItem, AutocompleteProps } from "@nextui-org/autocomplete";
 import { Category } from "@prisma/client";
 import { useRouter, useSearchParams } from "next/navigation";
-import { ReactNode, useEffect, useState } from "react";
+import React, { ReactNode, useEffect, useState } from "react";
 
 type CategorySelectProps = Modify<
   AutocompleteProps,
@@ -48,10 +48,14 @@ const CategorySelect = ({ uniqueKey, ...props }: CategorySelectProps) => {
         listboxWrapper: "w-[320px]",
       }}
       selectedKey={category}
-      onSelectionChange={setCategory}
+      onSelectionChange={(key: React.Key | null) => setCategory(key as string)}
       {...props}
     >
-      {category => <AutocompleteItem key={category.path}>{category.name}</AutocompleteItem>}
+      {category => (
+        <AutocompleteItem key={(category as Category).path}>
+          {(category as Category).name}
+        </AutocompleteItem>
+      )}
     </Autocomplete>
   );
 };

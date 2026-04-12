@@ -12,9 +12,6 @@ import { Input } from "@nextui-org/input";
 import {
   Accordion,
   AccordionItem,
-  Autocomplete,
-  AutocompleteItem,
-  Avatar,
   Checkbox,
   DatePicker,
   Link,
@@ -23,6 +20,8 @@ import {
   Textarea,
   Tooltip,
 } from "@nextui-org/react";
+import { Autocomplete, AutocompleteItem } from "@nextui-org/autocomplete";
+import { Avatar } from "@nextui-org/avatar";
 import { Gender, Phone, User } from "@prisma/client";
 import { Flex, Text } from "@radix-ui/themes";
 import { countries } from "countries-list";
@@ -308,7 +307,7 @@ const SignupForm = ({ setTab }: { setTab: Dispatch<SetStateAction<string | numbe
                                 : undefined
                             }
                             onChange={date => {
-                              field.onChange(new Date(date.toDate(getLocalTimeZone())));
+                              field.onChange(date ? new Date(date.toDate(getLocalTimeZone())) : null);
                             }}
                             isDisabled={field.disabled}
                             name={field.name}
@@ -340,16 +339,16 @@ const SignupForm = ({ setTab }: { setTab: Dispatch<SetStateAction<string | numbe
                                   type="tel"
                                   defaultItems={Object.entries(
                                     pick(countries, ["US", "EG", "NG", "IN", "BR"])
-                                  )}
+                                  ) as any}
                                   aria-label="Select Country"
                                   variant="underlined"
                                   size="sm"
                                   classNames={{ base: "w-[8rem] p-0", popoverContent: "w-[20rem]" }}
                                   isClearable={false}
                                   selectedKey={countryCode}
-                                  onSelectionChange={key => setCountryCode(key as string)}
+                                  onSelectionChange={(key: React.Key | null) => setCountryCode(key as string)}
                                 >
-                                  {([key, { name, phone }]) => (
+                                  {([key, { name, phone }]: [string, { name: string; phone: string }]) => (
                                     <AutocompleteItem
                                       key={key}
                                       value={name}

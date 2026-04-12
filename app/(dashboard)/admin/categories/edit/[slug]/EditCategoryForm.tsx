@@ -50,7 +50,10 @@ const EditCategoryForm = ({ slug }: { slug: string }) => {
   if (!isSuccess || !data) return <Text>Category not found</Text>;
 
   const handleSubmit = async (formData: FormData) => {
-    if (resources.length < 1) return toast.error("A category needs an image");
+    if (resources.length < 1) {
+      toast.error("A category needs an image");
+      return;
+    }
     const { name } = getFormDataObject<Pick<Category, "name">>(formData);
     // compare old category data with new data
     const newData = { name, image: resources[0], parent: parentPath ? parentPath : "/" };
@@ -58,7 +61,10 @@ const EditCategoryForm = ({ slug }: { slug: string }) => {
       key => !isEqual(newData[key as DataKey], data[key as DataKey])
     );
     // if no changes detected, return
-    if (differences.length < 1) return toast.error("No changes detected");
+    if (differences.length < 1) {
+      toast.error("No changes detected");
+      return;
+    }
     const bodyEdits = pick(newData, differences);
     const promise = new Promise<Category>(async (resolve, reject) => {
       await editCategoryMutation.mutateAsync(bodyEdits).then(resolve).catch(reject);
@@ -113,13 +119,13 @@ const EditCategoryForm = ({ slug }: { slug: string }) => {
             label="Parent Category"
             variant="underlined"
             selectedKey={parentPath}
-            onSelectionChange={key => setParentPath(key as string)}
+            onSelectionChange={(key: React.Key | null) => setParentPath(key as string)}
             validate={() =>
               validateSchema(parentPath, stringSchema("Category").nullish().optional())
             }
-            errorMessage={valid => valid.validationErrors}
+            errorMessage={valid => (valid as any).validationErrors}
           >
-            {category => <AutocompleteItem key={category.path}>{category.name}</AutocompleteItem>}
+            {(category: Category) => <AutocompleteItem key={category.path}>{category.name}</AutocompleteItem>}
           </Autocomplete>
         )}
 

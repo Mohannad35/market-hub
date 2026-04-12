@@ -48,7 +48,10 @@ const VendorTabForm = ({ username }: { username: string }) => {
       key => !isEqual(newData[key as DataKey], data[key as DataKey])
     );
     // if no changes detected, return
-    if (differences.length < 1) return toast.error("No changes detected");
+    if (differences.length < 1) {
+      toast.error("No changes detected");
+      return;
+    }
     const bodyEdits = pick(newData, differences);
     const promise = new Promise<User>(async (resolve, reject) => {
       await editProfileMutation.mutateAsync(bodyEdits).then(resolve).catch(reject);

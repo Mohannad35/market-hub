@@ -43,7 +43,10 @@ const EditBrandForm = ({ slug }: { slug: string }) => {
   if (!isSuccess || !data) return <Text>Brand not found</Text>;
 
   const handleSubmit = async (formData: FormData) => {
-    if (resources.length < 1) return toast.error("A brand needs at least one image");
+    if (resources.length < 1) {
+      toast.error("A brand needs at least one image");
+      return;
+    }
     const { name } = getFormDataObject<Pick<Brand, "name">>(formData);
     // compare old brand data with new data
     const newData = { name, image: resources[0] };
@@ -51,7 +54,10 @@ const EditBrandForm = ({ slug }: { slug: string }) => {
       key => !isEqual(newData[key as DataKey], data[key as DataKey])
     );
     // if no changes detected, return
-    if (differences.length < 1) return toast.error("No changes detected");
+    if (differences.length < 1) {
+      toast.error("No changes detected");
+      return;
+    }
     const bodyEdits = pick(newData, differences);
     const promise = new Promise<Brand>(async (resolve, reject) => {
       await editBrandMutation.mutateAsync(bodyEdits).then(resolve).catch(reject);

@@ -22,11 +22,9 @@ export default function GlobalError({
     <html>
       <body>
         <Heading>Something went wrong!</Heading>
-        <Error
-          statusCode={error.props.statusCode}
-          title={error.props.title}
-          withDarkMode={error.props.withDarkMode}
-        />
+        <Text size="4" mt="4">
+          An unexpected error occurred. Please try again or contact support if the issue persists.
+        </Text>
         <Button color="primary" onClick={() => reset()}>
           Try again
         </Button>

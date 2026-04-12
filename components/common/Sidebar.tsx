@@ -3,7 +3,7 @@
 import { Accordion, AccordionItem } from "@nextui-org/accordion";
 import { Card, CardBody, CardHeader } from "@nextui-org/card";
 import { Listbox, ListboxItem } from "@nextui-org/listbox";
-import { cn } from "@nextui-org/system";
+import { cn } from "@/lib/utils";
 import { Selection } from "@nextui-org/table";
 
 interface SidebarItem {

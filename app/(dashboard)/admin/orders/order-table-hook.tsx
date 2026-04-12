@@ -25,7 +25,7 @@ import { capitalize } from "lodash";
 import moment from "moment";
 import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
-import { ChangeEvent, Key, useCallback, useEffect, useState } from "react";
+import React, { ChangeEvent, Key, useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
 import { columns, INITIAL_VISIBLE_COLUMNS, statusOptions } from "./order-table-data";
 
@@ -101,7 +101,7 @@ const DataTableHook = (
   const renderCell = (
     order: OrderIncluded,
     columnKey: Key
-  ): { content: JSX.Element; textValue: string } => {
+  ): { content: React.JSX.Element; textValue: string } => {
     const {
       code,
       address,

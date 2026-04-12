@@ -2,10 +2,10 @@
 
 import { Carousel, CarouselApi, CarouselContent, CarouselItem } from "@/components/ui/carousel";
 import { Image } from "@nextui-org/image";
-import { cn } from "@nextui-org/system";
+import { cn } from "@/lib/utils";
 import { Flex } from "@radix-ui/themes";
 import NextImage from "next/image";
-import { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 
 export function Slider({ items }: { items: { public_id: string; secure_url: string }[] }) {
   const [emblaMainApi, setEmblaMainApi] = useState<CarouselApi>();

@@ -28,7 +28,7 @@ import { capitalize } from "lodash";
 import moment from "moment";
 import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
-import { ChangeEvent, Key, useCallback, useEffect, useState } from "react";
+import React, { ChangeEvent, Key, useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
 import { columns, INITIAL_VISIBLE_COLUMNS, roleOptions } from "./users-table-data";
 
@@ -127,7 +127,7 @@ const DataTableHook = (
     }
   };
 
-  const renderCell = (user: User, columnKey: Key): { content: JSX.Element; textValue: string } => {
+  const renderCell = (user: User, columnKey: Key): { content: React.JSX.Element; textValue: string } => {
     const {
       name,
       email,

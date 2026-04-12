@@ -3,12 +3,13 @@
 import { useQueryHook } from "@/hook/use-tanstack-hooks";
 import { ScrollShadow } from "@nextui-org/react";
 import { Flex, Text } from "@radix-ui/themes";
+import React from "react";
 import LoadingIndicator from "./LoadingIndicator";
 
 type Props = {
   api: string;
   uniqueKey: string[];
-  Card: JSX.ElementType;
+  Card: React.ElementType;
   label: string;
   width?: string;
   className?: string;

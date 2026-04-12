@@ -25,7 +25,10 @@ const NewBrandForm = () => {
   ]);
 
   const handleSubmit = async (formData: FormData) => {
-    if (resources.length < 1) return toast.error("A brand needs at least one image");
+    if (resources.length < 1) {
+      toast.error("A brand needs at least one image");
+      return;
+    }
     const data = getFormDataObject<Pick<Brand, "name">>(formData);
     const { name } = data;
     const promise = new Promise<Brand>(async (resolve, reject) =>

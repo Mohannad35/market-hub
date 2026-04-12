@@ -32,7 +32,10 @@ const NewCategoryForm = () => {
   });
 
   const handleSubmit = async (formData: FormData) => {
-    if (resources.length < 1) return toast.error("A category needs at least one image");
+    if (resources.length < 1) {
+      toast.error("A category needs at least one image");
+      return;
+    }
     const data = getFormDataObject<Pick<Category, "name">>(formData);
     const { name } = data;
     const promise = new Promise<Category>(async (resolve, reject) =>
@@ -89,11 +92,11 @@ const NewCategoryForm = () => {
             label="Parent Category"
             variant="underlined"
             selectedKey={parentPath}
-            onSelectionChange={key => setParentPath(key as string)}
+            onSelectionChange={(key: React.Key | null) => setParentPath(key as string)}
             validate={() => validateSchema(parentPath, stringSchema("Category").optional())}
-            errorMessage={valid => valid.validationErrors}
+            errorMessage={(valid: any) => valid.validationErrors}
           >
-            {category => <AutocompleteItem key={category.path}>{category.name}</AutocompleteItem>}
+            {(category: Category) => <AutocompleteItem key={category.path}>{category.name}</AutocompleteItem>}
           </Autocomplete>
         )}
 
